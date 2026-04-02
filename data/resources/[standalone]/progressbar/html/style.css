@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap");
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    height: 100%;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+
+.progress-container {
+    position: fixed;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: none;
+}
+
+#progress-label {
+    position: relative;
+    font-size: 3.5vh;
+    font-weight: 700;
+    width: max-content;
+}
+
+.label-empty {
+    color: #ffffff33; /* Gri şeffaf arka plan */
+}
+
+.label-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #ffffff;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0%; /* Başlangıçta boş */
+    pointer-events: none;
+    text-shadow:
+        0 0 5px rgba(255, 255, 255, 0.3),
+        0 0 10px rgba(255, 255, 255, 0.2),
+        0 0 15px rgba(255, 255, 255, 0.1);
+}

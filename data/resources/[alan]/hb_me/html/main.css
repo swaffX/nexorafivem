@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap");
+.me-container{
+  width: 100%;
+  max-width: 320px; /* Will be AT MOST 320px wide */
+  word-wrap: break-word;
+  text-size-adjust: auto;
+  height: auto;
+  margin: 40px -10px;
+  background: #cd88e1a4;
+  border-bottom: 4px solid #cb73e6;
+  padding: 6px 10px;
+  text-align: center;
+  color: #fff;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  border-radius: 3px;
+}
+
+.me-container:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -18px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 11px solid #bbbbbb67; /* Gri renk */
+}
+
+.do-container{
+ width: 100%;
+  max-width: 320px; /* Will be AT MOST 320px wide */
+  word-wrap: break-word;
+  text-size-adjust: auto;
+  height: auto;
+  margin: 40px -10px;
+  background: #43bb99ae;
+  border-bottom: 4px solid #54E3BA;
+  padding: 6px 10px;
+  text-align: center;
+  color: #fff;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  border-radius: 3px;
+}
+
+.do-container:before {
+ content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -18px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 11px solid #bbbbbb67; /* Gri renk */
+}
+
+
+.icon-container {
+  min-height: 20px;
+  max-height: 20px;
+  min-width: 20px;
+  padding: 5px;
+  padding-top: 5px;
+  padding-bottom: 0px;
+  text-align: center;
+  background: #28272e;
+  color: #1a1c20;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.text-container {
+ padding: 5px;
+ padding-top: 5px;
+ padding-left: 5px;
+ font-family: Poppins, sans-serif;
+ letter-spacing: 1.1px;
+ font-weight: bold;
+ font-size: 14px;
+
+}
+
+b {
+  font-weight: 700;
+}

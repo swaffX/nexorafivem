@@ -1,0 +1,1041 @@
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+
+.bank {
+    display: none;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+     background: linear-gradient(28deg, rgb(163, 185, 185) 4%, rgba(235,239,247,1) 59%, rgba(243,245,251,1) 74%, rgba(244,246,251,1) 80%, rgba(238,238,238,1) 90%, rgba(230,230,230,1) 100%);
+    opacity: 0.0;
+    transition: opacity 0.2s;
+    overflow: hidden;
+}
+
+
+.bank > .header > .box1 {
+    position: absolute;
+    top: -7%;
+    left: -3%;
+    width: 150%;
+    height: 25%;
+    z-index: 1;
+}
+
+.bank > .header > .box2 {
+    position: absolute;
+    top: -1%;
+    width: 150%;
+    height: 12%;
+    z-index: 2;
+    border-bottom: 1px solid #a1a1a154;
+}
+
+.bank > .header > .title {
+    position: absolute;
+    top: 4%;
+    left: 6%;
+    color: black;
+    font-family: 'Fugaz One', cursive;
+    font-size: 0.8vw;
+    white-space: nowrap;
+    z-index: 3;
+}
+
+
+
+/* -------------------- */
+/* MAIN SCREEN DIZAINAS */
+/* -------------------- */
+.bank > .mainscreen {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    transition: 0.35s;
+}
+
+.bank > .mainscreen > .box {
+    position: relative;
+    margin: 0 auto;
+    margin-top: 5.5vw;
+
+    width: 100%;
+    height: 20%;
+    
+    border-radius: 0.5vw;
+}
+.bank > .mainscreen > .box > .character-name {
+    position: absolute;
+    left: 7%;
+    top: -20%;
+    margin: 0;
+
+    color: #000000;
+    font-size: 0.8vw;
+    font-family: "Poppins", sans-serif;
+    font-weight: 250;
+    transition: 0.1s;
+}
+
+.character-name strong {
+    font-weight: 700;
+    color: #000000;
+    font-family: "Poppins", sans-serif;
+}
+
+.bank > .mainscreen > .box > .titlefront {
+    position: absolute;
+    left: 7%;
+    top: 0;
+    margin: 0;
+    font-size: 0.75vw;
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    color: #000000;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .box > .title {
+    position: absolute;
+    left: 7%;
+    top: 20%;
+    margin: 0;
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 0.7vw;
+    font-family: Poppins;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .box > .title.clickable:hover {
+    color: rgba(26, 26, 26, 0.8);
+    cursor: pointer;
+}
+.bank > .mainscreen > .box > .balance {
+    position: absolute;
+    left: 6%;
+    top: 50%;
+    margin: 0;
+
+    color: white;
+    font-size: 0.85vw;
+    font-family: PoppinsMedium;
+    transition: 0.1s;
+
+    background-color: #7c9094; /* Yeşil kutu */
+     border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    width: 100px;  /* Kutunun genişliği (isteğe göre değiştir) */
+
+}
+.bank > .mainscreen > .box > .currency-eur {
+    position: absolute;
+    left: 52%;
+    top: 50%;
+    margin: 0;
+
+    color: white;
+    font-size: 0.85vw;
+    font-family: PoppinsMedium;
+    transition: 0.1s;
+
+    background-color: #7c9094; /* Aynı stil */
+    padding: 10px;
+    text-align: center;
+    border-radius: 4px;
+    width: 100px;
+}
+
+
+
+
+
+.bank > .mainscreen > .buttons {
+    display: flex;
+    flex-wrap: nowrap;
+
+    position: relative;
+    margin: 0 auto;
+    margin-top: 0.5vw;
+
+    width: 80%;
+}
+
+.bank > .mainscreen > .buttons > form[name="transfer"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    margin-top: 0.2vw; /* Daha yukarı */
+}
+
+/* Başlık */
+.bank > .mainscreen > .buttons > form[name="transfer"] .ttitle {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9vw;
+    font-weight: 600;
+    color: #222;
+    align-self: flex-start;
+    margin-left: -0.2vw; /* Sol inputla daha dengeli */
+    margin-bottom: 0.2vw; /* Daha az boşluk */
+}
+
+/* Inputları tutan kutu */
+.bank > .mainscreen > .buttons > form[name="transfer"] .transfer-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 1vw; /* Aradaki boşluk arttı */
+    width: 80%;
+    margin-bottom: 0.5vw; /* Butona yakınlaştırıldı */
+    margin-left: 1.5vw;
+}
+
+/* Input stilleri */
+.bank > .mainscreen > .buttons > form[name="transfer"] .transfer-inputs input {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.7vw;
+    width: 5vw;
+    padding: 0.3vw 0.5vw;
+    border: none;
+    border-bottom: 1.5px solid #aaa;
+    background-color: transparent;
+    outline: none;
+    text-align: left;
+    transition: border-color 0.2s;
+}
+
+.bank > .mainscreen > .buttons > form[name="transfer"] .transfer-inputs input:focus {
+    border-bottom: 1.5px solid #7ca663;
+}
+
+/* Gönder butonu */
+.bank > .mainscreen > .buttons > form[name="transfer"] .transferbutton {
+    width: 13vw;
+    height: 1.8vw;
+    border: none;
+    background-color: #7ca663;
+    color: white;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75vw;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease;
+    align-self: center;
+    margin-top: 0.2vw; /* Daha yakın */
+    margin-left: 1.5vw;
+}
+
+.bank > .mainscreen > .buttons > form[name="transfer"] .transferbutton:hover {
+    background-color: #596b4e;
+}
+
+
+.bank > .mainscreen > .buttons > .button {
+    position: relative;
+    height: 3.5vw;
+    
+    flex-grow: 1;
+
+    background: linear-gradient(to bottom right, var(--color-1), var(--color-2));
+    margin: 0.3vw;
+    border-radius: 0.3vw;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .buttons > .button:hover {
+    transform: translateY(-5%);
+    cursor: pointer;
+}
+
+.bank > .mainscreen > .buttons > .button > * {
+    pointer-events: none;
+}
+
+.bank > .mainscreen > .buttons > .button > .icon {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 1vw;
+    color: white;
+}
+
+.bank > .mainscreen > .buttons > .button > .title {
+    position: absolute;
+    bottom: 10%;
+
+    margin: 0;
+
+    width: 100%;
+    text-align: center;
+
+    color: white;
+    font-size: 0.55vw;
+    font-family: Poppins;
+}
+
+.bank > .mainscreen > .statement-title {
+    position: relative;
+    left: 16%;
+    margin: 0;
+    margin-top: 0.5vw;
+
+    color: rgba(255, 255, 255, 0.637);
+    font-size: 0.6vw;
+    font-family: Poppins;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement {
+    position: relative;
+    margin: 0 auto;
+    margin-top: 1vw;
+    /* padding-top: 0.5vw;
+    padding-left: 0.3vw; */
+    border-radius: 0.5vw;
+    width: 100% !important;
+    height: 42% !important;
+}
+
+.bank > .mainscreen > .statement > .buttons {
+    display: flex;
+    flex-wrap: nowrap;
+
+    position: relative;
+    margin: 0 auto;
+    margin-top: 0.2vw;
+
+    width: 80%;
+}
+
+.bank > .mainscreen > .statement > .buttons > .button {
+    position: relative;
+    height: 3.5vw;
+    
+    flex-grow: 1;
+    top: 1vw;
+    background: linear-gradient(to bottom right, var(--color-1), var(--color-2));
+    margin: 0.2vw;
+    border-radius: 0.3vw;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .buttons > .button:hover {
+    transform: translateY(-5%);
+    cursor: pointer;
+}
+
+.bank > .mainscreen > .statement > .buttons > .button > * {
+    pointer-events: none;
+}
+
+.bank > .mainscreen > .statement > .buttons > .button > .icon {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 1vw;
+    color: white;
+}
+
+.bank > .mainscreen > .statement > .buttons > .button > .title {
+    position: absolute;
+    bottom: 10%;
+
+    margin: 0;
+
+    width: 100%;
+    text-align: center;
+
+    color: white;
+    font-size: 0.55vw;
+    font-family: Poppins;
+}
+
+.bank > .mainscreen > .statement > .box {
+    position: relative;
+    margin: 0.2vw;
+
+    width: 80%;
+    height: 17%;
+}
+
+.bank > .mainscreen > .statement > .box > .title {
+    position: absolute;
+    left: 3%;
+    top: 23%;
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.637);
+    font-size: 0.6vw;
+    font-family: Poppins;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .box > .balance {
+    position: absolute;
+    left: 7%;
+    top: 70%;
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 0.85vw;
+    font-family: PoppinsMedium;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .box2 {
+    position: relative;
+    margin: 0.2vw;
+    
+
+    width: 80%;
+    height: 17%;
+}
+
+.bank > .mainscreen > .statement > .box2 > .title {
+    position: absolute;
+    left: 3%;
+    top: 23%;
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.637);
+    font-size: 0.6vw;
+    font-family: Poppins;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .box2 > .balance {
+    position: absolute;
+    left: 7%;
+    top: 70%;
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 0.85vw;
+    font-family: PoppinsMedium;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .box3 {
+    position: relative;
+    margin: 0.2vw;
+    
+
+    width: 80%;
+    height: 17%;
+}
+
+.bank > .mainscreen > .statement > .box3 > .title {
+    position: absolute;
+    left: 3%;
+    top: 23%;
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.637);
+    font-size: 0.6vw;
+    font-family: Poppins;
+    transition: 0.1s;
+}
+
+.bank > .mainscreen > .statement > .box3 > .balance {
+    position: absolute;
+    left: 7%;
+    top: 70%;
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 0.85vw;
+    font-family: PoppinsMedium;
+    transition: 0.1s;
+}
+
+/* ------------------------ */
+/* INVOICES SCREEN DIZAINAS */
+/* ------------------------ */
+.bank .invoicelist {
+    position: relative;
+    margin: 0 auto;
+    padding: 0 0.3vw;
+    width: 85%;
+    max-height: 12vw; /* Gerekirse artırılabilir */
+    overflow-y: auto; /* Kaydırma özelliği */
+    scrollbar-width: thin;
+}
+
+/* Kaydırma çubuğu stili (modern tarayıcılar için) */
+.bank .invoicelist::-webkit-scrollbar {
+    width: 0.2vw;
+}
+
+.bank .invoicelist::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 1vw;
+}
+@media screen and (max-height: 900px) {
+  .bank .invoicelist {
+    max-height: 20vw;
+  }
+}
+
+.bank .invoicelist .invoice {
+    position: relative;
+    width: 80%;
+    height: 10%;
+    padding: 0.1vw 1vw;
+    margin-bottom: 0.5vw;
+    background-color: transparent; /* Arka plan kaldırıldı */
+    border-bottom: 0.7px solid #6b6b6b79;
+    border-left: none;
+    border-right: none;
+    border-radius: 0; /* Köşe yumuşatmaları da kaldırıldı */
+    display: flex;
+    align-items: center;
+    color: #333;
+    font-family: Poppins, sans-serif;
+    font-size: 0.7vw;
+}
+
+.bank .invoicelist .invoice .content {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.bank .invoicelist .invoice .content .title {
+    font-weight: 600;
+    margin-bottom: 0.2vw;
+}
+
+.bank .invoicelist .invoice .content .description {
+    font-weight: 400;
+    font-size: 0.6vw;
+    color: #666;
+}
+
+.bank .invoicelist .invoice .buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.4vw;
+    margin-left: auto;
+}
+
+.bank .invoicelist .invoice .buttons .button {
+    background-color: var(--background-color, #888);
+    border-radius: 0.3vw;
+    padding: 0.3vw 0.8vw;
+    height: auto;
+    font-size: 0.65vw;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+
+.bank .invoicelist .invoice .buttons .button:hover {
+    opacity: 0.9;
+}
+
+/* ------------------------ */
+/* TRANSFER SCREEN DIZAINAS */
+/* ------------------------ */
+.bank .transfer {
+    position: relative;
+    right: unset;
+    width: 100%;
+    height: auto;
+    background-color: rgb(2, 2, 2);
+    padding-top: 1vw;
+    transition: none;
+}
+
+.bank .transfer .inputs {
+    position: relative;
+    top: unset;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: 1vw;
+}
+
+.bank .transfer .inputs > label {
+    display: block;
+    margin-left: 0.6vw;
+    line-height: 1vw;
+    margin-bottom: 0.2vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.705);
+}
+
+.bank .transfer .inputs > input {
+    display: block;
+    margin-bottom: 0.9vw;
+    width: 12.5vw;
+    height: 2.3vw;
+    font-size: 0.65vw;
+    padding-left: 1vw;
+    outline: none;
+    border: none;
+    color: white;
+    background: #272727;
+    border-radius: 0.6vw;
+    box-sizing: border-box;
+}
+
+.bank .transfer .inputs > input::placeholder {
+    color: rgba(255, 255, 255, 0.756);
+    font-size: 0.6vw;
+    font-family: Poppins;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bank .transfer .inputs > .currency {
+    position: absolute;
+    top: 30%;
+    right: 7%;
+    font-size: 0.65vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.692);
+    z-index: 9999;
+}
+
+.bank .transfer .inputs > button {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5vw;
+    width: 98%;
+    height: 2.1vw;
+    border-radius: 0.5vw;
+    font-size: 0.65vw;
+    font-family: PoppinsRegular;
+    outline: 0;
+    padding: 0;
+}
+
+.bank .transfer .inputs > .transfer {
+    background-color: #505050;
+}
+
+.bank .transfer .inputs > .transfer:hover {
+    background-color: #626262;
+}
+
+/* ------------ CRYPTO TRANSFER ---------------- */
+.bank > .crypto-transfer {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    transition: 0.35s;
+}
+
+.bank > .crypto-transfer > .inputs {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bank > .crypto-transfer > .inputs > label {
+    display: block;
+    margin-left: 0.6vw;
+    line-height: 1vw;
+    margin-bottom: 0.2vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.705);
+}
+
+.bank > .crypto-transfer > .inputs > input {
+    position: relative;
+    display: block;
+    margin-bottom: 0.9vw;
+
+    width: 12.5vw;
+    height: 2.3vw;
+    font-size: 0.7vw;
+
+    padding-left: 1vw;
+    outline: 0;
+    border: 0;
+
+    color: white;
+    font-size: 0.65vw;
+    font-family: Poppins;
+    background: #2d2d2d;
+    border-radius: 0.6vw;
+    box-sizing: border-box;
+}
+
+.bank > .crypto-transfer > .inputs > input::placeholder {
+    color: rgba(255, 255, 255, 0.756);
+    font-size: 0.6vw;
+    font-family: Poppins;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bank > .crypto-transfer > .inputs > .currency {
+    position: absolute;
+    top: 30%;
+    right: 7%;
+
+    font-size: 0.65vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.692);
+    z-index: 9999;
+}
+
+.bank > .crypto-transfer > .inputs > button {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5vw;
+    width: 98%;
+    height: 2.1vw;
+    border-radius: 0.5vw;
+
+    font-size: 0.65vw;
+    font-family: PoppinsRegular;
+    outline: 0;
+    padding: 0;
+}
+
+.bank > .crypto-transfer > .inputs > .trans {
+    background-color: #505050;
+}
+
+.bank > .crypto-transfer > .inputs > .trans:hover {
+    background-color: rgb(75, 75, 75);
+}
+/* ------------ CRYPTO SELL ---------------- */
+.bank > .crypto-sell {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    transition: 0.35s;
+}
+
+.bank > .crypto-sell > .inputs {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bank > .crypto-sell > .inputs > label {
+    display: block;
+    margin-left: 0.6vw;
+    line-height: 1vw;
+    margin-bottom: 0.2vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.705);
+}
+
+.bank > .crypto-sell > .inputs > input {
+    position: relative;
+    display: block;
+    margin-bottom: 0.9vw;
+
+    width: 12.5vw;
+    height: 2.3vw;
+    font-size: 0.7vw;
+
+    padding-left: 1vw;
+    outline: 0;
+    border: 0;
+
+    color: white;
+    font-size: 0.65vw;
+    font-family: Poppins;
+    background: #212121;
+    border-radius: 0.6vw;
+    box-sizing: border-box;
+}
+
+.bank > .crypto-sell > .inputs > input::placeholder {
+    color: rgba(255, 255, 255, 0.756);
+    font-size: 0.6vw;
+    font-family: Poppins;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bank > .crypto-sell > .inputs > .currency {
+    position: absolute;
+    top: 30%;
+    right: 7%;
+
+    font-size: 0.65vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.692);
+    z-index: 9999;
+}
+
+.bank > .crypto-sell > .inputs > button {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5vw;
+    width: 98%;
+    height: 2.1vw;
+    border-radius: 0.5vw;
+
+    font-size: 0.65vw;
+    font-family: PoppinsRegular;
+    outline: 0;
+    padding: 0;
+}
+
+.bank > .crypto-sell > .inputs > .sell {
+    background-color: #505050;
+}
+
+.bank > .crypto-sell > .inputs > .sell:hover {
+    background-color: rgb(54, 54, 54);
+}
+/* ------------ CRYPTO BUY ---------------- */
+.bank > .crypto-buy {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    transition: 0.35s;
+}
+
+.bank > .crypto-buy > .inputs {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bank > .crypto-buy > .inputs > label {
+    display: block;
+    margin-left: 0.6vw;
+    line-height: 1vw;
+    margin-bottom: 0.2vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.705);
+}
+
+.bank > .crypto-buy > .inputs > input {
+    position: relative;
+    display: block;
+    margin-bottom: 0.9vw;
+
+    width: 12.5vw;
+    height: 2.3vw;
+    font-size: 0.7vw;
+
+    padding-left: 1vw;
+    outline: 0;
+    border: 0;
+
+    color: white;
+    font-size: 0.65vw;
+    font-family: Poppins;
+    background: #262626;
+    border-radius: 0.6vw;
+    box-sizing: border-box;
+}
+
+.bank > .crypto-buy > .inputs > input::placeholder {
+    color: rgba(255, 255, 255, 0.756);
+    font-size: 0.6vw;
+    font-family: Poppins;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bank > .crypto-buy > .inputs > .currency {
+    position: absolute;
+    top: 30%;
+    right: 7%;
+
+    font-size: 0.65vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.692);
+    z-index: 9999;
+}
+
+.bank > .crypto-buy > .inputs > button {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5vw;
+    width: 98%;
+    height: 2.1vw;
+    border-radius: 0.5vw;
+
+    font-size: 0.65vw;
+    font-family: PoppinsRegular;
+    outline: 0;
+    padding: 0;
+}
+
+.bank > .crypto-buy > .inputs > .buy {
+    background-color: rgb(56, 56, 56);
+}
+
+.bank > .crypto-buy > .inputs > .buy:hover {
+    background-color: #444444;
+}
+
+/* ---------------------------- */
+/* ----------------------- */
+/* REQUEST SCREEN DIZAINAS */
+/* ----------------------- */
+.bank > .request {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    transition: 0.35s;
+}
+
+.bank > .request > .inputs {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bank > .request > .inputs > label {
+    display: block;
+    margin-left: 0.6vw;
+    line-height: 1vw;
+    margin-bottom: 0.2vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.705);
+}
+
+.bank > .request > .inputs > input {
+    position: relative;
+    display: block;
+    margin-bottom: 0.9vw;
+
+    width: 12.5vw;
+    height: 2.3vw;
+    font-size: 0.7vw;
+
+    padding-left: 1vw;
+    outline: 0;
+    border: 0;
+
+    color: white;
+    font-size: 0.65vw;
+    font-family: Poppins;
+    background: #222222;
+    border-radius: 0.6vw;
+    box-sizing: border-box;
+}
+
+.bank > .request > .inputs > input::placeholder {
+    color: rgba(255, 255, 255, 0.756);
+    font-size: 0.6vw;
+    font-family: Poppins;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bank > .request > .inputs > .currency {
+    position: absolute;
+    top: 30%;
+    right: 7%;
+
+    font-size: 0.65vw;
+    font-family: Poppins;
+    color: rgba(255, 255, 255, 0.692);
+    z-index: 9999;
+}
+
+.bank > .request > .inputs > button {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5vw;
+    width: 98%;
+    height: 2.1vw;
+    border-radius: 0.5vw;
+
+    font-size: 0.65vw;
+    font-family: PoppinsRegular;
+    outline: 0;
+    padding: 0;
+}
+
+.bank > .request > .inputs > .request {
+    background-color: #505050;
+}
+
+.bank > .request > .inputs > .request:hover {
+    background-color: #6a6a6a;
+}
+
+/* mygtukų stiliai */
+.bank .fill {
+    border: 0;
+    color: white;
+    background-color: #1F2938;
+    transition: 0.1s;
+}
+
+.bank .nofill {
+    background: rgba(255, 255, 255, 0.02);
+    border: solid 0.1vw rgba(40, 40, 40, 0.1);
+    color: #A3AFC5;
+    transition: 0.1s;
+}
+
+.bank .fill:hover {
+    background-color: #424242;
+}
+
+.bank .nofill:hover {
+    background-color: rgba(57, 57, 57, 0.15);
+}

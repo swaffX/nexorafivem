@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+.nicesexytext {
+  font-family: "Inter", sans-serif;
+  font-size: calc(0.092592592vh * 18px);
+  letter-spacing: 0.1em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: rgb(199, 199, 199);
+  font-weight: 600;
+  width: 100%;
+  opacity: 0.8;
+  margin-top: -9%;
+}
+
+* {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  text-shadow: 0px 0px 0px black;
+}
+
+.divwrap {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  justify-content: end;
+  padding: 0;
+}
+
+.notify-wrap {
+  width: 21.5%;
+  position: absolute;
+  right: 0%;
+  bottom: 2%;              /* alt kenardan başlat */
+  display: flex;
+  flex-direction: column-reverse;  /* yeniler alta */
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 9999;
+}
+
+
+.notify-timer {
+  position: absolute;
+  top: 7px;
+  right: 5px;
+  transform: scale(1.4) rotate(-90deg);
+}
+
+.notification-bg {
+  color: #fff;
+  margin:6px;
+  text-align: left;
+  position: relative;
+  font-size: calc(0.092592592vh * 14);
+  display: flex;
+  align-items: center;
+  padding-bottom: 1px;
+  border-radius: 6px;
+  max-width: 400px;
+  white-space: normal;
+  overflow: hidden;
+  display:inline-block;
+  align-items: center;
+  padding: 12px;
+  justify-content: space-between;
+  background: radial-gradient(31.98% 56.85% at 50% 50%, #242424cb 0%, #1e1f1ec9 90%);
+  border: 0.5px solid #99999931; 
+}
+
+.notification-bg span {
+  padding-right: 25px;
+  margin-top: 2px;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  max-height: 300px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-strip,
+.warning-strip,
+.success-strip,
+.error-strip {
+  display: inline-block;
+  width: 6px;
+  height: 30px; /* YÜKSEKLİK BURADA SABİT OLSUN */
+  margin-right: 5px;
+  vertical-align: middle;
+  position: relative;
+  top: -2px;
+  border-radius: 2px;
+}
+
+.info-strip {
+  background-color: #4179b9;
+}
+
+.warning-strip {
+  background-color: #b99f41;
+}
+
+.success-strip {
+  background-color: #657B37;
+}
+
+.error-strip {
+  background-color: #C04A4E;
+}
+
+
+
+.info3 {
+  position: absolute;
+  color: #ffffff;
+  transform: translate(.7vw, .5vw);
+  text-shadow: 0 0 1vh #ffffff;
+}

@@ -1,0 +1,440 @@
+.phone {
+    display: none;
+    position: absolute;
+    top: 0%;
+
+    width: 100%;
+    height: 100%;
+    background-color: #1c1c20;
+    opacity: 0.0;
+
+    transition: opacity 0.2s;
+    overflow: hidden;
+}
+
+.phone > .calls > .header {
+    position: absolute;
+    width: 95%;
+    height: 19%;
+    left: 50%;
+    border-radius: 0px 0px 1.8vw 1.8vw;
+}
+
+.phone > .calls > .header > .left {
+    display: flex;
+    position: absolute;
+    top: 53%;
+    left: 3%;
+}
+
+.phone > .calls > .header > .left > .title {
+    margin: 0;
+    margin-top: 1px;
+    margin-left: -6.5vw;
+    font-family: PoppinsBolder;
+    font-size: 1vw;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.02vw;
+}
+
+
+.phone > .calls > .categories {
+    display: flex;
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6vw;
+    height: 1.2vw;
+    background-color: #272727 ;
+    border-radius: 0.3vw;
+}
+
+.phone > .calls > .categories:hover {
+    cursor: pointer;
+}
+
+.phone > .calls > .categories > .highlight {
+    position: absolute;
+    left: 0%;
+
+    width: 45%;
+    height: 1vw;
+
+    background-color: #3a3a3a;
+    border-radius: 0.3vw;
+    margin: 0.1vw;
+    z-index: -1;
+    transition: 0.2s;
+}
+
+.phone > .calls > .categories > .button {
+    width: 50%;
+    text-align: center;
+    font-size: 0.5vw;
+    line-height: 1.2vw;
+    color: white;
+    font-family: Poppins;
+}
+
+.phone > .calls > .callslist {
+    position: absolute;
+    top: 15%;
+    width: 100%;
+    height: 66%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+}
+
+.phone > .calls > .callslist::-webkit-scrollbar {
+    display: none;
+}
+
+.phone > .calls > .callslist > .call {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    width: 100%;
+    height: 2.3vw;
+    transition: 0.2s background, 0.5s margin, 0.3s opacity, height 0.5s;
+    background: rgba(28, 28, 28, 0.3);
+}
+
+.phone > .calls > .callslist > .call:nth-child(even) {
+    background-color: transparent;
+}
+
+.phone > .calls > .callslist > .call:hover {
+    background-color: #3a3a3ada;
+    cursor: pointer;
+}
+
+.phone > .calls > .callslist > .call > .inner {
+    pointer-events: none;
+}
+
+.phone > .calls > .callslist > .call > .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    border-bottom: 1px solid #a1a1a154;
+}
+
+.phone > .calls > .callslist > .call .name {
+    position: absolute;
+    top: -4%;
+    left: 13%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 7vw;
+    font-size: 0.62vw;
+font-weight: 500;
+    font-family: Inter;
+    color: rgba(255, 255, 255, 0.884);
+}
+
+.phone > .calls > .callslist > .call .number {
+    position: absolute;
+    top: 31%;
+    left: 13%;
+    width: 7vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    letter-spacing: 0.01vw;
+    color: rgba(255, 255, 255, 0.432);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.phone > .calls > .callslist > .call .time {
+    position: absolute;
+    top: 51%;
+    transform: translateY(-50%);
+    right: 10%;
+    text-align: right;
+    margin: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 7vw;
+    font-size: 0.55vw;
+    font-family: Poppins;
+    letter-spacing: 0.01vw;
+    color: rgba(255, 255, 255, 0.432);
+}
+
+
+.phone > .calls > .callslist > .call > .delete {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 0;
+    background: #ff4539;
+    color: white;
+    font-size: 0.6vw;
+    overflow: hidden;
+    transition: width 0.5s;
+}
+
+.phone > .calls > .callslist > .call > .delete.faster {
+    transition: width 0.25s;
+}
+
+.phone > .calls > .callslist > .call > .delete > * {
+    pointer-events: none;
+}
+
+.phone > .calls > .callslist > .call > .delete > .title {
+    margin: 0;
+    margin-left: 0.3vw;
+    
+    color: white;
+    font-family: Poppins;
+    font-size: 0.55vw;
+}
+
+.phone > .calls > .newcall {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    bottom: 9%;
+    right: 9%;
+
+    width: 2.3vw;
+    height: 2.3vw;
+
+    color: white;
+    font-size: 0.8vw;
+    background-color: #2d2d2d;
+    border-radius: 5vw;
+
+    transition: 0.1s;
+}
+
+.phone > .calls > .newcall:hover {
+    background-color: #727272;
+    cursor: pointer;
+}
+
+/* ------------- */
+/* DIAL DIZAINAS */
+/* ------------- */
+.phone > .dial {
+    position: absolute;
+    right: 0%;
+    transform: translate3d(100%, 0, 0);
+
+    width: 100%;
+    height: 100%;
+
+    background-color: #1c1c20;
+    transition: 0.35s;
+}
+
+.phone > .dial.visible {
+    transform: translate3d(0%, 0, 0);
+}
+
+.phone > .dial > .header {
+    position: absolute;
+    width: 99%;
+    height: 17%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: #1c1c20;
+}
+
+.phone > .dial > .header > .left {
+    display: flex;
+    position: absolute;
+    top: 33%;
+    left: 75%;
+}
+
+.phone > .dial > .header > .left > .icon {
+    font-size: 0.3vw;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.phone > .dial > .header > .left > .title {
+    margin: 0;
+    margin-left: 1.6vw;
+    margin-top: 4px;
+    color: #0c7fec;
+    font-family: Inter;
+    font-size: 0.6vw;
+    font-weight: bolder;
+}
+
+
+.phone > .dial > .header > .right {
+    position: absolute;
+    top: 53%;
+    right: 8%;
+}
+
+.phone #closedialing {
+    transition: 0.1s;
+}
+
+.phone #closedialing:hover {
+    color: #2288e7;
+    cursor: pointer;
+}
+
+.phone > .dial > .number {
+    position: absolute;
+    top: 23%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 80%;
+    height: 2vw;
+
+    font-size: 1.2vw;
+    color: white;
+    font-family: PoppinsMedium;
+    text-align: center;
+    
+    background: transparent;
+    outline: 0;
+    border: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    resize: none;
+}
+
+.phone > .dial > .buttons {
+    display: flex;
+    position: absolute;
+    top: 78%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 81%;
+    height: 4vw;
+
+    border-radius: 1.7vw;
+    justify-content: center;
+}
+
+.phone > .dial > .buttons > .button {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 2.3vw;
+    height: 2.3vw;
+    background-color: #67CB68;
+    border-radius: 4vw;
+    
+    margin: 0 0.2vw 0 0.2vw;
+    transition: 0.1s;
+}
+
+.phone > .dial > .buttons > .button:hover {
+    background-color: #77c978;
+    cursor: pointer;
+}
+
+.phone > .dial > .buttons > .button > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 0.7vw;
+    color: white;
+}
+
+.phone > .dial > .numbers {
+    display: flex;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.phone > .dial > .numbers > .number {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 2.6vw;
+    height: 2.6vw;
+    background-color: #333333 ;
+    border-radius: 2vw;
+    
+    margin: 0.25vw 0.5vw 0.25vw 0.5vw;
+}
+
+.phone > .dial > .numbers > .number:hover {
+    background-color: rgb(54, 54, 54);
+    cursor: pointer;
+}
+
+.phone > .dial > .numbers > .delete {
+    position: absolute;
+    top: 107%;
+    right: 16%;
+
+    width: 0.9vw;
+    height: 0.5vw;
+    font-size: 1.1vw;
+    color: rgb(44, 44, 44);
+    background-color: white;
+}
+
+.phone > .dial > .numbers > .delete > * {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+}
+
+.phone > .dial > .numbers > .delete:hover {
+    color: rgb(68, 68, 68);
+    cursor: pointer;
+}
+
+.phone > .dial > .numbers > .number > .title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    margin: 0;
+
+    font-size: 1.2vw;
+    font-family: Poppins;
+    color: white;
+    font-weight: bold;
+}
+
+.phone > .dial > .numbers > .number > .subtitle {
+    position: absolute;
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    margin: 0;
+
+    font-size: 0.4vw;
+    letter-spacing: 0.07vw;
+    font-family: Poppins;
+    color: white;
+    font-weight: bold;
+}

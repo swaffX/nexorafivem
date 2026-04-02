@@ -1,0 +1,46 @@
+# FiveM Server Files
+*.log
+*.db
+cache/
+data/cache/
+data/.replxx_history
+
+# Artifacts (binary files)
+artifacts/*.dll
+artifacts/*.exe
+
+# Sensitive Information
+server.cfg
+*.key
+*.crt
+
+# Keep server.cfg.bkp as template
+!server.cfg.bkp
+
+# Database backups
+*.sql.bak
+backup_*.sql
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+~*
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+
+# Transfer scripts (local use only)
+transfer_to_vps.sh
+vps_setup.sh
