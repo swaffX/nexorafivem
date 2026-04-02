@@ -53,16 +53,16 @@ Config.Discord = {
     isEnabled = true,                                     -- If set to true, then discord rich presence will be enabled
     applicationId = '1040374012313862246',                   -- The discord application id
     iconLarge = 'logoqb',                               -- The name of the large icon
-    iconLargeHoverText = 'hollyborn', -- The hover text of the large icon
+    iconLargeHoverText = 'Nexora RP', -- The hover text of the large icon
     iconSmall = 'logoqb',                         -- The name of the small icon
-    iconSmallHoverText = 'hollyborn temel paketi', -- The hover text of the small icon
+    iconSmallHoverText = 'Nexora Roleplay', -- The hover text of the small icon
     updateRate = 60000,                                    -- How often the player count should be updated
     showPlayerCount = true,                                -- If set to true the player count will be displayed in the rich presence
     maxPlayers = 1,                                       -- Maximum amount of players
     buttons = {
         {
-            text = 'hollystore',
-            url = 'https://discord.gg/hollystore'
+            text = 'Nexora RP',
+            url = 'https://discord.gg/nexora'
         },
 
     }

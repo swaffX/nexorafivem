@@ -668,8 +668,8 @@ CREATE TABLE IF NOT EXISTS `phone_mail` (
 -- temelpaket.phone_mail: ~2 rows (yaklaşık) tablosu için veriler indiriliyor
 DELETE FROM `phone_mail`;
 INSERT INTO `phone_mail` (`id`, `owner`, `subject`, `starred`, `mail`, `trash`, `muted`, `lastOpened`) VALUES
-	(1, 'emreleann@hollystore.com', 'emreleann', 1, '[{"attachments":"[{\\"image\\":\\"https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg\\"}]","content":"emreleannemreleannemreleannemreleannemreleannemreleannemreleannemreleann","time":1749562410000,"sender":{"address":"hollystore@hollystore.com","name":"hollystore","photo":""},"recipients":[["emreleann@hollystore.com"]]}]', 0, 0, 1749562433000),
-	(2, 'hollystore@hollystore.com', 'emreleann', 0, '[{"attachments":"[{\\"image\\":\\"https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg\\"}]","content":"emreleannemreleannemreleannemreleannemreleannemreleannemreleannemreleann","time":1749562410000,"sender":{"address":"hollystore@hollystore.com","name":"hollystore","photo":""},"recipients":[["emreleann@hollystore.com"]]}]', 0, 0, 1749562415000);
+	(1, 'emreleann@Nexora.com', 'emreleann', 1, '[{"attachments":"[{\\"image\\":\\"https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg\\"}]","content":"emreleannemreleannemreleannemreleannemreleannemreleannemreleannemreleann","time":1749562410000,"sender":{"address":"Nexora@Nexora.com","name":"Nexora","photo":""},"recipients":[["emreleann@Nexora.com"]]}]', 0, 0, 1749562433000),
+	(2, 'Nexora@Nexora.com', 'emreleann', 0, '[{"attachments":"[{\\"image\\":\\"https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg\\"}]","content":"emreleannemreleannemreleannemreleannemreleannemreleannemreleannemreleann","time":1749562410000,"sender":{"address":"Nexora@Nexora.com","name":"Nexora","photo":""},"recipients":[["emreleann@Nexora.com"]]}]', 0, 0, 1749562415000);
 
 -- tablo yapısı dökülüyor temelpaket.phone_mailaccounts
 CREATE TABLE IF NOT EXISTS `phone_mailaccounts` (
@@ -682,9 +682,9 @@ CREATE TABLE IF NOT EXISTS `phone_mailaccounts` (
 -- temelpaket.phone_mailaccounts: ~3 rows (yaklaşık) tablosu için veriler indiriliyor
 DELETE FROM `phone_mailaccounts`;
 INSERT INTO `phone_mailaccounts` (`address`, `name`, `password`, `photo`) VALUES
-	('hollystore@hollystore.com', 'hollystore', 'hollystore', ''),
-	('emreleann@hollystore.com', 'emreleann', 'emreleann', ''),
-	('emreleannn@hollystore.com', 'Emre Anal', 'emreleannn', '');
+	('Nexora@Nexora.com', 'Nexora', 'Nexora', ''),
+	('emreleann@Nexora.com', 'emreleann', 'emreleann', ''),
+	('emreleannn@Nexora.com', 'Emre Anal', 'emreleannn', '');
 
 -- tablo yapısı dökülüyor temelpaket.phone_messages
 CREATE TABLE IF NOT EXISTS `phone_messages` (
@@ -771,20 +771,20 @@ CREATE TABLE IF NOT EXISTS `phone_tweets` (
 -- temelpaket.phone_tweets: ~14 rows (yaklaşık) tablosu için veriler indiriliyor
 DELETE FROM `phone_tweets`;
 INSERT INTO `phone_tweets` (`id`, `reply`, `email`, `author`, `authorimg`, `authorrank`, `title`, `content`, `image`, `views`, `likes`, `time`, `likers`) VALUES
-	(1, NULL, 'hollystore@hollystore.com', 'hollystore', '', 'default', NULL, 'hollyborn temel paketi mi?', 'https://files.fivemerr.com/images/e88d0435-1217-4a48-a2a1-035351769578.jpg', 3, 0, 1748906476000, NULL),
-	(2, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'işte bu gerçekten harika!', '', 2, 0, 1748906511000, NULL),
-	(3, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasd', '', 2, 0, 1749249957000, NULL),
-	(4, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasd', '', 2, 0, 1749249959000, NULL),
-	(5, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasdasdasda', '', 0, 0, 1749510392000, NULL),
-	(6, NULL, 'emrealan@hollystore.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default', NULL, 'demiri seviyorum ya ', '', 0, 0, 1750109678000, NULL),
-	(7, NULL, 'emrealan@hollystore.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default', NULL, 'ama emreleann daha iyi :)', 'https://files.fivemerr.com/images/8ade65fb-0f35-4e37-aea1-80ffc9fbbfc6.jpg', 0, 0, 1750109694000, NULL),
-	(8, NULL, 'emreleannn@hollystore.com', 'emreleannn', '', 'default', NULL, 'selam güzellik', 'https://files.fivemerr.com/images/8ade65fb-0f35-4e37-aea1-80ffc9fbbfc6.jpg', 0, 0, 1750110105000, NULL),
-	(9, NULL, 'emreleannn@hollystore.com', 'emreleannn', '', 'default', NULL, 'ne bu demirin g****', 'https://files.fivemerr.com/images/eb9be45e-0538-4376-b154-a91e2ef9813f.jpg', 0, 0, 1750110296000, NULL),
-	(10, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', NULL, 'asdasdas', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 0, 0, 1750884109000, NULL),
-	(11, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', 'asdasdas', 'asdasdasd', '', 0, 0, 1751234163000, NULL),
-	(12, 9, 'mikeshawn@hollystore.com', 'mikeshawn', '', 'default', NULL, 'demirimle oynaşmöayın lütfen', '', 0, 0, 1751237544000, NULL),
-	(13, NULL, 'mikeshawn@hollystore.com', 'DEMİRİM DE DEMİR', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 'default', NULL, 'selam insanlar', 'https://files.fivemerr.com/images/925c79bd-e8ac-40e0-a58b-5dc95c116753.jpg', 0, 0, 1751237579000, NULL),
-	(14, NULL, 'hollystore@hollystore.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', NULL, 'selam dunya', 'https://files.fivemerr.com/images/098c8a89-95fd-49aa-8ed5-3782db39143b.jpg', 0, 0, 1751710098000, NULL);
+	(1, NULL, 'Nexora@Nexora.com', 'Nexora', '', 'default', NULL, 'Nexora temel paketi mi?', 'https://files.fivemerr.com/images/e88d0435-1217-4a48-a2a1-035351769578.jpg', 3, 0, 1748906476000, NULL),
+	(2, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'işte bu gerçekten harika!', '', 2, 0, 1748906511000, NULL),
+	(3, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasd', '', 2, 0, 1749249957000, NULL),
+	(4, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasd', '', 2, 0, 1749249959000, NULL),
+	(5, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/c3bfeccf-b5f0-4c89-aeb6-ef9575ecebcd.jpg', 'default', NULL, 'asdasdasdasda', '', 0, 0, 1749510392000, NULL),
+	(6, NULL, 'emrealan@Nexora.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default', NULL, 'demiri seviyorum ya ', '', 0, 0, 1750109678000, NULL),
+	(7, NULL, 'emrealan@Nexora.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default', NULL, 'ama emreleann daha iyi :)', 'https://files.fivemerr.com/images/8ade65fb-0f35-4e37-aea1-80ffc9fbbfc6.jpg', 0, 0, 1750109694000, NULL),
+	(8, NULL, 'emreleannn@Nexora.com', 'emreleannn', '', 'default', NULL, 'selam güzellik', 'https://files.fivemerr.com/images/8ade65fb-0f35-4e37-aea1-80ffc9fbbfc6.jpg', 0, 0, 1750110105000, NULL),
+	(9, NULL, 'emreleannn@Nexora.com', 'emreleannn', '', 'default', NULL, 'ne bu demirin g****', 'https://files.fivemerr.com/images/eb9be45e-0538-4376-b154-a91e2ef9813f.jpg', 0, 0, 1750110296000, NULL),
+	(10, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', NULL, 'asdasdas', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 0, 0, 1750884109000, NULL),
+	(11, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', 'asdasdas', 'asdasdasd', '', 0, 0, 1751234163000, NULL),
+	(12, 9, 'mikeshawn@Nexora.com', 'mikeshawn', '', 'default', NULL, 'demirimle oynaşmöayın lütfen', '', 0, 0, 1751237544000, NULL),
+	(13, NULL, 'mikeshawn@Nexora.com', 'DEMİRİM DE DEMİR', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 'default', NULL, 'selam insanlar', 'https://files.fivemerr.com/images/925c79bd-e8ac-40e0-a58b-5dc95c116753.jpg', 0, 0, 1751237579000, NULL),
+	(14, NULL, 'Nexora@Nexora.com', 'emreleann', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default', NULL, 'selam dunya', 'https://files.fivemerr.com/images/098c8a89-95fd-49aa-8ed5-3782db39143b.jpg', 0, 0, 1751710098000, NULL);
 
 -- tablo yapısı dökülüyor temelpaket.phone_twitteraccounts
 CREATE TABLE IF NOT EXISTS `phone_twitteraccounts` (
@@ -798,10 +798,10 @@ CREATE TABLE IF NOT EXISTS `phone_twitteraccounts` (
 -- temelpaket.phone_twitteraccounts: ~4 rows (yaklaşık) tablosu için veriler indiriliyor
 DELETE FROM `phone_twitteraccounts`;
 INSERT INTO `phone_twitteraccounts` (`nickname`, `email`, `password`, `picture`, `rank`) VALUES
-	('emreleann', 'hollystore@hollystore.com', 'hollystore', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default'),
-	('emrealan', 'emrealan@hollystore.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default'),
-	('emreleannn', 'emreleannn@hollystore.com', 'emreleannn', NULL, 'default'),
-	('DEMİRİM DE DEMİR', 'mikeshawn@hollystore.com', 'mikeshawn', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 'default');
+	('emreleann', 'Nexora@Nexora.com', 'Nexora', 'https://files.fivemerr.com/images/eb911186-dce6-4ced-b5dd-f3e13c245d44.jpg', 'default'),
+	('emrealan', 'emrealan@Nexora.com', 'emrealan', 'https://files.fivemerr.com/images/8087a740-c37c-48aa-8fa5-a81b55ea5ef1.jpg', 'default'),
+	('emreleannn', 'emreleannn@Nexora.com', 'emreleannn', NULL, 'default'),
+	('DEMİRİM DE DEMİR', 'mikeshawn@Nexora.com', 'mikeshawn', 'https://files.fivemerr.com/images/ec0bf7ff-78f5-4f17-9e11-07934050f90d.jpg', 'default');
 
 -- tablo yapısı dökülüyor temelpaket.players
 CREATE TABLE IF NOT EXISTS `players` (
@@ -1149,10 +1149,10 @@ CREATE TABLE IF NOT EXISTS `qb_banking_transactions` (
 DELETE FROM `qb_banking_transactions`;
 INSERT INTO `qb_banking_transactions` (`id`, `receiver_identifier`, `receiver_name`, `sender_identifier`, `sender_name`, `date`, `value`, `type`) VALUES
 	(1, 'bank', 'Bank (PIN)', 'NOF79195', 'Emre Alan', '2025-05-05 02:18:42', 0, 'transfer'),
-	(2, 'bank', 'Bank (IBAN)', 'YAP86904', 'Holly Store', '2025-05-22 14:10:38', 5000, 'transfer'),
-	(3, 'bank', 'Bank (PIN)', 'YAP86904', 'Holly Store', '2025-05-22 14:10:47', 0, 'transfer'),
-	(4, 'bank', 'Banka Hesabı', 'YAP86904', 'Holly Store', '2025-05-22 14:10:59', 200, 'deposit'),
-	(5, 'YAP86904', 'Holly Store', 'bank', 'Banka Hesabı', '2025-05-22 15:13:53', 140, 'withdraw');
+	(2, 'bank', 'Bank (IBAN)', 'YAP86904', 'Nexora Store', '2025-05-22 14:10:38', 5000, 'transfer'),
+	(3, 'bank', 'Bank (PIN)', 'YAP86904', 'Nexora Store', '2025-05-22 14:10:47', 0, 'transfer'),
+	(4, 'bank', 'Banka Hesabı', 'YAP86904', 'Nexora Store', '2025-05-22 14:10:59', 200, 'deposit'),
+	(5, 'YAP86904', 'Nexora Store', 'bank', 'Banka Hesabı', '2025-05-22 15:13:53', 140, 'withdraw');
 
 -- tablo yapısı dökülüyor temelpaket.spy_bodycam
 CREATE TABLE IF NOT EXISTS `spy_bodycam` (
@@ -1175,3 +1175,4 @@ INSERT INTO `spy_bodycam` (`id`, `job`, `videolink`, `street`, `date`, `playerna
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+

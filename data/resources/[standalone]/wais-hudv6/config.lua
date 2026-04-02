@@ -10,7 +10,7 @@ Config.Framework = {
     ["SharedEvent"] = "" -- Event name for old cores.
 }
 
-Config.Language = "en" -- ar, cz, ro, it, fr, de, tr
+Config.Language = "tr" -- ar, cz, ro, it, fr, de, tr
 Config.ShowDebug = false -- If you set this to `true`, the debug messages will be printed in the console. If you set it to `false`, no debug messages will be printed.
 Config.ShowMapOnFoot = true -- If `true` is set, the player can see the map when not in the vehicle. If `false`, the map will only be visible when in the vehicle.
 Config.SendStatusAlert = false -- If this option is `true`, the player will be notified if the hunger or thirst value falls below 20. Tick `false` if you do not want to use this system
@@ -19,13 +19,14 @@ Config.DisableRightCorner = false -- If you want to disable the top right corner
 Config.DisableMapAnimation = false -- If you set it to `true`, the minimap loading animation will be disabled. If you set it to `false`, the minimap loading animation will be enabled.
 Config.MusicSystem = {
     --[[
-        📛 Currently this system is not synchronised with other players. 
-        🟠 I tried to synchronise as efficiently as possible, but it did not work as I wanted. 
-        🟠 I can optionally bring the synchronisation option with the update
+        ✅ This system is now synchronized with other players using 3D positional audio!
+        🔊 Players near the vehicle (within distance) can hear the music.
+        🎵 Music is attached to the vehicle and moves with it.
+        📻 Music automatically stops when you exit the vehicle.
     --]]
 
     ["disable"] = false, -- If you set `true`, people will not be able to use the music system from the car control menu. The system will switch off completely.
-    ["distance"] = 10.0, -- If you are using the music system in the car control, it is the distance distance of the music played in the vehicle.  
+    ["distance"] = 10.0, -- Distance in meters that other players can hear the music from the vehicle. (Default: 10.0 meters)
 }
 
 Config.PostalMap = {
@@ -54,7 +55,7 @@ Config.Commands = {
         ["disabled"] = false, -- If you set this variable to `true`, the belt system will be completely disabled.
         ["notification"] = true, -- If you set it to `true`, you will receive a notification for the seatbelt connection. If it is `false`, you will not see a notification, only hear a sound.
         ["keymapping"] = {
-            ["key"] = "B",
+            ["key"] = "K",
             ["usable"] = true,
             ["command"] = "belt",
             ["description"] = "Toggle seatbelt",

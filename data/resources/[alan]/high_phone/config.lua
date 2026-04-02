@@ -27,7 +27,7 @@ Config.AirdropDistance = 5.0 -- Closest player max distance to share contacts/et
 
 Config.MaxRecipients = 10 -- How many recipients can be added to a new mail?
 Config.MailLimit = 100 -- How many conversations to load for mail app
-Config.MailFormat = "@hollystore.com" -- Email address format [suffix]
+Config.MailFormat = "@Nexora.com" -- Email address format [suffix]
 Config.MailStackingTime = 24 -- In hours, how much time has to be between each mail with the same subject to not save it in the same conversation? [This is some sort of an anti-spam]
 
 Config.SyncedFlashlightDistance = 30 -- How near will flashlights get synced?

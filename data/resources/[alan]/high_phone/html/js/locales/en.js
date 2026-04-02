@@ -61,7 +61,7 @@ Locales["en"] = {
     "new_group_message": "<strong>{1}</strong> içerisinde <strong>{0}</strong>:<br>{2}", // {0} is the sender name/number, {1} is the group name, {2} is the content
     // Bank app
     "iban": "IBAN: {0}", // {0} is player bank account number
-    "cardname": "hollyBank",
+    "cardname": "NexoraBank",
     "cardexpiry": "GEÇERLİLİK TARİHİ",
     "invoicedescription": "Miktar: <strong>{0}$</strong>", // {0} is the invoice amount
     "requestdescription": "<strong>{0} [{1}]</strong> tarafından istendi.<br>Sebep: <strong>{2}</strong>", // {0} is player name, {1} is player ID, {2} is purpose (reason)

@@ -1,0 +1,146 @@
+╔═══════════════════════════════════════════════════════════╗
+║     GitHub + Manuel Transfer - Hızlı Komutlar            ║
+╚═══════════════════════════════════════════════════════════╝
+
+🎯 3 ADIMDA TRANSFER:
+
+┌─────────────────────────────────────────────────────────┐
+│ ADIM 1: GITHUB'A YÜKLEYİN (Güvenli Dosyalar)            │
+└─────────────────────────────────────────────────────────┘
+
+1. GitHub'da private repo oluşturun:
+   https://github.com/new
+   İsim: fivem-server
+   ✓ Private seçin
+
+2. Yerel bilgisayarınızda (Git Bash/PowerShell):
+   cd temelPaket
+   git init
+   git add .
+   git commit -m "FiveM server files"
+   git remote add origin https://github.com/KULLANICI_ADINIZ/fivem-server.git
+   git branch -M main
+   git push -u origin main
+
+┌─────────────────────────────────────────────────────────┐
+│ ADIM 2: VPS'TE GITHUB'DAN ÇEKİN                         │
+└─────────────────────────────────────────────────────────┘
+
+ssh root@194.105.5.37
+
+mkdir -p ~/fivem-server
+cd ~/fivem-server
+
+# Public repo ise:
+git clone https://github.com/KULLANICI_ADINIZ/fivem-server.git .
+
+# Private repo ise (token gerekir):
+git clone https://GITHUB_TOKEN@github.com/KULLANICI_ADINIZ/fivem-server.git .
+
+┌─────────────────────────────────────────────────────────┐
+│ ADIM 3: HASSAS DOSYALARI MANUEL AKTARİN                 │
+└─────────────────────────────────────────────────────────┘
+
+Yerel bilgisayarınızda (YENİ terminal):
+
+cd temelPaket
+
+# Server.cfg (lisans anahtarı var)
+scp data/server.cfg root@194.105.5.37:~/fivem-server/data/
+
+# SQL dosyası (veritabanı)
+scp temelpaket.sql root@194.105.5.37:~/
+
+# txData (opsiyonel, büyük)
+scp -r txData root@194.105.5.37:~/fivem-server/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 VPS'TE KURULUM:
+
+ssh root@194.105.5.37
+cd ~/fivem-server
+bash vps_setup.sh
+
+Kurulum soracak:
+• MySQL root şifresi: (örn: FiveM2024!)
+• FiveM DB şifresi: (örn: FiveM2024!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ SERVER.CFG DÜZENLEYİN:
+
+nano ~/fivem-server/data/server.cfg
+
+Değiştirin:
+• sv_licenseKey "YENİ_ANAHTARINIZ"
+  (https://keymaster.fivem.net)
+
+Kaydet: CTRL+O, Enter, CTRL+X
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 BAŞLATIN:
+
+systemctl start fivem
+systemctl status fivem
+journalctl -u fivem -f
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 GÜNCELLEME (Sonraki Değişiklikler):
+
+Yerel:
+  cd temelPaket
+  git add .
+  git commit -m "Updated resources"
+  git push
+
+VPS:
+  ssh root@194.105.5.37
+  cd ~/fivem-server
+  systemctl stop fivem
+  git pull
+  systemctl start fivem
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 GITHUB TOKEN OLUŞTURMA (Private Repo İçin):
+
+1. GitHub → Settings → Developer settings
+2. Personal access tokens → Tokens (classic)
+3. Generate new token
+4. Seçin: repo (tüm kutular)
+5. Generate token
+6. Token'ı kopyalayın (bir daha göremezsiniz!)
+
+Kullanım:
+git clone https://TOKEN@github.com/KULLANICI/repo.git
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ KONTROL LİSTESİ:
+
+□ GitHub private repo oluşturuldu
+□ .gitignore dosyası var
+□ Yerel'den GitHub'a push yapıldı
+□ VPS'te git clone yapıldı
+□ server.cfg manuel aktarıldı
+□ temelpaket.sql manuel aktarıldı
+□ vps_setup.sh çalıştırıldı
+□ Lisans anahtarı güncellendi
+□ Sunucu başlatıldı
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 GÜVENLİK NOTU:
+
+✓ server.cfg GitHub'a GİTMEZ (.gitignore'da)
+✓ temelpaket.sql GitHub'a GİTMEZ (.gitignore'da)
+✓ Cache klasörü GitHub'a GİTMEZ (.gitignore'da)
+✓ Private repo kullanın
+✓ Token'ı güvenli saklayın
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Detaylı rehber: GITHUB_TRANSFER_PLAN.md

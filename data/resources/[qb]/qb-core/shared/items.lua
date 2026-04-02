@@ -424,4 +424,11 @@ QBShared.Items = {
       
         cash = { name = 'cash', label = 'Para', weight = 0, type = 'item', image = 'cash.png', unique = false, useable = false, shouldClose = false, description = 'kağıt parçası' },
 
-}   
+    -- Balıkçılık / Fishing (Wasabi Fishing)
+    fishingrod = { name = 'fishingrod', label = 'Olta Kamışı', weight = 250, type = 'item', image = 'fishingrod.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Balık tutmak için yem ile birlikte kullan.' },
+    fishbait = { name = 'fishbait', label = 'Balık Yemi', weight = 5, type = 'item', image = 'fishbait.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Olta kamışı ile balık tutmak için gerekli.' },
+    anchovy = { name = 'anchovy', label = 'Hamsi', weight = 35, type = 'item', image = 'anchovy.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış hamsi balığı.' },
+    trout = { name = 'trout', label = 'Alabalık', weight = 85, type = 'item', image = 'trout.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış alabalık.' },
+    salmon = { name = 'salmon', label = 'Somon', weight = 125, type = 'item', image = 'salmon.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış somon balığı.' },
+    tuna = { name = 'tuna', label = 'Ton Balığı', weight = 225, type = 'item', image = 'tuna.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış ton balığı.' },
+}

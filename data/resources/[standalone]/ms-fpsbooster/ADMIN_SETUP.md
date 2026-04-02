@@ -1,0 +1,1 @@
+To access the admin panel, you must first add yourself as an admin in admins.lua. After entering the required information correctly, you can easily use the admin panel.

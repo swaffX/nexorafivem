@@ -117,7 +117,7 @@ Config.ImageUploading = { // Do not change index names, only the values.
     },
     DiscordWebhooks: {
         Url: "https://discord.com/api/webhooks/1174820196716912750/-4Ews08zEzHCZbKIjbEJrNCqT2L0juYdC3dQrjmp67UE91r3fz-Yn2P0aZOiY0Q4bWBB", // Change this to your own discord webhook link.
-        Content: "**{0}** Fotograf uploadladı **{0}** [**{1}**] | **holly4o**" // {0} is the player name, {1} is the player ID
+        Content: "**{0}** Fotograf uploadladı **{0}** [**{1}**] | **Nexora RP**" // {0} is the player name, {1} is the player ID
     }
 }
 Config.Notifications = {
@@ -280,7 +280,7 @@ Config.Applications = {
     },
     //5
     "Bank": {
-        label: "HollyBank",
+        label: "NexoraBank",
         description: "Banka hesaplarını kontrol edebileceğin banka uygulaması",
         icon: "",
         icon_color: "#fff",
@@ -339,6 +339,23 @@ Config.Applications = {
         notifications: {
             icon: "fa-brands fa-x-twitter",
             color: "#22aef0"
+        }
+    },
+    //9
+    "Darkchat": {
+        label: "Dark Chat",
+        description: "Anonim grup sohbetleri",
+        icon: "fas fa-user-secret",
+        icon_color: "#fff",
+        icon_image: "",
+        background: ["#1a1a1a", "#000000"],
+        bottom: false,
+        downloadable: false,
+        downloadTime: 4000, // in miliseconds, 1000 ms = 1 second
+        category: "social",
+        notifications: {
+            icon: "fas fa-user-secret",
+            color: "#ff0000"
         }
     },
 }

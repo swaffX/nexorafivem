@@ -41,6 +41,13 @@ if not Config.Commands.belt.disabled then
             end
         end, false)
     end
+    
+    -- Alternatif komut ekle (hem /belt hem de /kemer)
+    RegisterCommand('kemer', function()
+        if not Config.Commands.belt.disabled then
+            ToggleSeatbelt()
+        end
+    end, false)
 end
 
 function resetBelt()

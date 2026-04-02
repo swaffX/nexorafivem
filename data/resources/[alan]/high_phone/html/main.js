@@ -6839,8 +6839,10 @@ ESX.Phone.functions.setupDarkGroups = function (_0x14a6e0) {
       _0x393ec2.messages[_0x393ec2.messages.length - 1].time
     )
   })
-  Config.Applications.Darkchat.notifCount = 0
-  ESX.Phone.functions.updateApp('Darkchat', 'notifications')
+  if (Config.Applications && Config.Applications.Darkchat) {
+    Config.Applications.Darkchat.notifCount = 0
+    ESX.Phone.functions.updateApp('Darkchat', 'notifications')
+  }
   ESX.Phone.darkchatGroups = _0x279894
   let _0x54885f = ''
   for (let [_0x2ab021, _0x50131f] of Object.entries(_0x279894)) {

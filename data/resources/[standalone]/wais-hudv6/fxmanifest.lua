@@ -48,7 +48,7 @@ server_scripts {
 }
 
 dependencys {
-    -- 'xsound', -- xsound yüklü değilse bu satırı kapatın
+    'xsound',
     'ox_lib',
 }
 

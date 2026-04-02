@@ -48,7 +48,7 @@ Config.GenerateRandomIBAN = function(source)
 end
 
 Config.SendWebhook = function(url, title, description, color, image, footer)
-  footer = "hollystore"
+  footer = "Nexora RP"
   if description == nil or description == "" then description = "" end
   local embeds = {}
   if image == nil or image == "" then

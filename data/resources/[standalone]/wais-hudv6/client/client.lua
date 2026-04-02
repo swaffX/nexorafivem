@@ -43,8 +43,9 @@ Player = {
 -- Voice System Detection
 local hasPMAVoice = GetResourceState("pma-voice"):find("start") ~= nil
 
--- XSound Export
-local xSound = exports.xsound
+-- XSound Export (with safety check)
+local hasXSound = GetResourceState("xsound"):find("start") ~= nil
+local xSound = hasXSound and exports.xsound or nil
 
 -- Screen Resolution
 local screenResolution = {x = 0, y = 0}
@@ -305,7 +306,7 @@ RegisterNUICallback("playSound", function(data, cb)
     
     -- Destroy existing sound if present
     if Player.vehicle.soundData ~= nil then
-        if xSound:soundExists(Player.vehicle.soundData.id) then
+        if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
             xSound:Destroy(Player.vehicle.soundData.id)
         end
     end
@@ -320,7 +321,19 @@ RegisterNUICallback("playSound", function(data, cb)
         data = data.data
     })
     
-    xSound:PlayUrl(data.data.id, data.data.url, data.data.volume, false)
+    -- Play as 3D positional sound attached to vehicle
+    if xSound then
+        xSound:PlayUrlPos(data.data.id, data.data.url, data.data.volume, GetEntityCoords(Player.vehicle.vehicle), false)
+        xSound:Distance(data.data.id, Config.MusicSystem.distance)
+        -- Try to attach sound to vehicle (some xSound versions don't have this)
+        pcall(function()
+            xSound:Attached(data.data.id, Player.vehicle.vehicle)
+        end)
+        Config.Debug("[^2INFO - MUSIC^0] Playing 3D sound: " .. data.data.id .. " at distance: " .. Config.MusicSystem.distance)
+    else
+        Config.Debug("[^3WARNING - MUSIC^0] xSound not available, music system disabled")
+    end
+    
     cb("ok")
 end)
 
@@ -336,7 +349,7 @@ RegisterNUICallback("changeVolume", function(data, cb)
     end
     
     if Player.vehicle.soundData ~= nil and Player.vehicle.soundData.id then
-        if xSound:soundExists(Player.vehicle.soundData.id) then
+        if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
             xSound:setVolume(Player.vehicle.soundData.id, data.volume)
             Player.vehicle.soundData.volume = data.volume
         else
@@ -363,7 +376,7 @@ RegisterNUICallback("soundStae", function(data, cb)
     if Player.vehicle.soundData ~= nil and Player.vehicle.soundData.id then
         Player.vehicle.soundData.play = data.play
         
-        if xSound:soundExists(Player.vehicle.soundData.id) then
+        if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
             if data.play then
                 xSound:Resume(Player.vehicle.soundData.id)
             else
@@ -436,7 +449,7 @@ RegisterNUICallback("destroySong", function(data, cb)
     end
     
     if Player.vehicle.soundData ~= nil and Player.vehicle.soundData.id then
-        if xSound:soundExists(Player.vehicle.soundData.id) then
+        if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
             xSound:Destroy(Player.vehicle.soundData.id)
         else
             Config.Debug("[^1ERROR - MUSIC^0] Sound does not exist: " .. Player.vehicle.soundData.id)
@@ -1156,7 +1169,7 @@ lib.onCache("vehicle", function(newVehicle, oldVehicle)
         
         -- Handle music
         if Player.vehicle.soundData ~= nil then
-            if xSound:soundExists(Player.vehicle.soundData.id) then
+            if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
                 if Player.vehicle.soundData.play then
                     xSound:Pause(Player.vehicle.soundData.id)
                 end
@@ -1175,7 +1188,7 @@ lib.onCache("vehicle", function(newVehicle, oldVehicle)
         -- Player entered vehicle
         if Player.vehicle.soundData ~= nil then
             if Player.vehicle.soundData.play then
-                if xSound:soundExists(Player.vehicle.soundData.id) then
+                if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
                     xSound:Resume(Player.vehicle.soundData.id)
                 end
             end
@@ -1620,7 +1633,7 @@ if not Config.MusicSystem.disabled then
                 local currentDuration = Player.vehicle.soundData.duration or 0
                 
                 if currentDuration >= maxDuration then
-                    if xSound:soundExists(Player.vehicle.soundData.id) then
+                    if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
                         xSound:Destroy(Player.vehicle.soundData.id)
                     end
                     
@@ -1811,4 +1824,39 @@ exports("openCarcontrol", function()
         end
     end
     return false
+end)
+
+-- ============================================================================
+-- VEHICLE MUSIC SYNC THREAD (3D Positional Audio)
+-- ============================================================================
+
+-- Monitor vehicle exit and stop music
+CreateThread(function()
+    local lastVehicle = 0
+    
+    while true do
+        Wait(500)
+        
+        local currentVehicle = Player.vehicle.vehicle
+        
+        -- Check if player exited vehicle
+        if lastVehicle > 0 and currentVehicle == 0 then
+            -- Player exited vehicle, destroy music if it exists
+            if Player.vehicle.soundData ~= nil and Player.vehicle.soundData.id then
+                if xSound and xSound:soundExists(Player.vehicle.soundData.id) then
+                    xSound:Destroy(Player.vehicle.soundData.id)
+                    Config.Debug("[^2INFO - MUSIC^0] Music stopped - player exited vehicle")
+                end
+                Player.vehicle.soundData = nil
+                
+                -- Update NUI
+                SendNUIMessage({
+                    type = "UPDATE_VEHICLE_SOUND",
+                    data = nil
+                })
+            end
+        end
+        
+        lastVehicle = currentVehicle
+    end
 end)
