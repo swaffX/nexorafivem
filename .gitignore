@@ -12,6 +12,7 @@ credentials.txt
 
 # Cache ve Geçici Dosyalar
 data/cache/
+/cache/
 *.log
 *.cache
 
@@ -21,6 +22,14 @@ artifacts/
 *.exe
 *.so
 txData/
+/txData/
+/alpine/
+/server.log
+/run.sh
+/.replxx_history
+/minimal.cfg
+/test.cfg
+/myLogo.png
 
 # Oyuncu Verileri
 data/playerskins/
