@@ -32,7 +32,7 @@
             </defs>
         </svg>
 
-        <transition-group name="custom-classes" enter-active-class="animate_enter" leave-active-class="animate_leave">
+        <transition name="custom-classes" enter-active-class="animate_enter" leave-active-class="animate_leave">
             <div key="widget" v-if="inVehicle && currentSongInformations.name && enableTopWidget" class="widget">
                 <div class="widget-info">
                     <div>
@@ -49,7 +49,9 @@
                 </div>
 
             </div>
-            <div key="menu" v-if="inVehicle || showHudSettings" class="nav">
+            </transition>
+            <transition name="custom-classes" enter-active-class="animate_enter" leave-active-class="animate_leave">
+                <div key="menu" v-if="inVehicle || showHudSettings" class="nav">
                 <div @click="setActiveMenu('quick');PlayClick()" class="nav-item"
                     :class="{selected: activeMenu == 'quick'}" data-action="changeMenu" data-val="quick">
                     {{locales.QUICK}}</div>
@@ -63,7 +65,7 @@
                     :class="{selected: activeMenu == 'media'}" data-action="changeMenu" data-val="media">
                     {{locales.MEDIA}}</div>
             </div>
-        </transition-group>
+            </transition>
 
         <div v-show="hudSettings.showAllLocation" class="location"
             :class="{hovered:hoveredSettingsElement == 'location' || selectedSettingsElement == 'location' || selectedSettingsElement == 'compass'}">
