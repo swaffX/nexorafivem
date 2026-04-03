@@ -70,24 +70,11 @@
             </div>
         </transition>
         <div class="wrapper" v-show="!hudSettings.hideHud && hudLoaded">
-            <div :style="getGiftContainerStyle" class="gift-container" v-if="giftInformations.enable && giftTime">
-                <div  v-html="giftInformations.text.format(giftTime)"></div>
-                <img class="weapon-img" src="./assets/images/gift.png">
-            </div>
+            <!-- Gift Container Removed -->
             <hud></hud>
             <speedometer v-show="inVehicle || showHudSettings"></speedometer>
             <info></info>
-            <div v-if="!hudSettings.hideKeysWidget && hudSettings.showWidgets && enableUIKeys" class="keys screen-keys"
-                :style="getScreenKeysStyle"
-                :class="{hovered:hoveredSettingsElement == 'helper-widgets' || selectedSettingsElement == 'helper-widgets'}">
-
-                <div class="key" v-for="key in keys">
-                    {{key.desc}}
-                    <div class="key-right">
-                        {{key.key}}
-                    </div>
-                </div>
-            </div>
+            <!-- Keys Widget Removed -->
             <div :class="{hovered:hoveredSettingsElement == 'helper-widgets' || selectedSettingsElement == 'helper-widgets'}"
                 class="weapon weapon-widget" :style="getWeaponStyle"
                 v-if="(weaponImg && !hudSettings.hideWeaponWidget && hudSettings.showWidgets) || (showHudSettings && !hudSettings.hideWeaponWidget && hudSettings.showWidgets)">

@@ -23,29 +23,7 @@
             <div id="timer"></div>
             <p>{{FormatJob}}</p>
         </div>
-        <div class="money-container">
-            <div class="money-box bank bank-box" :style="getBankBoxStyle" v-if="!hudSettings.hideBankMoney && forceAccountsVisibility.bank">
-                <inlinesvg src="./app/pages/info/images/bank-icon.svg"></inlinesvg>
-                <p>${{numberWithSpaces(accounts.bank)}}</p>
-            </div>
-            <div class="money-box cash cash-box" :style="getCashBoxStyle" v-if="!hudSettings.hideCashMoney && forceAccountsVisibility.cash">
-                <inlinesvg src="./app/pages/info/images/cash-icon.svg"></inlinesvg>
-                <p>${{numberWithSpaces(accounts.cash)}}</p>
-            </div>
-            <div class="money-box boss-money-box" :style="getBossMoneyBoxStyle" v-if="!hudSettings.hideSocietyMoney && forceAccountsVisibility.boss_money">
-                <inlinesvg src="./app/pages/info/images/boss-money.svg"></inlinesvg>
-                <p>${{numberWithSpaces(accounts.boss_money)}}</p>
-            </div>
-            <div class="money-box black-money-box" :style="getBlackMoneyBoxStyle" v-if="!hudSettings.hideBlackMoney && forceAccountsVisibility.black_money">
-                <inlinesvg src="./app/pages/info/images/black_money.svg"></inlinesvg>
-                <p>${{numberWithSpaces(accounts.black_money)}}</p>
-            </div>
-            <div class="vip-money-box" :style="getVipMoneyBoxStyle" v-if="!hudSettings.hideVipCoinMoney && forceAccountsVisibility.vip_money">
-                <inlinesvg src="./app/pages/info/images/vip-money.svg"></inlinesvg>
-    
-                <p>${{numberWithSpaces(accounts.vip_money)}}</p>
-            </div>
-        </div>
+        <!-- Money Container Removed -->
     </div>
 
 
