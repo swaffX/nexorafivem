@@ -362,6 +362,7 @@ end)
 
 function GetVehicleType(vehicle)
     if Config.EnableOnlyDefaultSpeedometer then
+        local class = GetVehicleClass(vehicle)
         if class == 13 then
             return "bike"
         elseif class == 16 or class == 15 then
@@ -380,13 +381,11 @@ function GetVehicleType(vehicle)
             return "plane"
         elseif class == 14 then
             return "boat"
-        elseif class == 4 then
-            return "muscle"
-        elseif class == 6 or class == 7 then
-            return "super"
+        else
+            return "driftmode"
         end
     end
-    return "vehicle"
+    return "driftmode"
 end
 
 local inPassengerSeat = false

@@ -23,7 +23,16 @@
             <div id="timer"></div>
             <p>{{FormatJob}}</p>
         </div>
-        <!-- Money Container Removed -->
+        <div class="money-container">
+            <div class="money-box bank bank-box" :style="getBankBoxStyle" v-if="!hudSettings.hideBankMoney && forceAccountsVisibility.bank">
+                <inlinesvg src="./app/pages/info/images/bank-icon.svg"></inlinesvg>
+                <p>${{numberWithSpaces(accounts.bank)}}</p>
+            </div>
+            <div class="money-box cash cash-box" :style="getCashBoxStyle" v-if="!hudSettings.hideCashMoney && forceAccountsVisibility.cash">
+                <inlinesvg src="./app/pages/info/images/cash-icon.svg"></inlinesvg>
+                <p>${{numberWithSpaces(accounts.cash)}}</p>
+            </div>
+        </div>
     </div>
 
 

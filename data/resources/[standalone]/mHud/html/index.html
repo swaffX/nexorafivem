@@ -58,10 +58,7 @@
 
 <body>
     <div id="app">
-        <transition name="custom-classes" enter-active-class="animate__animated  animate__fadeIn"
-            leave-active-class="animate__animated  animate__fadeOut">
-            <settings v-if="showHudSettings"></settings>
-        </transition>
+        <!-- Settings Removed -->
         <transition name="custom-classes" enter-active-class="animate__animated  animate__fadeIn"
             leave-active-class="animate__animated  animate__fadeOut">
             <div class="safezone-notify" v-if="(showSafezoneNotify && enableSafezoneNotify && !hudSettings.hideSafezoneNotify) || (showHudSettings && enableSafezoneNotify && !hudSettings.hideSafezoneNotify)">

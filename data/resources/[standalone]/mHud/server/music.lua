@@ -29,7 +29,7 @@ AddEventHandler('playerDropped', function()
     if musics[src] then
         musics[src] = false
         TriggerClientEvent("mHud:DestroyMusic", -1, src)
-        TriggerClientEvent("mHud:SynchronizeMusics", -1, data, src)
+        TriggerClientEvent("mHud:SynchronizeMusics", -1, false, src)
     end
 end)
 
@@ -237,7 +237,7 @@ AddEventHandler("mHud:DestroyMusic", function()
     if musics[src] then
         musics[src] = false
         TriggerClientEvent("mHud:DestroyMusic", -1, src)
-        TriggerClientEvent("mHud:SynchronizeMusics", -1, data, src)
+        TriggerClientEvent("mHud:SynchronizeMusics", -1, false, src)
     end
 end)
 
