@@ -382,10 +382,10 @@ function GetVehicleType(vehicle)
         elseif class == 14 then
             return "boat"
         else
-            return "driftmode"
+            return "sportmode"
         end
     end
-    return "driftmode"
+    return "sportmode"
 end
 
 local inPassengerSeat = false
@@ -935,9 +935,10 @@ RegisterNUICallback("closeSettings", function(data, cb)
 end)
 
 function OpenHudSettings()
-    nuiMessage("OPEN_HUD_SETTINGS")
-    SetNuiFocusKeepInput(false)       
-    SetNuiFocus(true, true)
+    -- Settings menu disabled
+    -- nuiMessage("OPEN_HUD_SETTINGS")
+    -- SetNuiFocusKeepInput(false)       
+    -- SetNuiFocus(true, true)
 end
 local doors = {
     frontLeftDoor = false,
