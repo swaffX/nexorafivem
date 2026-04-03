@@ -62,10 +62,7 @@
                 <div @click="setActiveMenu('media');PlayClick()" class="nav-item"
                     :class="{selected: activeMenu == 'media'}" data-action="changeMenu" data-val="media">
                     {{locales.MEDIA}}</div>
-                <div v-if="enableVehicleModes" @click="setActiveMenu('settings');PlayClick()" class="nav-item"
-                    :class="{selected: activeMenu == 'settings'}" data-action="changeMenu" data-val="settings">
-                    {{locales.SETTINGS}}
-                </div>
+                <!-- Settings tab removed -->
             </div>
         </transition-group>
 
