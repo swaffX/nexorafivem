@@ -136,15 +136,15 @@ const Hud = {
                     break
                 case "SET_SEATBELT":
                     this.seatbeltEnabled = event.data.payload
-                    if (this.seatbeltEnabled) {
-                        let audio = new Audio('./assets/sounds/buckle.ogg');
-                        audio.play();
-                        audio.volume = 0.10;
-                    } else {
-                        let audio = new Audio('./assets/sounds/unbuckle.ogg');
-                        audio.play();
-                        audio.volume = 0.10;
-                    }
+                    // if (this.seatbeltEnabled) {
+                    //     let audio = new Audio('./assets/sounds/buckle.ogg');
+                    //     audio.play();
+                    //     audio.volume = 0.10;
+                    // } else {
+                    //     let audio = new Audio('./assets/sounds/unbuckle.ogg');
+                    //     audio.play();
+                    //     audio.volume = 0.10;
+                    // }
 
                     break
                 case "SET_CRUISE":

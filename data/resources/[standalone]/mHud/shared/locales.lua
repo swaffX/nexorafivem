@@ -183,61 +183,61 @@ Config.Locales = {
 Config.Notifications = {
     ["ENGINE_ON"] = {
        type = "success",
-       message = "Engine is on",
+       message = "Motor çalıştırıldı.",
     },
     ["ENGINE_OFF"] = {
         type = "error",
-        message = "Engine is off",
+        message = "Motor kapatıldı.",
     },
     ["YOU_DONT_HAVE_ITEM"] = {
         type = "error",
-        message = "You don't have %s",
+        message = "Bunda %s yok",
     },
     ["CRUISE_ENABLED"] = {
         type = "success",
-        message = "Cruise control is enabled",
+        message = "Hız sabitleyici aktif.",
     },
     ["CRUISE_DISABLED"] = {
         type = "error",
-        message = "Cruise control is disabled",
+        message = "Hız sabitleyici devre dışı.",
     },
     ["SIT_DRIVER_SEAT"] = {
         type = "error",
-        message = "You have to sit on driver seat to install nitro",
+        message = "Nitroyu takmak için sürücü koltuğunda oturmalısın.",
     },
     
     ["NOT_IN_VEHICLE"] = {
         type = "error",
-        message = "You are not in vehicle",
+        message = "Araçta değilsin.",
     },
 
     ["HAS_ALREADY_NITRO"] = {
         type = "error",
-        message = "This vehicle has already nitro",
+        message = "Bu araçta zaten nitro var.",
     },
     ["INSTALLING_NITRO"] = {
         type = "info",
-        message = "You are installing nitro...",
+        message = "Nitro takılıyor...",
     },
     ["NITRO_INSTALLED"] = {
         type = "success",
-        message = "Nitro installed",
+        message = "Nitro takıldı.",
     },
     ["TOOK_SEATBELT"] = {
         type = "success",
-        message = "You took seatbelt",
+        message = "Emniyet kemerini taktın.",
     },
     ["TOOK_OFF_SEATBELT"] = {
         type = "error",
-        message = "You took off seatbelt",
+        message = "Emniyet kemerini çıkardın.",
     },
     ["GETTING_STRESSED"] = {
         type = "error",
-        message = "Getting Stressed",
+        message = "Stres artıyor.",
     },
     ["RELIEVED_STRESS"] = {
         type = "error",
-        message = "You Are Relaxing",
+        message = "Rahatlıyorsun.",
     },
     
 }
