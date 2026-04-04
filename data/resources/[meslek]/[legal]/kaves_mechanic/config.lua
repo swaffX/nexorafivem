@@ -254,8 +254,8 @@ Config.ExtraMenuLocations = {
 }
 
 Config.Locale = {
-    ["open_mechanic_menu"] = "~INPUT_CONTEXT~ Mechanic Menu",
-    ["open_extra_menu"] = "~INPUT_CONTEXT~ Extra Menu",
-    ["dont_have_money"] = "You don't have enough money",
-    ["popcorn_exhaust"] = "Exhaust status: %s"
+    ["open_mechanic_menu"] = "~INPUT_CONTEXT~ Mekanik Menüsü",
+    ["open_extra_menu"] = "~INPUT_CONTEXT~ Ekstra Menü",
+    ["dont_have_money"] = "Yeterli paran yok",
+    ["popcorn_exhaust"] = "Egzoz durumu: %s"
 }
