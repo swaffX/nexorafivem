@@ -15,7 +15,7 @@ Config.ShowDebug = false -- If you set this to `true`, the debug messages will b
 Config.ShowMapOnFoot = true -- If `true` is set, the player can see the map when not in the vehicle. If `false`, the map will only be visible when in the vehicle.
 Config.SendStatusAlert = false -- If this option is `true`, the player will be notified if the hunger or thirst value falls below 20. Tick `false` if you do not want to use this system
 Config.StressSystem = true -- If you make `true`, stress will come next to the status bars. You will be able to see your stress values. You need to use a script for qb-stress esx for QBCore
-Config.DisableRightCorner = false -- If you want to disable the top right corner, set it to `true`. This will hide all server and player information. If set to `false`, users can see and customize the top right corner.
+Config.DisableRightCorner = false -- Sağ köşe aktif ama server_infos gizli
 Config.DisableMapAnimation = true -- If you set it to `true`, the minimap loading animation will be disabled. If you set it to `false`, the minimap loading animation will be enabled.
 Config.MusicSystem = {
     --[[
@@ -96,12 +96,12 @@ Config.Commands = {
 
 Config.MoneySettings = {
     ["name"] = "money",
-    ["isItem"] = false, -- If your money is in the form of items, make it `true`. If you are using ox_inventory, make it `false`.
-    ["isOldType"] = false, -- If you have an old ESX Version or Chezza Inventory etc. If you are using esx with an old infrastructure, make `true`. If you do not know what you are doing, please leave it as `false`
+    ["isItem"] = false, -- qb-inventory: para item değil, PlayerData.money.cash
+    ["isOldType"] = false, -- Yeni QBCore versiyonu
     
-    -- [[ 🟢 Inventory detections, to work automatically compatible with some inventories. 🟢 ]]
-    ["qs_inventory"] = GetResourceState("qs-inventory"):find("start") and true or false,
-    ["ox_inventory"] = GetResourceState("ox_inventory"):find("start") and true or false,
+    -- [[ 🟢 Inventory detections 🟢 ]]
+    ["qs_inventory"] = false,
+    ["ox_inventory"] = false,
 }
 
 Config.RefreshTimes = {

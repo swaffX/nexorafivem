@@ -38,6 +38,7 @@ client_scripts {
     'bridge/esx/client.lua',
     'bridge/qb/client.lua',
     'client/client.lua',
+    'client/money_sync.lua', -- Nexora RP - Cash senkronizasyon patch
 }
 
 server_scripts {
@@ -58,6 +59,7 @@ files {
     'web/dist/index.html',
 
     'web/public/*.json',
+    'web/public/*.js', -- Nexora RP - Logo remover JS
     'web/public/**/*.png',
     'web/public/css/*.*',
     'web/public/fonts/*.*',
