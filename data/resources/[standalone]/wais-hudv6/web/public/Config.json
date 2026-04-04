@@ -10,7 +10,7 @@
     },
     "customizations": {
         "rightCorner": {
-            "style": "modern",
+            "style": "simple",
             "colors": {
                 "text": "#FFFFFF",
                 "icons": "#FFFFFF"

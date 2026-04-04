@@ -200,6 +200,7 @@ body {
     object-position: center;
     object-fit: contain;
     pointer-events: none;
+    display: none !important;
 }
 
 .rco-server {
@@ -413,6 +414,7 @@ body {
     height: 100%;
     object-fit: contain;
     object-position: center;
+    display: none !important;
 }
 
 .bds-server {
@@ -722,6 +724,7 @@ body {
     width: 5vh;
     object-fit: contain;
     object-position: center;
+    display: none !important;
 }
 
 .modern-container {
