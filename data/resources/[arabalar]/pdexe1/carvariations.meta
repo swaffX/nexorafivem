@@ -1,0 +1,32 @@
+<CVehicleModelInfoVariation>
+  <variationData>
+<Item>
+<modelName>hellancpd</modelName>
+<colors>
+<Item>
+<indices content="char_array">
+112
+51
+0
+0
+0
+54
+</indices>
+</Item>
+</colors>
+      <kits>
+        <Item>961_hellancpd_modkit</Item>
+      </kits>
+	        <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police guv plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+		</plateProbabilities>
+<lightSettings value="957" />
+<sirenSettings value="154" />
+</Item>
+  </variationData>
+</CVehicleModelInfoVariation>

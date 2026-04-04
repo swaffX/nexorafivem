@@ -1,0 +1,150 @@
+{
+  "modal": {
+    "save": {
+      "title": "Değişiklikleri onayla",
+      "description": "Çirkin olmayı da seçebilirsin"
+    },
+    "exit": {
+      "title": "Değişikliklerden vazgeç",
+      "description": "Yaptıkların kayıt edilmeyecek"
+    },
+    "accept": "Evet",
+    "decline": "Hayır"
+  },
+  "ped": {
+    "title": "Ped",
+    "model": "Model"
+  },
+  "headBlend": {
+    "title": "Genetik",
+    "shape": {
+      "title": "Yüz",
+      "firstOption": "Anne",
+      "secondOption": "Baba",
+      "mix": "Karışım"
+    },
+    "skin": {
+      "title": "Ten",
+      "firstOption": "Anne",
+      "secondOption": "Baba",
+      "mix": "Karışım"
+    },
+    "race": {
+      "title": "Soy",
+      "shape": "Şekil",
+      "skin": "Ten",
+      "mix": "Karışım"
+    }
+  },
+  "faceFeatures": {
+    "title": "Yüz Özellikleri",
+    "nose": {
+      "title": "Burun",
+      "width": "Genişlik",
+      "height": "Yükseklik",
+      "size": "Boyut",
+      "boneHeight": "Kemik yüksekliği",
+      "boneTwist": "Kemik eğriliği",
+      "peakHeight": "Tepe yüksekliği"
+    },
+    "eyebrows": {
+      "title": "Kaşlar",
+      "height": "Yükseklik",
+      "depth": "Derinlik"
+    },
+    "cheeks": {
+      "title": "Yanak",
+      "boneHeight": "Kemik yüksekliği",
+      "boneWidth": "Kemik genişliği",
+      "width": "Genişlik"
+    },
+    "eyesAndMouth": {
+      "title": "Gözler ve Ağız",
+      "eyesOpening": "Göz kısıklığı",
+      "lipsThickness": "Dudak kalınlığı"
+    },
+    "jaw": {
+      "title": "Çene",
+      "width": "Genişlik",
+      "size": "Boyut"
+    },
+    "chin": {
+      "title": "Alt Çene",
+      "lowering": "Düşüklük",
+      "length": "Uzunluk",
+      "size": "Boyut",
+      "hole": "Çukur"
+    },
+    "neck": {
+      "title": "Boyun",
+      "thickness": "Kalınlık"
+    }
+  },
+  "headOverlays": {
+    "title": "Dış Görünüş",
+    "hair": {
+      "title": "Saç",
+      "style": "Stil",
+      "color": "Renk",
+      "highlight": "Parlama",
+      "texture": "Yapı",
+      "fade": "Dip"
+    },
+    "opacity": "Saydamlık",
+    "style": "Stil",
+    "color": "Renk",
+    "secondColor": "İkincil renk",
+    "blemishes": "Leke",
+    "beard": "Sakal",
+    "eyebrows": "Kaşlar",
+    "ageing": "Yaş",
+    "makeUp": "Makyaj",
+    "blush": "Kızarıklık",
+    "complexion": "Ten",
+    "sunDamage": "Güneş etkisi",
+    "lipstick": "Ruj",
+    "moleAndFreckles": "Köstebek ve Çiller",
+    "chestHair": "Göğüs kılları",
+    "bodyBlemishes": "Vücut kusurları",
+    "eyeColor": "Göz rengi"
+  },
+  "components": {
+    "title": "Elbise",
+    "drawable": "Giyilebilir",
+    "texture": "Doku",
+    "mask": "Maske",
+    "upperBody": "Kollar",
+    "lowerBody": "Pantalon",
+    "bags": "Çanta",
+    "shoes": "Ayakkabı",
+    "scarfAndChains": "Kolye ve Kravat",
+    "shirt": "T-Shirt",
+    "bodyArmor": "Zırh",
+    "decals": "Çıkartma",
+    "jackets": "Gövde"
+  },
+  "props": {
+    "title": "Aksesuar",
+    "drawable": "Giyilebilir",
+    "texture": "Doku",
+    "hats": "Şapka ve Kask",
+    "glasses": "Gözlük",
+    "ear": "Kulak Aksesuarı",
+    "watches": "Saat",
+    "bracelets": "Bileklik"
+  },
+  "tattoos": {
+    "title": "Dövme",
+    "items": {
+      "ZONE_TORSO": "Gövde",
+      "ZONE_HEAD": "Baş",
+      "ZONE_LEFT_ARM": "Sol kol",
+      "ZONE_RIGHT_ARM": "Sağ kol",
+      "ZONE_LEFT_LEG": "Sol bacak",
+      "ZONE_RIGHT_LEG": "Sağ bacak"
+    },
+    "apply": "Uygula",
+    "delete": "Sil",
+    "deleteAll": "Tüm dövmeleri sil"
+  }
+}

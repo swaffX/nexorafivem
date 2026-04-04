@@ -1,0 +1,86 @@
+{
+	"Rules": [
+		{
+			"title": "Kural 1 ",
+			"rule": "ADK DDK MDK Yasaktır"
+		},
+		{
+			"title": "Kural 2 ",
+			"rule": "TT Yasaktır"
+		},
+		{
+			"title": "Kural 3 ",
+			"rule": "RDM VDM Yasaktır"
+		}
+	],
+
+	"Gallery": ["", "", ""],
+
+	"Team": [
+		{
+			"img": "dede.png",
+			"rank": "Owner",
+			"name": "exe_sa"
+		},
+	    {
+	    	"img": "dede.png",
+	    	"rank": "Founder",
+	    	"name": "ares_capone"
+	    },
+	    {
+	    	"img": "dede.png",
+	    	"rank": "founder",
+	    	"name": "gayo"
+	    },
+		{
+			"img": "dede.png",
+			"rank": "fav admin",
+			"name": "AngelofDarkness"
+		},
+		{
+			"img": "klaytx.png",
+			"rank": "Developer",
+			"name": "exe_sa"
+		}
+	],
+
+	"Updates": [
+		{
+			"img": "",
+			"title": "Fps sorunu düzeltildi.",
+			"update": "Araç içinde olan fps düşüş sorunu düzeltildi."
+		},
+		{
+			"img": "",
+			"title": "Araç bozulma sorunu düzeltildi.",
+			"update": "Araçların bozuk çıkma sıkıntısı çözüldü."
+		}
+	],
+
+	"Music": [
+		{
+			"name": "Yasaksın Artık Bana",
+			"author": "Dave",
+			"path": "musics/son.mp3"
+		}
+	],
+
+	"Keys": {
+		"1": {
+			"title": "Telefon",
+			"description": "Telefonu açmanızı sağlar"
+		},
+		"2": {
+			"title": "Envanter",
+			"description": "Envanteri açmanızı sağlar"
+		},
+		"3": {
+			"title": "Radialmenu",
+			"description": "Radialmenu açmanızı sağlar"
+		}
+	},
+
+	"Discord": "https://www.discord.gg/dederp",
+	"Instagram": "yok",
+	"Youtube": "yok"
+}
