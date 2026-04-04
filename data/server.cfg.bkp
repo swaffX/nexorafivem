@@ -14,20 +14,25 @@
 ## You CAN edit the following:
 endpoint_add_tcp "0.0.0.0:30120"
 endpoint_add_udp "0.0.0.0:30120"
-sv_maxclients 7
-set steam_webApiKey "37F2F0677225AC2D95AD8B074D5344D6"
+sv_maxclients 48
+set steam_webApiKey "none"
 sets tags "default, deployer, qbcore, qb-core"
 
 ## You MAY edit the following:
-sv_licenseKey "cfxk_VgBkE0XFy2Mc6trQpvUk_4HDw12"
-sv_hostname "temelPaket built with QBCore Framework by JericoFx & Kakarot & Hamy!"
-sets sv_projectName "[QBCore Framework] temelPaket"
-sets sv_projectDesc "An advanced FiveM RP framework including jobs, gangs, housing & more!"
-sets locale "root-AQ" # replace with your language and location code, like en-US, pt-BR, etc
+sv_licenseKey "cfxk_z1RMik0DczCYjR8GOqVw_lA23L"
+sv_hostname "Nexora Roleplay"
+sets sv_projectName "discord.gg/Nexora"
+sets sv_projectDesc "Nexora Roleplay"
+sets locale "tr-TR" # replace with your language and location code, like en-US, pt-BR, etc
 load_server_icon myLogo.png
-sv_enforceGameBuild 3095 #DLC The Chop Shop
+sv_enforceGameBuild 3258 #DLC The Chop Shop
 set resources_useSystemChat false
-set mysql_connection_string "mysql://root@localhost/temelPaket?charset=utf8mb4"
+
+# Database Connection String
+set mysql_connection_string "mysql://nexora:Nexora123!@127.0.0.1/temelpaket?charset=utf8mb4"
+
+# Developer Mode (for debugging)
+setr game_enableFlyThroughWindscreen false
 
 # Voice config
 setr voice_useNativeAudio true
@@ -44,7 +49,7 @@ setr qb_locale "en"
 setr UseTarget true
 
 # These resources will start by default.
-start hb_loading
+start izzy_loading
 ensure mapmanager
 ensure spawnmanager
 ensure sessionmanager
@@ -53,22 +58,42 @@ ensure hardcap
 ensure baseevents
 
 # QBCore & Extra stuff
-
 start ox_lib
+
+# Load qb-core FIRST
 ensure qb-core
+
+# Then load [qb] folder
+ensure [exe-eklenti]
+
+# Then load remaining resources
 ensure [alan] 
 ensure [qb]
 ensure [standalone]
 ensure [voice]
 ensure [defaultmaps]
+ensure [maps]
 ensure [stream]
-svgui
+ensure [arabalar]
+start RoadsOfEuropeDE
+# svgui removed: invalid command
+
+# NPC Density Control (Performance Optimization)
+ensure npc-control
+
+# Jobs / Meslekler
+ensure [meslek]
+
+# Custom MLO Maps / Özel Haritalar
+ensure [mlo]
 
 
 ## Permissions ##
 add_ace group.admin command allow # allow all commands
-add_principal identifier.fivem:5804329 group.admin #emreleann1
-add_principal identifier.discord:597885612082593857 group.admin #emreleann1
+
+# Adminler
+add_principal identifier.fivem:17492281 group.admin # swaff
+add_principal identifier.fivem:18812042 group.admin # oguz
 
 # Resources
 add_ace resource.qb-core command allow # Allow qb-core to execute commands
@@ -77,10 +102,6 @@ add_ace resource.qb-core command allow # Allow qb-core to execute commands
 add_ace qbcore.god command allow # Allow all commands
 
 # Inheritance
-add_principal qbcore.god group.admin # Allow gods access to the main admin group used to get all default permissions
+add_principal qbcore.god group.admin # Allow gods access to the main admin group
 add_principal qbcore.god qbcore.admin # Allow gods access to admin commands
 add_principal qbcore.admin qbcore.mod # Allow admins access to mod commands
-
-# OX Configuration
-
-

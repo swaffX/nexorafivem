@@ -14,20 +14,20 @@
 ## You CAN edit the following:
 endpoint_add_tcp "0.0.0.0:30120"
 endpoint_add_udp "0.0.0.0:30120"
-sv_maxclients 48
+sv_maxclients 32
 set steam_webApiKey "none"
-sets tags "qbcore, turkish, roleplay, tr, nexora"
+sets tags "default, qbcore, qb-core"
 
 ## You MAY edit the following:
-sv_licenseKey "cfxk_z1RMik0DczCYjR8GOqVw_lA23L"
-sv_hostname "Nexora FiveM - QBCore Türkçe RP"
-sets sv_projectName "Nexora FiveM"
-sets sv_projectDesc "Türkçe QBCore Roleplay Sunucusu"
+sv_licenseKey "BURAYA_LISANS_ANAHTARINIZI_GIRIN"
+sv_hostname "FiveM Server - QBCore"
+sets sv_projectName "FiveM Server - QBCore"
+sets sv_projectDesc "QBCore Framework Server"
 sets locale "tr-TR"
 load_server_icon myLogo.png
 sv_enforceGameBuild 3258 #DLC The Chop Shop
 set resources_useSystemChat false
-set mysql_connection_string "mysql://root:sifre123@localhost/temelpaket?charset=utf8mb4"
+set mysql_connection_string "mysql://KULLANICI:SIFRE@localhost/VERITABANI_ADI?charset=utf8mb4"
 
 # Voice config
 setr voice_useNativeAudio true
@@ -38,7 +38,7 @@ setr voice_enableRadioAnim 1
 setr voice_syncData 1
 
 # QBCore locale config
-setr qb_locale "tr"
+setr qb_locale "en"
 
 # QBCore UseTarget
 setr UseTarget true
@@ -61,9 +61,12 @@ ensure [standalone]
 ensure [voice]
 ensure [defaultmaps]
 ensure [stream]
+svgui
 
 ## Permissions ##
 add_ace group.admin command allow # allow all commands
+# add_principal identifier.fivem:BURAYA_ID group.admin
+# add_principal identifier.discord:BURAYA_DISCORD_ID group.admin
 
 # Resources
 add_ace resource.qb-core command allow # Allow qb-core to execute commands
@@ -75,6 +78,3 @@ add_ace qbcore.god command allow # Allow all commands
 add_principal qbcore.god group.admin # Allow gods access to the main admin group used to get all default permissions
 add_principal qbcore.god qbcore.admin # Allow gods access to admin commands
 add_principal qbcore.admin qbcore.mod # Allow admins access to mod commands
-
-add_principal identifier.discord:315875588906680330 group.admin
-add_principal identifier.discord:1466655477998817310 group.admin
