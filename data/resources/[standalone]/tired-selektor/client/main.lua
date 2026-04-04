@@ -1,5 +1,5 @@
 Config = {}
-Config.Keybind = 37 -- TAB
+Config.Keybind = 86 -- E (korna ile aynı)
 Config.FlashCount = 3
 Config.FlashSpeed = 150
 
@@ -18,7 +18,7 @@ RegisterCommand('selektorFlash', function()
     end
 end, false)
 
-RegisterKeyMapping('selektorFlash', 'Selektor (Flash Lights)', 'keyboard', 'TAB')
+RegisterKeyMapping('selektorFlash', 'Selektor (Flash Lights)', 'keyboard', 'E')
 
 function PerformFlashSequence(vehicle)
     isFlashing = true

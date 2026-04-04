@@ -182,7 +182,7 @@ function wFramework.requestData()
     elseif Config.Framework.Framework == "qbcore" then
         -- Safety check: if this fails, it might actually be QBX
         local success, result = pcall(function()
-            return wFramework.Framework.Functions.GetPlayerData()
+            return wFramework.Framework.Functions:GetPlayerData()
         end)
         if success then
             return result

@@ -200,7 +200,6 @@ body {
     object-position: center;
     object-fit: contain;
     pointer-events: none;
-    display: none !important;
 }
 
 .rco-server {
@@ -414,7 +413,6 @@ body {
     height: 100%;
     object-fit: contain;
     object-position: center;
-    display: none !important;
 }
 
 .bds-server {
@@ -724,7 +722,6 @@ body {
     width: 5vh;
     object-fit: contain;
     object-position: center;
-    display: none !important;
 }
 
 .modern-container {
@@ -3666,34 +3663,4 @@ body {
     height: 100%;
     stroke-linecap: round;
     stroke-linejoin: round;
-}
-
-
-/* Nexora RP - Logo Değiştirme */
-/* Yeşil arka planı kaldır, Nexora logosunu göster */
-.server-info,
-.server_info,
-.serverInfo,
-.ServerInfo,
-[class*="server-info"],
-[class*="server_info"],
-[class*="serverInfo"],
-[class*="ServerInfo"],
-.right-corner > div:first-child,
-.right-corner-simple > div:first-child,
-.simple-mode .server-info,
-.simple-mode .server_info,
-div[class*="server"],
-div[data-type="server-info"],
-div[data-type="server_info"] {
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-}
-
-/* Yeşil kare renk override */
-div[style*="background"] > div:first-child,
-div[style*="rgb"] > div:first-child {
-    background: transparent !important;
-    background-color: transparent !important;
 }
