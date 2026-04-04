@@ -34,7 +34,7 @@ Config.QBLogs = false --  true (optional)
  -- UM - Multi Character | Main Settings
 -----------------------------------------------------------------------------------------------------------------
 
-Config.Lang = 'tr' -- [locales/.lua]
+Config.Lang = 'en' -- [locales/.lua]
 
 Config.ConvertQBoxLicense = false -- If you are using QBox set true,
 
