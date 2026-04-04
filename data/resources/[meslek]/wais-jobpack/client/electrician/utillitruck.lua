@@ -557,9 +557,7 @@ function L22_1()
           L5_2 = L2_2
           L6_2 = -1
           L4_2 = L4_2(L5_2, L6_2)
-          if L4_2 == L1_2 then
-            goto lbl_57
-          end
+          -- Removed invalid goto lbl_57
         end
         L4_2 = IsEntityAttachedToEntity
         L5_2 = L1_2
@@ -570,7 +568,6 @@ function L22_1()
           if L4_2 then
             L4_2 = Group
             L4_2 = L4_2.active
-            ::lbl_57::
             if not L4_2 and L3_2 then
               L0_2 = 1
               L5_2 = L3_1
