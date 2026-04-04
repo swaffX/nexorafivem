@@ -7,6 +7,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(PlayerData)
     if PlayerData and PlayerData.money then
         -- WAIS-HUD'a para güncelleme eventi gönder
+        Wait(500) -- Biraz bekle ki inventory güncellensin
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
         
         if Config.ShowDebug then
@@ -19,7 +20,7 @@ end)
 
 -- Oyuncu yüklendiğinde
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    Wait(2000)
+    Wait(3000) -- Daha uzun bekle
     local PlayerData = QBCore.Functions.GetPlayerData()
     if PlayerData and PlayerData.money then
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
@@ -29,13 +30,29 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     end
 end)
 
--- Para güncellendiğinde
+-- Para güncellendiğinde (qb-core'dan gelen event)
 RegisterNetEvent('hud:client:OnMoneyChange', function(type, amount, reason)
-    Wait(100)
+    Wait(500)
     local PlayerData = QBCore.Functions.GetPlayerData()
     if PlayerData and PlayerData.money then
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
+        if Config.ShowDebug then
+            print(string.format('[QB-Inventory] Para değişti: %s, Miktar: %d, Sebep: %s', type, amount, reason or 'unknown'))
+        end
     end
 end)
+
+-- Manuel senkronizasyon komutu (test için)
+RegisterCommand('syncmoney', function()
+    local PlayerData = QBCore.Functions.GetPlayerData()
+    if PlayerData and PlayerData.money then
+        TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
+        print(string.format('[QB-Inventory] Manuel senkronizasyon: Cash=%d, Bank=%d', 
+            PlayerData.money.cash or 0, 
+            PlayerData.money.bank or 0))
+    else
+        print('[QB-Inventory] PlayerData bulunamadı!')
+    end
+end, false)
 
 print('[QB-Inventory] WAIS-HUD bridge yüklendi')
