@@ -6,7 +6,8 @@ Config.Command = 'vinewood' -- Command to open the menu
 
 Config.AuthorizedGroups = {
     group = { -- Only for esx and qbcore
-        'admin'
+        'admin',
+        'god'
     },
     identifier = { -- Only for standalone
         'discord:638415863682170881'

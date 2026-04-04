@@ -31,12 +31,13 @@ function SendToDiscord(title, message, color, fields)
             ["color"] = color or Config.WebhookColor,
             ["footer"] = {
                 ["text"] = "Nexora Performans Monitörü | " .. os.date("%d.%m.%Y %H:%M:%S"),
-            },
-            ["thumbnail"] = {
-                ["url"] = Config.WebhookAvatar ~= "" and Config.WebhookAvatar or nil,
-            },
+            }
         }
     }
+
+    if Config.WebhookAvatar and Config.WebhookAvatar ~= "" then
+        embed[1]["thumbnail"] = { ["url"] = Config.WebhookAvatar }
+    end
 
     -- Fields ekle
     if fields and #fields > 0 then
