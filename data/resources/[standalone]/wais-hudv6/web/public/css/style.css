@@ -3669,8 +3669,8 @@ body {
 }
 
 
-/* Yeşil logo TAMAMEN kaldırma - Nexora RP */
-/* Tüm olası logo elementlerini gizle */
+/* Nexora RP - Logo Değiştirme */
+/* Yeşil arka planı kaldır, Nexora logosunu göster */
 .server-info,
 .server_info,
 .serverInfo,
@@ -3686,21 +3686,14 @@ body {
 div[class*="server"],
 div[data-type="server-info"],
 div[data-type="server_info"] {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    max-width: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-    position: absolute !important;
-    left: -9999px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
 }
 
 /* Yeşil kare renk override */
 div[style*="background"] > div:first-child,
 div[style*="rgb"] > div:first-child {
     background: transparent !important;
+    background-color: transparent !important;
 }
