@@ -1,17 +1,54 @@
 {
+  "months": {
+    "january": "Ocak",
+    "february": "Şubat",
+    "march": "Mart",
+    "april": "Nisan",
+    "may": "Mayıs",
+    "june": "Haziran",
+    "july": "Temmuz",
+    "august": "Ağustos",
+    "september": "Eylül",
+    "october": "Ekim",
+    "november": "Kasım",
+    "december": "Aralık"
+  },
+  "days": {
+    "monday": "Pazartesi",
+    "tuesday": "Salı",
+    "wednesday": "Çarşamba",
+    "thursday": "Perşembe",
+    "friday": "Cuma",
+    "saturday": "Cumartesi",
+    "sunday": "Pazar"
+  },
+  "time": {
+    "am": "ÖÖ",
+    "pm": "ÖS",
+    "hour": "Saat",
+    "minute": "Dakika",
+    "second": "Saniye"
+  },
   "rightCorner": {
     "job": "Meslek",
     "gang": "Çete",
     "bank": "Banka",
     "cash": "Nakit",
-    "weapon": "Silah"
+    "weapon": "Silah",
+    "id": "Kimlik",
+    "ping": "Ping",
+    "players": "Oyuncu"
   },
   "carhud": {
     "kmh": "km/s",
     "mph": "mil/s",
     "feet": "ft",
     "airspeed": "Hava Hızı",
-    "waterspeed": "Su Hızı"
+    "waterspeed": "Su Hızı",
+    "fuel": "Yakıt",
+    "engine": "Motor",
+    "speed": "Hız",
+    "gear": "Vites"
   },
   "quickMenu": {
     "markText": "İşaretlemek için tıkla",
@@ -31,6 +68,11 @@
     "music": {
       "placeholder": "Bir şarkı URL'si girin",
       "play": "Oynat",
+      "pause": "Duraklat",
+      "stop": "Durdur",
+      "next": "Sonraki",
+      "previous": "Önceki",
+      "volume": "Ses",
       "errorTitle": "Müzik Hatası",
       "errorMessages": {
         "invalidUrl": "Geçersiz URL. Lütfen geçerli bir şarkı URL'si girin.",
@@ -40,7 +82,19 @@
     }
   },
   "location": {
-    "nearPostal": "Posta Yakını"
+    "nearPostal": "Posta Yakını",
+    "location": "Konum",
+    "street": "Sokak",
+    "area": "Bölge"
+  },
+  "status": {
+    "health": "Sağlık",
+    "armor": "Zırh",
+    "hunger": "Açlık",
+    "thirst": "Susuzluk",
+    "stress": "Stres",
+    "stamina": "Dayanıklılık",
+    "oxygen": "Oksijen"
   },
   "settingsMenu": {
     "title": "Hud",
@@ -48,6 +102,8 @@
     "reset": "Ayarları Sıfırla",
     "confirm": "Onayla",
     "cancel": "İptal",
+    "save": "Kaydet",
+    "close": "Kapat",
     "categories": {
       "general": "Genel",
       "carhud": "Araç Hud",
@@ -68,7 +124,7 @@
     },
     "cinematic": {
       "title": "Sinema Modu",
-      "description": "Sinema modunu etkinleştir veya devre dışı bırak..",
+      "description": "Sinema modunu etkinleştir veya devre dışı bırak.",
       "enabled": "Etkin",
       "disabled": "Devre Dışı"
     },
@@ -132,7 +188,7 @@
       "performance": "Performans"
     },
     "speed": {
-      "title": "Hız türü",
+      "title": "Hız Türü",
       "description": "Carhud'da görmek istediğiniz hız türünü seçin.",
       "kmh": "KM/S",
       "mph": "MIL/S"
