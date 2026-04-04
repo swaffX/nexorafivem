@@ -11,7 +11,8 @@ support "https://discord.gg/jAnEnyGBef"
 documentation "https://docs.cloud-resources.eu/"
 repository "https://github.com/cloud-resources/cloud-shop"
 
-dependencies { "ox_lib" }
+-- DISABLED: UI not built, download release version
+-- dependencies { "ox_lib" }
 
 shared_scripts {
     "@ox_lib/init.lua",

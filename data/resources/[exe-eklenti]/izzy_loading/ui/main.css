@@ -1050,6 +1050,12 @@ body {
 	object-fit: cover;
 }
 
+.video iframe,
+#youtubeVideo {
+	border: none;
+	pointer-events: none;
+}
+
 .background {
 	position: absolute;
 	top: 0;

@@ -94,7 +94,8 @@ local function ShouldPreservePed(ped, playerPed)
         return true
     end
 
-    if IsEntityPositionFrozen(ped) or GetEntityInvincible(ped) then
+    -- GetEntityInvincible native'i mevcut değil, IsEntityPositionFrozen yeterli
+    if IsEntityPositionFrozen(ped) then
         return true
     end
 
@@ -115,7 +116,8 @@ local function ShouldPreserveVehicle(vehicle)
         return true
     end
 
-    if IsEntityPositionFrozen(vehicle) or GetEntityInvincible(vehicle) then
+    -- GetEntityInvincible native'i mevcut değil, IsEntityPositionFrozen yeterli
+    if IsEntityPositionFrozen(vehicle) then
         return true
     end
 
