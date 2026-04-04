@@ -1,0 +1,27 @@
+# Editors
+.idea/
+*.swp
+*.swo
+
+# Dependencies
+node_modules/
+
+# Testing
+coverage/
+
+# Production
+dist/
+build/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
