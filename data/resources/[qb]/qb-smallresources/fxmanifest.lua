@@ -17,7 +17,28 @@ client_scripts {
     '@PolyZone/client.lua',
     '@PolyZone/BoxZone.lua',
     '@PolyZone/ComboZone.lua',
-    'client/*.lua'
+    'client/afk.lua',
+    'client/arkadakilerigormeme.lua',
+    'client/binoculars.lua',
+    'client/calmai.lua',
+    'client/consumables.lua',
+    'client/crouchprone.lua',
+    'client/cruise.lua',
+    'client/discord.lua',
+    'client/editor.lua',
+    'client/fireworks.lua',
+    'client/handsup.lua',
+    'client/hudcomponents.lua',
+    'client/ignore.lua',
+    'client/noshuff.lua',
+    'client/point.lua',
+    'client/removeentities.lua',
+    -- 'client/seatbelt.lua', -- DISABLED: wais-hudv6 has its own seatbelt system
+    'client/tackle.lua',
+    'client/teleports.lua',
+    'client/vehiclepush.lua',
+    'client/vehicletext.lua',
+    'client/weapdrop.lua'
 }
 
 data_file 'FIVEM_LOVES_YOU_4B38E96CC036038F' 'events.meta'
