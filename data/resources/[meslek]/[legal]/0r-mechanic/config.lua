@@ -234,7 +234,7 @@ Config.Locations = {
     ["Bennys Workshop"] = {
         illegalMechanic = false,
         enableSociety = true,
-        job = "unemployed",
+        job = "mechanic", -- Sadece mekanikler kullanabilir
         coords = {
             vector3(-211.2, -1323.79, 30.22)
         },

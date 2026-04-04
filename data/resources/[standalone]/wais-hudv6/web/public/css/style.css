@@ -3667,3 +3667,23 @@ body {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+
+/* Yeşil logo gizleme - Nexora RP */
+/* Sadece simple modda görünen yeşil kare logo için */
+.server-info,
+.server_info,
+[class*="server-info"],
+[class*="server_info"],
+[class*="ServerInfo"],
+.right-corner > div:first-child,
+.right-corner-simple > div:first-child,
+.simple-mode .server-info,
+.simple-mode .server_info {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none !important;
+}
