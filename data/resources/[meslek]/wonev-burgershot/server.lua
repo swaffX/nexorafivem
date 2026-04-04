@@ -707,3 +707,34 @@ QBCore.Functions.CreateUseableItem('wonev_chickenburgermenu2', function(source, 
         
     end
 end)
+
+
+-- Kasa para güncelleme eventi (eksikti)
+RegisterNetEvent('wonev:Updatemoney', function()
+    local src = source
+    -- qb-management veya qb-bossmenu'den kasa parasını al
+    local job = 'burgershot' -- Config'den alınabilir
+    
+    -- qb-management kullanıyorsa
+    if GetResourceState('qb-management') == 'started' then
+        exports['qb-management']:GetAccount(job, function(account)
+            if account then
+                totalmoney = account
+                TriggerClientEvent('wonev:UpdatemoneyClient', src, totalmoney)
+            else
+                totalmoney = 0
+                TriggerClientEvent('wonev:UpdatemoneyClient', src, 0)
+            end
+        end)
+    -- qb-bossmenu kullanıyorsa
+    elseif GetResourceState('qb-bossmenu') == 'started' then
+        local account = exports['qb-bossmenu']:GetAccount(job)
+        totalmoney = account or 0
+        TriggerClientEvent('wonev:UpdatemoneyClient', src, totalmoney)
+    else
+        -- Hiçbiri yoksa 0 gönder
+        totalmoney = 0
+        TriggerClientEvent('wonev:UpdatemoneyClient', src, 0)
+        print('[Burgershot] qb-management veya qb-bossmenu bulunamadı!')
+    end
+end)

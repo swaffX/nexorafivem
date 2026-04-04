@@ -18,14 +18,8 @@ Config.StressSystem = true -- If you make `true`, stress will come next to the s
 Config.DisableRightCorner = false -- If you want to disable the top right corner, set it to `true`. This will hide all server and player information. If set to `false`, users can see and customize the top right corner.
 Config.DisableMapAnimation = true -- Harita animasyonunu kapat (beyaz kaplama)
 Config.MusicSystem = {
-    --[[
-        📛 Currently this system is not synchronised with other players. 
-        🟠 I tried to synchronise as efficiently as possible, but it did not work as I wanted. 
-        🟠 I can optionally bring the synchronisation option with the update
-    --]]
-
-    ["disable"] = false, -- If you set `true`, people will not be able to use the music system from the car control menu. The system will switch off completely.
-    ["distance"] = 10.0, -- If you are using the music system in the car control, it is the distance distance of the music played in the vehicle.  
+    ["disable"] = true, -- Müzik sistemini kapat (script.js hatası için)
+    ["distance"] = 10.0,
 }
 
 Config.PostalMap = {
