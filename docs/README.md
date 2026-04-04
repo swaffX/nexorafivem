@@ -52,3 +52,9 @@ Bu docs paketi su sorulari hizli cevaplamak icin yazildi:
 - Runtime cache, `txData`, `alpine`, log ve benzeri ortam dosyalarini commit etme.
 - Yeni bir DB ihtiyaci varsa once `docs/DATABASE_AND_MARIADB.md` oku.
 - Sunucuda calisan layout ile repo layout'unun birebir ayni olmadigini kontrol et.
+
+## Yerel calisma notu
+
+- Yerelde calismaya baslamadan once `git pull --ff-only origin main` calistir.
+- Eger bir degisiklik once VPS uzerinde yapildiysa, repo'ya alinmadan yerelde yeni is acma.
+- GitHub push icin temiz kaynak repo kabul edilir; runtime klasorleri ve anlik sunucu dosyalari referans alinmaz.
