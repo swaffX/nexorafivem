@@ -1,12 +1,14 @@
 fx_version 'cerulean'
 game 'gta5'
-author 'atiysu'
+author 'swaffdev & oguzxdev'
 lua54 'yes'
 
 files {
 	'config.json',
 	'ui/**/*.*',
 	'ui/*.*',
+	'video.mp4',
+	'music.mp3',
 }
 
 loadscreen 'ui/index.html'

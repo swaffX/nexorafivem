@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
+		<title>Nexora Roleplay - Loading</title>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="main.css" />
 	</head>
 	<body>
@@ -70,7 +73,7 @@
 						<div class="key minikey" data-key="N">N</div>
 						<div class="key minikey" data-key="M">M</div>
 						<div class="key minikey" data-key=".">.</div>
-						<div class="key minikey" data-key=">">></div>
+						<div class="key minikey" data-key=">">&gt;</div>
 						<div class="key minikey" data-key="?">?</div>
 						<div class="key bigkey" style="width: 9.5833vw" data-key="RSHIFT">Shift</div>
 						<div class="key bigkey" data-key="LCTRL">Ctrl</div>
@@ -86,7 +89,7 @@
 							<div class="keyIcon">A</div>
 							<h2>
 								SELECT
-								<p>Select a key to see.</p>
+								<p>Bir tuş seçin.</p>
 							</h2>
 						</div>
 					</div>
@@ -94,44 +97,42 @@
 				</div>
 			</div>
 
+			<!-- Left Side -->
 			<div class="leftSide">
 				<div class="titleBox">
 					<div class="titleIcon">
+						<div class="titleIcon-glow"></div>
 						<img src="./img/logo.png" class="logoPng" />
 					</div>
 					<h2 class="titleText">
-						HİGH V ROLEPLAY
-						<p>dc.gg/Highvrp</p>
+						NEXORA ROLEPLAY
+						<p>discord.gg/Nexora</p>
 					</h2>
 				</div>
 
 				<div class="serverRules-wrapper">
 					<div class="boxStyle serverRules">
 						<div class="closeBox" id="rulesBtn"><i class="fa-solid fa-angles-left"></i></div>
-						<div class="boxTopTitle">SUNUCU KURALLARI</div>
+						<div class="boxTopTitle">
+							<i class="fa-solid fa-scroll" style="margin-right: 0.4vw; font-size: 0.55vw;"></i>
+							SUNUCU KURALLARI
+						</div>
 						<div class="rulesListBox">
 							<div class="rulesList"></div>
 						</div>
 					</div>
 				</div>
-<!-- 
-				<div class="gallerBox-wrapper">
-					<div class="boxStyle galleryBox">
-						<div class="closeBox" id="galleryBox"><i class="fa-solid fa-angles-left"></i></div>
-						<div class="boxTopTitle">GALERI</div>
-						<div class="galleryList">
-							<div class="imagesWrapper"></div>
-						</div>
-					</div>
-				</div> -->
 
 				<div class="socialMediaBox-wrapper">
 					<div class="boxStyle socialMediaBox">
 						<div class="closeBox" id="socialBtn"><i class="fa-solid fa-angles-left"></i></div>
-						<div class="boxTopTitle">SOSYAL MEDYA BAGLANTILARI</div>
+						<div class="boxTopTitle">
+							<i class="fa-solid fa-link" style="margin-right: 0.4vw; font-size: 0.55vw;"></i>
+							SOSYAL MEDYA BAĞLANTILARI
+						</div>
 						<div class="socialMediaList">
-							<div id="discord" class="socialMedia">
-								<div class="socialMediaIcon">
+							<div id="discord" class="socialMedia discord-card">
+								<div class="socialMediaIcon discord-icon">
 									<i class="fa-brands fa-discord"></i>
 								</div>
 								<h2 class="socialText">
@@ -141,24 +142,24 @@
 								<div class="socialJoinButton">Katıl</div>
 							</div>
 
-							<div id="instagram" class="socialMedia" style="border: 0.0521vw solid rgba(203, 185, 255, 0.24); background: rgba(203, 185, 255, 0.08)">
-								<div class="socialMediaIcon" style="background: rgba(203, 185, 255, 0.04)">
-									<i class="fa-brands fa-discord" style="color: #cbb9ff99"></i>
+							<div id="instagram" class="socialMedia nexora-card">
+								<div class="socialMediaIcon nexora-icon">
+									<i class="fa-solid fa-gamepad"></i>
 								</div>
-								<h2 class="socialText" style="color: rgba(203, 185, 255, 0.6)">
-									HİGH V ROLEPLAY 
-									<p style="color: rgba(203, 185, 255, 0.6)">Katıl</p>
+								<h2 class="socialText">
+									NEXORA RP
+									<p>Sunucu</p>
 								</h2>
-								<div class="socialJoinButton">Katıl</div>
+								<div class="socialJoinButton">İncele</div>
 							</div>
 
-							<div id="youtube" class="socialMedia" style="border: 0.0521vw solid rgba(255, 206, 206, 0.24); background: rgba(255, 206, 206, 0.08)">
-								<div class="socialMediaIcon" style="background: rgba(203, 185, 255, 0.04)">
-									<i class="fa-brands fa-chrome" style="color: #ffcece99"></i>
+							<div id="youtube" class="socialMedia web-card">
+								<div class="socialMediaIcon web-icon">
+									<i class="fa-brands fa-chrome"></i>
 								</div>
-								<h2 class="socialText" style="color: rgba(255, 206, 206, 0.6)">
+								<h2 class="socialText">
 									Website
-									<p style="color: rgba(255, 206, 206, 0.6)">İncele</p>
+									<p>İncele</p>
 								</h2>
 								<div class="socialJoinButton">İncele</div>
 							</div>
@@ -166,57 +167,12 @@
 					</div>
 				</div>
 
-				<div class="buttonListBox-wrapper">
-					<div class="buttonListBox">
-						<div class="buttonBox" id="keysBtn">
-							<div class="buttonIcon"><i class="fa-solid fa-keyboard"></i></div>
-							<h2>Tuşlar</h2>
-							<i class="fa-solid fa-arrow-pointer"></i>
-						</div>
-						<div class="buttonBox" id="hideBtn">
-							<div class="buttonIcon"><i class="fa-solid fa-eye"></i></div>
-							<h2>Ogeleri Gizle</h2>
-							<i class="fa-solid fa-arrow-pointer"></i>
-						</div>
-						<!-- <div class="buttonBox" id="videoHideBtn">
-							<div class="buttonIcon"><i class="fa-solid fa-eye"></i></div>
-							<h2>Videoyu Gizle</h2>
-							<i class="fa-solid fa-arrow-pointer"></i>
-						</div> -->
-					</div>
-				</div>
-			</div>
-
-			<div class="rightSide">
-				<div class="authorizedTeamBox-wrapper">
-					<div class="boxStyle authorizedTeamBox">
-						<div id="teamBtn" class="closeBoxRight" style="left: -0.7292vw">
-							<i class="fa-solid fa-angles-right"></i>
-						</div>
-						<div class="boxTopTitle" style="background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.14) 100%)">AUTHORIZED TEAM</div>
-						<div class="teamListBox"></div>
-					</div>
-				</div>
-<!-- 
-				<div class="serverUpdateBox-wrapper">
-					<div class="boxStyle serverUpdateBox">
-						<div id="updatesBtn" class="closeBoxRight" style="left: -0.7292vw">
-							<i class="fa-solid fa-angles-right"></i>
-						</div>
-						<div class="boxTopTitle" style="background: linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.14) 100%)">
-							<span>Güncellemeler</span>
-						</div>
-						<div class="updateListBox"></div>
-					</div>
-				</div> -->
-
 				<div class="serverMusicBox-wrapper">
 					<div class="boxStyle serverMusicBox">
-						<div id="musicBtn" class="closeBoxRight" style="left: -0.7292vw">
-							<i class="fa-solid fa-angles-right"></i>
-						</div>
-						<div class="boxTopTitle" style="background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.14) 100%)">
-							<span>Müzik</span>
+						<div class="closeBox" id="musicBtn"><i class="fa-solid fa-angles-left"></i></div>
+						<div class="boxTopTitle">
+							<i class="fa-solid fa-music" style="margin-right: 0.4vw; font-size: 0.55vw;"></i>
+							MÜZİK
 						</div>
 						<div class="musicListBox">
 							<div class="musicBox">
@@ -248,8 +204,40 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="buttonListBox-wrapper">
+					<div class="buttonListBox">
+						<div class="buttonBox" id="keysBtn">
+							<div class="buttonIcon"><i class="fa-solid fa-keyboard"></i></div>
+							<h2>Tuşlar</h2>
+							<i class="fa-solid fa-arrow-pointer"></i>
+						</div>
+						<div class="buttonBox" id="hideBtn">
+							<div class="buttonIcon"><i class="fa-solid fa-eye"></i></div>
+							<h2>Ögeleri Gizle</h2>
+							<i class="fa-solid fa-arrow-pointer"></i>
+						</div>
+					</div>
+				</div>
 			</div>
 
+			<!-- Right Side -->
+			<div class="rightSide">
+				<div class="authorizedTeamBox-wrapper">
+					<div class="boxStyle authorizedTeamBox">
+						<div id="teamBtn" class="closeBoxRight" style="left: -0.7292vw">
+							<i class="fa-solid fa-angles-right"></i>
+						</div>
+						<div class="boxTopTitle" style="background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.14) 100%)">
+							<i class="fa-solid fa-code" style="margin-right: 0.4vw; font-size: 0.55vw;"></i>
+							DEVELOPER TEAM
+						</div>
+						<div class="teamListBox"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Loading Bar -->
 			<div class="loadingBox">
 				<div class="loadingSourceBox">
 					<h2>Yükleniyor</h2>
@@ -264,17 +252,15 @@
 
 			<div class="background"></div>
 		
-			<iframe
-				id="youtube-player"
-				class="video"
-				src="https://www.youtube.com/embed/To-ov6L0_HI?enablejsapi=1&autoplay=1&loop=1"
-				frameborder="0"
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-			></iframe>
+			<!-- Background Video (muted, local file) -->
+			<div class="video">
+				<video id="myVideo" autoplay muted loop playsinline>
+					<source src="../video.mp4" type="video/mp4" />
+				</video>
+			</div>
 		</div>
 
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/BrowserFS/2.0.0/browserfs.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 		<script src="main.js"></script>
 	</body>

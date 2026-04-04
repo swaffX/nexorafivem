@@ -13,66 +13,43 @@ function convertValue (value, oldMin, oldMax, newMin, newMax) {
     return newValue
 }
 
-$(document).ready(function () {
-    $(".video").append(`
-        <video id="myVideo" autoplay muted loop>
-            <source src="./img/video.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-        </video>
-    `)
-})
-
-var tag = document.createElement('script');
-
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-var player;
-var muted = false;
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player("youtube-player", {
-        events: {
-            'onReady': onPlayerReady
-        }
-    });
-}
-
-let interval;
-function onPlayerReady() {
-    player.mute();
-
-    $('#sounds').on("change", function(){
-        muted = !muted;
-        clearInterval(interval)
-        if(muted) {
-            let volume = 0.3;
-            interval = setInterval(() => {
-                if(volume > 0.00) {
-                    volume -= 0.02
-                    song.volume = volume;
-                } else {
-                    clearInterval(interval)
-                    song.volume = .0;
-                }
-            }, 1);
-        } else {
-            let volume = 0.0;
-            interval = setInterval(() => {
-                if(volume < 1.00) {
-                    volume += 0.02
-                    song.volume = volume;
-                } else {
-                    clearInterval(interval)
-                    song.volume = 0.3;
-                }
-            }, 1);
-        }
-    });
-}
-
 $(async function () {
-    const Config = await fetch(`../../config.json`).then((res) => res.json())
+    // Fallback config (tarayıcıda file:// ile fetch çalışmaz, FiveM NUI'de çalışır)
+    const fallbackConfig = {
+        "Rules": [
+            { "title": "Kural 1", "rule": "ADK DDK MDK Yasaktır" },
+            { "title": "Kural 2", "rule": "TT Yasaktır" },
+            { "title": "Kural 3", "rule": "RDM VDM Yasaktır" }
+        ],
+        "Gallery": [],
+        "Team": [
+            { "img": "swaffdev.gif", "rank": "Developer", "name": "swaffdev" },
+            { "img": "oguzdev.gif", "rank": "Developer", "name": "oguzxdev" }
+        ],
+        "Updates": [
+            { "img": "", "title": "Nexora Roleplay Açıldı!", "update": "Sunucumuz yepyeni içeriklerle hizmetinize açıldı." },
+            { "img": "", "title": "Performans Güncellemesi", "update": "FPS optimizasyonları ve bug fixleri uygulandı." }
+        ],
+        "Music": [
+            { "name": "ÇIKTIN KARŞIMA 2.0", "author": "DEEPRISE & JABBAR ft. UZI", "path": "../music.mp3" }
+        ],
+        "Keys": {
+            "1": { "title": "Telefon", "description": "Telefonu açmanızı sağlar" },
+            "2": { "title": "Envanter", "description": "Envanteri açmanızı sağlar" },
+            "3": { "title": "Radialmenu", "description": "Radialmenu açmanızı sağlar" }
+        },
+        "Discord": "https://discord.gg/Nexora",
+        "Instagram": "yok",
+        "Youtube": "yok"
+    };
+
+    let Config;
+    try {
+        Config = await fetch(`../config.json`).then((res) => res.json());
+    } catch (e) {
+        console.log("[izzy_loading] Config fetch failed, using fallback config");
+        Config = fallbackConfig;
+    }
 
     let rulehtml = ''
     let galleryhtml = ''
@@ -113,15 +90,17 @@ $(async function () {
     });
 
     Config.Gallery.forEach(photo => {
-        galleryhtml += `<img src="img/gallery/${photo}" class="galleryImg"/>`
+        if (photo && photo.length > 0) {
+            galleryhtml += `<img src="img/gallery/${photo}" class="galleryImg"/>`
+        }
     });
 
     Config.Team.forEach(member => {
         teamhtml += `
         <div class="teamBox">
-            <div class="teamProfileImg" style="background-image: url(img/team/${member.img});"></div>
-            <h2 class="teamRank">${member.rank}</h2>
+            <div class="teamProfileImg" style="background-image: url(${member.img});"></div>
             <div class="teamName">${member.name}</div>
+            <h2 class="teamRank">${member.rank}</h2>
         </div>`
 
     });
@@ -167,16 +146,6 @@ $(async function () {
         $(".keyboardSide-wrapper").fadeOut()
     })
 
-    $("#videoHideBtn").click(function(){
-        if(video){
-            video = false
-            $("iframe").fadeOut()
-        }else{
-            video = true
-            $("iframe").fadeIn()
-        }
-    })
-
     $("#rulesBtn").click(function(){
         if(rules){
             rules = false
@@ -190,28 +159,6 @@ $(async function () {
         }else{
             rules = true
             $(".serverRules").css({
-                transform: "translateX(0)",
-            })
-            $(this).css({
-                rotate: "0deg",
-                transform: "translateX(0)",
-            })
-        }
-    })
-
-    $("#galleryBox").click(function(){
-        if(gallery){
-            gallery = false
-            $(".galleryBox").css({
-                transform: "translateX(-27vw)",
-            })
-            $(this).css({
-                rotate: "180deg",
-                transform: "translateX(-100px)",
-            })
-        }else{
-            gallery = true
-            $(".galleryBox").css({
                 transform: "translateX(0)",
             })
             $(this).css({
@@ -291,11 +238,11 @@ $(async function () {
         if(music){
             music = false
             $(".serverMusicBox").css({
-                transform: "translateX(24vw)",
+                transform: "translateX(-27vw)",
             })
             $(this).css({
                 rotate: "180deg",
-                transform: "translateX(100px)",
+                transform: "translateX(-100px)",
             })
         }else{
             music = true

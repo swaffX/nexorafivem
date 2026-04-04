@@ -1,15 +1,15 @@
 {
 	"Rules": [
 		{
-			"title": "Kural 1 ",
+			"title": "Kural 1",
 			"rule": "ADK DDK MDK Yasaktır"
 		},
 		{
-			"title": "Kural 2 ",
+			"title": "Kural 2",
 			"rule": "TT Yasaktır"
 		},
 		{
-			"title": "Kural 3 ",
+			"title": "Kural 3",
 			"rule": "RDM VDM Yasaktır"
 		}
 	],
@@ -18,50 +18,35 @@
 
 	"Team": [
 		{
-			"img": "dede.png",
-			"rank": "Owner",
-			"name": "exe_sa"
-		},
-	    {
-	    	"img": "dede.png",
-	    	"rank": "Founder",
-	    	"name": "ares_capone"
-	    },
-	    {
-	    	"img": "dede.png",
-	    	"rank": "founder",
-	    	"name": "gayo"
-	    },
-		{
-			"img": "dede.png",
-			"rank": "fav admin",
-			"name": "AngelofDarkness"
-		},
-		{
-			"img": "klaytx.png",
+			"img": "swaffdev.gif",
 			"rank": "Developer",
-			"name": "exe_sa"
+			"name": "swaffdev"
+		},
+		{
+			"img": "oguzdev.gif",
+			"rank": "Developer",
+			"name": "oguzxdev"
 		}
 	],
 
 	"Updates": [
 		{
 			"img": "",
-			"title": "Fps sorunu düzeltildi.",
-			"update": "Araç içinde olan fps düşüş sorunu düzeltildi."
+			"title": "Nexora Roleplay Açıldı!",
+			"update": "Sunucumuz yepyeni içeriklerle hizmetinize açıldı."
 		},
 		{
 			"img": "",
-			"title": "Araç bozulma sorunu düzeltildi.",
-			"update": "Araçların bozuk çıkma sıkıntısı çözüldü."
+			"title": "Performans Güncellemesi",
+			"update": "FPS optimizasyonları ve bug fixleri uygulandı."
 		}
 	],
 
 	"Music": [
 		{
-			"name": "Yasaksın Artık Bana",
-			"author": "Dave",
-			"path": "musics/son.mp3"
+			"name": "ÇIKTIN KARŞIMA 2.0",
+			"author": "DEEPRISE & JABBAR ft. UZI",
+			"path": "../music.mp3"
 		}
 	],
 
@@ -80,7 +65,7 @@
 		}
 	},
 
-	"Discord": "https://www.discord.gg/dederp",
+	"Discord": "https://discord.gg/Nexora",
 	"Instagram": "yok",
 	"Youtube": "yok"
 }
