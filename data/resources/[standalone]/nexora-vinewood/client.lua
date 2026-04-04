@@ -38,29 +38,7 @@ end
 
 -- Komut
 RegisterCommand(Config.Command, function()
-    if Config.Framework == 'qbcore' and QBCore then
-        local PlayerData = QBCore.Functions.GetPlayerData()
-        local hasPermission = false
-        
-        -- Yetki kontrolü
-        for _, group in ipairs(Config.AuthorizedGroups) do
-            if PlayerData.job.name == group or (PlayerData.gang and PlayerData.gang.name == group) then
-                hasPermission = true
-                break
-            end
-        end
-        
-        -- Admin kontrolü
-        if QBCore.Functions.HasPermission('admin') or QBCore.Functions.HasPermission('god') then
-            hasPermission = true
-        end
-        
-        if not hasPermission then
-            QBCore.Functions.Notify(Config.Locale['no_permission'], 'error')
-            return
-        end
-    end
-    
+    -- Yetki kontrolü sunucu tarafında yapılacak
     -- Input al
     local input = lib.inputDialog('Vinewood Yazısı', {
         {
@@ -82,7 +60,7 @@ RegisterCommand(Config.Command, function()
             return
         end
         
-        -- Sunucuya gönder
+        -- Sunucuya gönder (yetki kontrolü orada yapılacak)
         TriggerServerEvent('nexora-vinewood:server:changeText', newText)
     end
 end)
