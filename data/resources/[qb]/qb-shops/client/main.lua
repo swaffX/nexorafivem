@@ -53,7 +53,7 @@ local function openShop(shop, data)
                     products[k].amount = v.amount
                 end
             elseif not shopInvJson[shop] then
-                print('No shop inventory found -- defaults enabled')
+                -- Shop inventory not found, using defaults (this is normal when Config.UseTruckerJob = false)
             end
 
             for i = 1, #products do

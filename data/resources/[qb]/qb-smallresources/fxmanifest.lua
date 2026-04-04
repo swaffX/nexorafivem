@@ -18,7 +18,7 @@ client_scripts {
     '@PolyZone/BoxZone.lua',
     '@PolyZone/ComboZone.lua',
     'client/afk.lua',
-    'client/arkadakilerigormeme.lua',
+    -- 'client/arkadakilerigormeme.lua', -- DISABLED: Causes character transparency issues
     'client/binoculars.lua',
     'client/calmai.lua',
     'client/consumables.lua',

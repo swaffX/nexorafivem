@@ -21,14 +21,58 @@ RegisterNUICallback("TestDrive", function(data, cb)
 
     startCountDown = true
     local timeGG = GetGameTimer()
+    local testDriveActive = true
+
+    -- Modern bildirim göster
+    if Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
+        Framework.Functions.Notify("Test sürüşü başladı! Süre: " .. TestDriveTime .. " saniye", "success", 5000)
+        Framework.Functions.Notify("Test sürüşünü bitirmek için [E] tuşuna basın veya araçtan inin", "primary", 7000)
+    else
+        Framework.ShowNotification("Test sürüşü başladı! Süre: " .. TestDriveTime .. " saniye")
+        Framework.ShowNotification("Test sürüşünü bitirmek için [E] tuşuna basın veya araçtan inin")
+    end
 
     Citizen.CreateThread(function()
-        while startCountDown do
+        while startCountDown and testDriveActive do
             SendNUIMessage({type = "close"})
             Citizen.Wait(1)
-            if GetGameTimer() < timeGG + tonumber(1000*TestDriveTime) then
-                drawTxt(' ~r~ TEST DRIVE:' .. math.ceil(TestDriveTime - (GetGameTimer() - timeGG)/1000) ,4,0.5,0.93,0.50,255,255,255,180)
+            
+            local remainingTime = math.ceil(TestDriveTime - (GetGameTimer() - timeGG)/1000)
+            
+            -- E tuşuna basıldı mı kontrol et
+            if IsControlJustPressed(0, 38) then -- E tuşu
+                testDriveActive = false
+                if Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
+                    Framework.Functions.Notify("Test sürüşü sonlandırıldı", "error", 3000)
+                else
+                    Framework.ShowNotification("Test sürüşü sonlandırıldı")
+                end
+            end
+            
+            -- Araçtan indi mi kontrol et
+            if not IsPedInVehicle(PlayerPedId(), testDriveEntity, false) then
+                testDriveActive = false
+                if Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
+                    Framework.Functions.Notify("Araçtan indiğiniz için test sürüşü sonlandırıldı", "error", 3000)
+                else
+                    Framework.ShowNotification("Araçtan indiğiniz için test sürüşü sonlandırıldı")
+                end
+            end
+            
+            if GetGameTimer() < timeGG + tonumber(1000*TestDriveTime) and testDriveActive then
+                -- Modern HUD gösterimi
+                drawTxt('~w~TEST SÜRÜŞÜ: ~g~' .. remainingTime .. ' ~w~saniye~n~~y~[E] ~w~ile bitir',4,0.5,0.93,0.50,255,255,255,200)
             else
+                testDriveActive = false
+                if Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
+                    Framework.Functions.Notify("Test sürüşü süresi doldu", "error", 3000)
+                else
+                    Framework.ShowNotification("Test sürüşü süresi doldu")
+                end
+            end
+            
+            -- Test sürüşü bitti, aracı sil ve oyuncuyu geri götür
+            if not testDriveActive then
                 DeleteEntity(testDriveEntity)
                 SetEntityCoords(PlayerPedId(), lastPlayerCoords)
                 startCountDown = false

@@ -91,7 +91,10 @@ class GameRender {
 
         this.rtTexture = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat, type: UnsignedByteType});
 
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        // Fix: Check if renderer exists before calling setSize
+        if (this.renderer) {
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
     }
 
     animate() {

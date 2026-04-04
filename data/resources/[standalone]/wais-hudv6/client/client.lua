@@ -1502,16 +1502,22 @@ CreateThread(function()
                 if next(Player.customizations) then
                     sleepTime = Config.RefreshTimes.compass[Player.customizations.performance]
                     
-                    -- Street names removed - set to empty
+                    -- Get street names
                     local streetHash, crossingHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
-                    local streetName = "" -- Removed: GetStreetNameFromHashKey(streetHash)
-                    local crossingName = "" -- Removed: GetStreetNameFromHashKey(crossingHash)
+                    local streetName = GetStreetNameFromHashKey(streetHash)
+                    local crossingName = GetStreetNameFromHashKey(crossingHash)
+                    
+                    -- If no street name, show zone name
+                    if streetName == "" or streetName == nil then
+                        local zoneHash = GetNameOfZone(coords.x, coords.y, coords.z)
+                        streetName = GetLabelText(zoneHash)
+                    end
                     
                     SendNUIMessage({
                         type = "UPDATE_COMPASS",
                         compass = getCompassDirection(heading),
-                        title = "", -- Street name removed
-                        subtitle = "" -- Crossing name removed
+                        title = streetName,
+                        subtitle = crossingName
                     })
                     
                     -- Update postal code
