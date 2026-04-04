@@ -51,7 +51,7 @@ Config.Commands = {
             ["key"] = "B",
             ["usable"] = true,
             ["command"] = "belt",
-            ["description"] = "Toggle seatbelt",
+            ["description"] = "Emniyet Kemeri",
         },
     },
     ["settings"] = { -- You can make the necessary command or key links to open Hud's settings menu here.
@@ -60,7 +60,7 @@ Config.Commands = {
             ["key"] = "G",
             ["usable"] = false,
             ["command"] = "hud",
-            ["description"] = "Open HUD settings",
+            ["description"] = "HUD Ayarlarını Aç",
         },
     },
     ["editor"] = { -- If you change the key, enter the equivalent of the key you changed here in this way or it will not work!
@@ -70,7 +70,7 @@ Config.Commands = {
             ["key"] = "PageUp",
             ["usable"] = true,
             ["command"] = "editormode",
-            ["description"] = "Open Editor mode",
+            ["description"] = "Editör Modunu Aç",
         },
     },
     ["carcontrol"] = {
@@ -79,7 +79,7 @@ Config.Commands = {
         ["disabled"] = false, -- If you set this variable to `true`, car control menu will be completely disabled.
         ["openevent"] = "wais:hudv6:client:openCarControl", -- Event to open car control menu
         ["disableKey"] = false, -- If you set this variable to `true`, the keymapping system will be disabled and only command or event will be used to open car control menu.
-        ["description"] = "Open Car Control Menu", -- Description of the command
+        ["description"] = "Araç Kontrol Menüsünü Aç", -- Description of the command
         ["mouseControl"] = false, -- Allows you to control both the mouse and keyboard simultaneously. If you set it to `true`, you can control car control without splitting the game. If set to `false`, the game will split because your keyboard will only focus on car control.
     },
     ["postal"] = {

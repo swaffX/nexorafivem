@@ -1,21 +1,21 @@
 -- Nexora RP - NPC Density Control
--- NPC'leri açar (orta seviye)
+-- NPC'leri açar (yüksek seviye)
 
 CreateThread(function()
     while true do
         -- Yaya yoğunluğu (0.0 = kapalı, 1.0 = tam açık)
-        SetPedDensityMultiplierThisFrame(0.5) -- Orta seviye yaya
+        SetPedDensityMultiplierThisFrame(1.0) -- Tam yaya yoğunluğu
         
         -- Araç yoğunluğu
-        SetVehicleDensityMultiplierThisFrame(0.5) -- Orta seviye araç
-        SetRandomVehicleDensityMultiplierThisFrame(0.5)
-        SetParkedVehicleDensityMultiplierThisFrame(0.5)
+        SetVehicleDensityMultiplierThisFrame(1.0) -- Tam araç yoğunluğu
+        SetRandomVehicleDensityMultiplierThisFrame(1.0)
+        SetParkedVehicleDensityMultiplierThisFrame(1.0)
         
         -- Senaryo yoğunluğu (yayaların aktiviteleri)
-        SetScenarioPedDensityMultiplierThisFrame(0.5, 0.5)
+        SetScenarioPedDensityMultiplierThisFrame(1.0, 1.0)
         
         Wait(0)
     end
 end)
 
-print('[Nexora Density] NPC yoğunluğu orta seviyede açıldı')
+print('[Nexora Density] NPC yoğunluğu YÜKSEK seviyede açıldı (1.0)')
