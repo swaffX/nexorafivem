@@ -38,6 +38,7 @@ client_scripts {
     'bridge/esx/client.lua',
     'bridge/qb/client.lua',
     'client/client.lua',
+    'client/xsound_integration.lua', -- xsound entegrasyonu
 }
 
 server_scripts {
