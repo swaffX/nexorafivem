@@ -50,7 +50,7 @@ Config.AIResponse = {
 
 -- To Set This Up visit https://forum.cfx.re/t/how-to-updated-discord-rich-presence-custom-image/157686
 Config.Discord = {
-    isEnabled = true,                                     -- If set to true, then discord rich presence will be enabled
+    isEnabled = false,                                     -- If set to true, then discord rich presence will be enabled
     applicationId = '1040374012313862246',                   -- The discord application id
     iconLarge = 'logoqb',                               -- The name of the large icon
     iconLargeHoverText = 'Nexora RP', -- The hover text of the large icon
