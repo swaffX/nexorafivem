@@ -180,11 +180,11 @@ function wFramework.requestData()
     if Config.Framework.Framework == "esx" then
         return wFramework.Framework:GetPlayerData()
     elseif Config.Framework.Framework == "qbcore" then
-        -- Safety check: if this fails, it might actually be QBX
+        -- QBCore için callback olmadan direkt çağır
         local success, result = pcall(function()
-            return wFramework.Framework.Functions:GetPlayerData()
+            return wFramework.Framework.Functions.GetPlayerData()
         end)
-        if success then
+        if success and result then
             return result
         else
             -- If GetPlayerData fails, check if qbx_core is running and switch to QBX mode

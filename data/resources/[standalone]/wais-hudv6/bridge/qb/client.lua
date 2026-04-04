@@ -54,6 +54,21 @@ RegisterNetEvent("QBCore:Player:SetPlayerData", function(val)
     wFramework.GetPlayerMoney()
 end)
 
+-- Para güncelleme eventi (qb-inventory bridge'den gelir)
+RegisterNetEvent('hud:client:UpdateMoney', function(money)
+    if money then
+        -- Para bilgisini güncelle
+        local PlayerData = wFramework.Framework.Functions.GetPlayerData()
+        if PlayerData then
+            PlayerData.money = money
+            -- HUD'ı güncelle
+            Wait(100)
+            wFramework.GetPlayerBank()
+            wFramework.GetPlayerMoney()
+        end
+    end
+end)
+
 -- QBX Player Loaded Event - Store player data when loaded
 CreateThread(function()
     -- Wait for framework to be initialized

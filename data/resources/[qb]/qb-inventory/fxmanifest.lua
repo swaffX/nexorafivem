@@ -16,6 +16,7 @@ client_scripts {
     'client/main.lua',
     'client/drops.lua',
     'client/vehicles.lua',
+    'client/hud_bridge.lua', -- WAIS-HUD bridge
 }
 
 server_scripts {
