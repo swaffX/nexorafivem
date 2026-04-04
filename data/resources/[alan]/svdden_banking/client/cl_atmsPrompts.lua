@@ -24,8 +24,10 @@ CreateThread(function()
         if not existsNear then
           local point = CreatePoint({ coords = coords, radius = 2 })
           point.Inside = function()
-            if IsControlJustPressed(0, 38) then
-              manageUI(true, "BANKINGVISABLITY", Callbacks.Await("fetchAccountData"), true)
+            if IsControlJustReleased(0, 38) then
+              Config.hideText()
+              local accountData = Callbacks.Await("fetchAccountData") or {}
+              manageUI(true, "BANKINGVISABLITY", accountData, true)
             end
           end
           point.OnEnter = function()

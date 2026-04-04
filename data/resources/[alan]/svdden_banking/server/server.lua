@@ -19,6 +19,22 @@ function logDebug(message)
     print(fmt:format(message))
   end
 end
+local function ensureBankingTable()
+  MySQL.Sync.execute([[
+    CREATE TABLE IF NOT EXISTS `sv_banking_data` (
+      `uuid` VARCHAR(64) NOT NULL,
+      `credit_score` INT NOT NULL DEFAULT 0,
+      `savings_balance` BIGINT NOT NULL DEFAULT 0,
+      `transactions` LONGTEXT NULL,
+      PRIMARY KEY (`uuid`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  ]])
+end
+
+MySQL.ready(function()
+  ensureBankingTable()
+end)
+
 -- Fetch or create user's banking row; returns row table
 function getOrCreateBankingRow(sourceId)
   local uuid = fetchUsersUUID(sourceId)

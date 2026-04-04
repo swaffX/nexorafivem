@@ -275,42 +275,35 @@ CreateThread(function()
 end)
 
 function LoadRectMinimap()
+    local defaultAspectRatio = 1920 / 1080
+    local aspectRatio = GetAspectRatio(false)
+    local minimapOffset = 0.0
 
-    local defaultAspectRatio = 1920/1080 -- Don't change this.
-    local resolutionX, resolutionY = GetActiveScreenResolution()
-
-    local aspectRatio = GetAspectRatio(0)
-    local aspectRatio = resolutionX/resolutionY
-    local minimapOffset = 0
     if aspectRatio > defaultAspectRatio then
-        minimapOffset = ((defaultAspectRatio-aspectRatio)/3.6)
+        minimapOffset = ((defaultAspectRatio - aspectRatio) / 3.6) - 0.008
     end
- 
-    RequestStreamedTextureDict("squaremap", false)
-    if not HasStreamedTextureDictLoaded("squaremap") then
-        Wait(150)
+
+    while not HasStreamedTextureDictLoaded("squaremap") do
+        RequestStreamedTextureDict("squaremap", false)
+        Wait(50)
     end
+
     SetMinimapClipType(0)
     AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squaremap", "radarmasksm")
     AddReplaceTexture("platform:/textures/graphics", "radarmask1g", "squaremap", "radarmasksm")
-    -- 0.0 = nav symbol and icons left
-    -- 0.1638 = nav symbol and icons stretched
-    -- 0.216 = nav symbol and icons raised up
-    SetMinimapComponentPosition("minimap", "L", "B", 0.0 + minimapOffset, -0.047, 0.1638, 0.183)
-    -- icons within map
-    SetMinimapComponentPosition("minimap_mask", "L", "B", 0.0 + minimapOffset, 0.0, 0.128, 0.20)
-    -- -0.01 = map pulled left
-    -- 0.025 = map raised up
-    -- 0.262 = map stretched
-    -- 0.315 = map shorten
-    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.0085+ minimapOffset , 0.028, 0.296, 0.339)
+
+    SetMinimapComponentPosition("minimap", "L", "B", -0.0045 + minimapOffset, -0.022, 0.150, 0.188888)
+    SetMinimapComponentPosition("minimap_mask", "L", "B", 0.020 + minimapOffset, 0.032, 0.111, 0.159)
+    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.030 + minimapOffset, 0.022, 0.266, 0.237)
+
     SetBlipAlpha(GetNorthRadarBlip(), 0)
     SetRadarBigmapEnabled(true, false)
-    SetMinimapClipType(0)
     Wait(50)
     SetRadarBigmapEnabled(false, false)
-  
-
+    if IsBigmapActive() then
+        SetRadarBigmapEnabled(false, false)
+        SetBigmapActive(false, false)
+    end
 end
 
 function GetMinimapAnchor()

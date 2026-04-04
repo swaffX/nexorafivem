@@ -3,29 +3,37 @@
 -- Keeps original behavior: server event "__svBanking:callback:" .. name, promise-based await, and handler execution
 
 local _Callbacks = {}
+local registeredEvents = {}
+local pendingPromises = {}
+
+local function ensureCallbackEvent(name)
+  local eventName = "__svBanking:callback:" .. name
+  if registeredEvents[eventName] then
+    return eventName
+  end
+
+  registeredEvents[eventName] = true
+  RegisterNetEvent(eventName, function(result)
+    local pending = pendingPromises[eventName]
+    if not pending then return end
+    pendingPromises[eventName] = nil
+    pending:resolve(result)
+  end)
+
+  return eventName
+end
 
 function _Callbacks.Await(name, ...)
-  local eventName = "__svBanking:callback:" .. name
-  TriggerServerEvent(eventName, ...)
+  local eventName = ensureCallbackEvent(name)
   local p = promise.new()
-  local firstResult
-  RegisterNetEvent(eventName, function(...)
-    firstResult = (...)
-    p:resolve(...)
-  end)
-  Citizen.Await(p)
-  return firstResult
+  pendingPromises[eventName] = p
+  TriggerServerEvent(eventName, ...)
+  return Citizen.Await(p)
 end
 
 function _Callbacks.Callback(name, handler, ...)
-  local eventName = "__svBanking:callback:" .. name
-  TriggerServerEvent(eventName, ...)
-  local p = promise.new()
-  RegisterNetEvent(eventName, function(...)
-    p:resolve(...)
-    return handler(...)
-  end)
-  Citizen.Await(p)
+  local result = _Callbacks.Await(name, ...)
+  return handler(result)
 end
 
 Callbacks = _Callbacks

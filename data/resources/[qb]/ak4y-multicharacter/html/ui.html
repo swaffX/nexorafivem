@@ -1,0 +1,389 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/main.css" />
+        <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+        <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"
+        ></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+            integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+    </head>
+    <body>
+        <div class="loadingSection">
+            <!-- <div class="loadingCharInfoArea">
+                <div class="loadingPPArea">
+                    <img src="./images/pp.png" alt="" />
+                </div>
+                <div class="loadingCharName">AK4Y</div>
+            </div> -->
+
+            <div class="loadingBar">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+
+            <div class="charInformationText">
+                <div class="charInfoText">KARAKTER BİLGİLERİ</div>
+                <div class="loadingText">YÜKLENİYOR!</div>
+            </div>
+
+            <div class="loadingBottomArea">
+                <i id="infoIcon" class="fa-solid fa-circle-info"></i>
+                <div class="pleaseWaitText">Karakter bilgileriniz yüklenirken lütfen bekleyiniz!</div>
+            </div>
+        </div>
+        <div class="slotRedeemSection">
+            <div class="slotRedeemMain">
+                <div class="redeemTitleArea">
+                    <span class="slotText">SLOT</span>
+                    <span class="redeemCodeText">REDEEM CODE</span>
+                </div>
+                <input
+                    type="text"
+                    class="redeemInput"
+                    name=""
+                    id=""
+                    value="İZNİNİZ YOK..."
+                    onblur="if(this.value == '') { this.value='İZNİNİZ YOK...'}"
+                    onfocus="if (this.value == 'İZNİNİZ YOK...') {this.value=''}"
+                />
+                <div class="redeemButtonArea">
+                    <div class="redeemButton" id="redeemCancel">HAYIR</div>
+                    <div class="redeemButton" id="redeemAccept">EVET</div>
+                </div>
+            </div>
+        </div>
+        <div class="agreeDeleteSection">
+            <div class="agreeSection">
+                <div class="doYouAgreeText">
+                    <span class="agreeText"> İSİMLİ KARAKTERİN SİLİNMESİNE KABUL EDİYOR MUSUNUZ? </span>
+                    <span class="charNameAgreeText">BRENDEN RANDALL?</span>
+                </div>
+                <div class="agreeButtonAreas">
+                    <div class="agreeButton" id="agreeCancelButton">İPTAL</div>
+                    <!--<div class="agreeButton" id="agreeDeleteButton">SİL</div-->
+                </div>
+            </div>
+        </div>
+        <div class="generalSection">
+            <div class="bgEffect"></div>
+            <div class="leftWrapper">
+                <div class="titleArea">
+                    <div class="titleSvName">FİVE ROLEPLAY</div>
+                    <div class="charSelectorTitle">
+                        <span class="chrSelector1">KARAKTER</span>
+                        <span class="chrSelector2">SEÇME</span>
+                    </div>
+                </div>
+                <div class="titleRectangle"></div>
+                <div class="leftDescription">
+                </div>
+                <div class="charList">
+                    <div class="charListLeftArea">
+                        <div class="rectangleItem">
+                            <div class="leftText">1</div>
+                            <div class="rightRectangle"></div>
+                            <div class="bottomRectangle"></div>
+                        </div>
+                        <div class="rectangleItem">
+                            <div class="leftText">2</div>
+                            <div class="rightRectangle"></div>
+                            <div class="bottomRectangle"></div>
+                        </div>
+                        <div class="rectangleItem">
+                            <div class="leftText empty">3</div>
+                            <div class="rightRectangle"></div>
+                            <div class="bottomRectangle"></div>
+                        </div>
+                        <div class="rectangleItem">
+                            <div class="leftText empty">4</div>
+                            <div class="rightRectangle"></div>
+                            <div class="bottomRectangle"></div>
+                        </div>
+                        <div class="rectangleItem">
+                            <div class="leftText empty">5</div>
+                            <div class="rightRectangle"></div>
+                            <div class="bottomRectangle"></div>
+                        </div>
+                        <div class="rectangleItem">
+                            <div class="leftText empty">6</div>
+                            <div class="rightRectangle"></div>
+                            <!-- <div class="bottomRectangle"></div> -->
+                        </div>
+                    </div>
+                    <div class="charListRightArea">
+                        <div class="charItem">
+                            <div class="charItemSexArea male">ERKEK</div>
+                            <div class="charItemAgeText">
+                                <span class="age">28</span>
+                                <span>AGE</span>
+                            </div>
+                            <div class="charItemNameArea">
+                                <span class="firstName">BRENDEN</span>
+                                <span class="lastName">RANDALL</span>
+                            </div>
+                            <div class="charItemArrowArea">
+                                <img src="./images/arrow.png" alt="" />
+                            </div>
+                        </div>
+                        <div class="charItem active">
+                            <div class="charItemSexArea female">KADIN</div>
+                            <div class="charItemAgeText active">
+                                <span class="age">28</span>
+                                <span>AGE</span>
+                            </div>
+                            <div class="charItemNameArea active">
+                                <span class="firstName">BRENDEN</span>
+                                <span class="lastName">RANDALL</span>
+                            </div>
+                            <div class="charItemArrowArea">
+                                <img src="./images/arrow.png" alt="" />
+                            </div>
+                        </div>
+                        <div class="charItem create" id="createButton">
+                            <div class="charCreateImgArea">
+                                <img src="./images/create.png" alt="" />
+                            </div>
+                            <div class="createCharText">KARAKTER OLUŞTUR</div>
+                        </div>
+                        <div class="charItem locked" id="locked">
+                            <div class="charCreateImgArea">
+                                <img src="./images/lock.png" alt="" />
+                            </div>
+                            <div class="createCharText">KARAKTER KİLİTLİ</div>
+                        </div>
+                        <div class="charItem locked" id="locked">
+                            <div class="charCreateImgArea">
+                                <img src="./images/lock.png" alt="" />
+                            </div>
+                            <div class="createCharText">KARAKTER KİLİTLİ</div>
+                        </div>
+                        <div class="charItem locked" id="locked">
+                            <div class="charCreateImgArea">
+                                <img src="./images/lock.png" alt="" />
+                            </div>
+                            <div class="createCharText">KARAKTER KİLİTLİ</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttonAreas">
+                    <div class="buttonItem" id="clickablePlay">
+                        <img src="./images/play.png" alt="" />
+                        <div class="inButtonText" id="playButton">OYNA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="charInfoRight">
+                <div class="rightSexText female">FEMALE</div>
+                <div class="rightCharName">BRENDEN RANDALL</div>
+                <div class="rightItemArea">
+                    <div class="rightItemLeftArea">
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="dob">DOĞUM TARİHİ</div>
+                            <div class="rightInfo" id="dateInfo">01 - 01 - 1999</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="natinTE">UYRUK</div>
+                            <div class="rightInfo" id="natinInfo">KÜRT</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="jobTe">MESLEK</div>
+                            <div class="rightInfo" id="jobInfo">AMELE</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="cashT">CÜZDAN</div>
+                            <div class="rightInfo" id="cashInfo">$513.461</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="bankT">BANKA</div>
+                            <div class="rightInfo" id="bankInfo">$215.706.379</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="phnNmT">TELEFON NUMARASI</div>
+                            <div class="rightInfo" id="phoneInfo">08538578562</div>
+                        </div>
+                        <div class="rightInfoItem">
+                            <div class="rightInfoText" id="accNm">HESAP NUMARASI</div>
+                            <div class="rightInfo" id="citizenIdInfo">7345ESDB436Y4NDGSB4</div>
+                        </div>
+                    </div>
+                    <div class="rightItemRightArea">
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">1</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">2</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">3</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">4</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">5</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">6</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightBottomRectangle"></div>
+                        </div>
+                        <div class="charInfoRectangleItem">
+                            <div class="rightText">6</div>
+                            <div class="leftRectangle"></div>
+                            <!-- <div class="rightBottomRectangle"></div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="charCreateRight">
+                <div class="characterText">KARAKTER</div>
+                <div class="creatorText">OLUŞTUR</div>
+                <div class="rightCreatorRectangle"></div>
+                <div class="creatorDescription">
+                </div>
+                <div class="creatorRightItemArea">
+                    <div class="creatorItemLeftArea">
+                        <div class="sexArea">
+                            <div class="sexButton active" data-sex="male">
+                                <i id="sexIconActive" class="fa-solid fa-mars"></i>
+                                <div class="sexText active" id="maleTx">ERKEK</div>
+                            </div>
+                            <div class="sexButton" data-sex="female">
+                                <i id="sexIcon" class="fa-solid fa-venus"></i>
+                                <div class="sexText" id="femaleTx">KADIN</div>
+                            </div>
+                        </div>
+                        <div class="firstNameArea">
+                            <span class="inputTitle" id="nmTx">AD</span>
+                            <span class="inputDesc">( MAX KARAKTER 15 )</span>
+                            <input
+                                type="text"
+                                class="customInput"
+                                name=""
+                                id="firstname"
+                                value="AD"
+                                onblur="if(this.value == '') { this.value='AD'}"
+                                onfocus="if (this.value == 'AD') {this.value=''}"
+                            />
+                        </div>
+                        <div class="lastNameArea">
+                            <span class="inputTitle" id="srnTx">SOYAD</span>
+                            <span class="inputDesc">( MAX KARAKTER 15 )</span>
+                            <input
+                                type="text"
+                                class="customInput"
+                                name=""
+                                id="lastname"
+                                value="SOYAD"
+                                onblur="if(this.value == '') { this.value='SOYAD'}"
+                                onfocus="if (this.value == 'SOYAD') {this.value=''}"
+                            />
+                        </div>
+                        <div class="nationalityArea">
+                            <span class="inputTitle" id="ntnTx">UYRUK</span>
+                            <span class="inputDesc">( MAX KARAKTER 15 )</span>
+                            <input
+                                type="text"
+                                class="customInput"
+                                name=""
+                                id="nationality"
+                                value="UYRUK"
+                                onblur="if(this.value == '') { this.value='UYRUK'}"
+                                onfocus="if (this.value == 'UYRUK') {this.value=''}"
+                            />
+                        </div>
+                        <div class="dateOfBirthArea">
+                            <div class="rightSolidText" id="dobTx">DOĞUM TARİHİ</div>
+                            <input type="date" class="" name="" id="datepicker" min="1900-01-01" max="2023-12-31" />
+                        </div>
+                        <!-- <div class="heightArea">
+                            <div class="rightSolidText">HEIHGT</div>
+                            <input
+                                type="text"
+                                class=""
+                                name=""
+                                id="heightInput"
+                                value="CM"
+                                onblur="if(this.value == '') { this.value='CM'}"
+                                onfocus="if (this.value == 'CM') {this.value=''}"
+                            />
+                        </div> -->
+                        <div class="rightButtonAreas">
+                            <!-- <div class="rightButtonItem">
+                                <img src="./images/delete.png" alt="" />
+                                <div class="rightInButtonText" id="cancelButton">CANCEL</div>
+                            </div> -->
+                            <div class="rightButtonItem">
+                                <img src="./images/play.png" alt="" />
+                                <div class="rightInButtonText" id="createButtonX">CREATE</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="creatorItemRightArea">
+                        <div class="rightRectangleItem">
+                            <div class="rightText">1</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightCreatorBottomRectangle"></div>
+                        </div>
+                        <div class="rightRectangleItem">
+                            <div class="rightText">2</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightCreatorBottomRectangle second"></div>
+                        </div>
+                        <div class="rightRectangleItem third">
+                            <div class="rightText">3</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightCreatorBottomRectangle third"></div>
+                        </div>
+                        <div class="rightRectangleItem four">
+                            <div class="rightText">4</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightCreatorBottomRectangle five"></div>
+                        </div>
+                        <!-- <div class="rightRectangleItem">
+                            <div class="rightText">5</div>
+                            <div class="leftRectangle"></div>
+                            <div class="rightCreatorBottomRectangle"></div>
+                        </div> -->
+                        <div class="rightRectangleItem">
+                            <div class="rightText">5</div>
+                            <div class="leftRectangle"></div>
+                            <!-- <div class="rightBottomRectangle"></div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="js/app.js"></script>
+        <script type="text/javascript" src="js/profanity.js"></script>
+    </body>
+</html>

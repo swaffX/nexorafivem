@@ -5,6 +5,29 @@ function LoadPlayerMoney(type, amount)
     })
 end
 
+local function GetQBCoreCashAmount(playerData)
+    if not playerData then return 0 end
+    if playerData.items then
+        for _, item in pairs(playerData.items) do
+            if item and item.name == 'cash' then
+                return item.amount or 0
+            end
+        end
+    end
+    return playerData.money and playerData.money.cash or 0
+end
+
+local function RefreshQBCoreMoney(delay)
+    if Config.Framework == 'esx' or Config.Framework == 'oldesx' then return end
+    CreateThread(function()
+        Wait(delay or 100)
+        local PlayerData = Core.Functions.GetPlayerData()
+        if not PlayerData then return end
+        LoadPlayerMoney('cash', GetQBCoreCashAmount(PlayerData))
+        LoadPlayerMoney('bank', PlayerData.money and PlayerData.money.bank or 0)
+    end)
+end
+
 function LoadPlayerId()
     nuiMessage("LOAD_PLAYER_ID", Config.PlayerServerId())
 end
@@ -28,9 +51,31 @@ end)
 
 RegisterNetEvent("QBCore:Player:SetPlayerData")
 AddEventHandler("QBCore:Player:SetPlayerData", function(data)
-    LoadPlayerMoney("cash", data.money.cash)
-    LoadPlayerMoney("bank", data.money.bank)
+    LoadPlayerMoney("cash", GetQBCoreCashAmount(data))
+    LoadPlayerMoney("bank", data.money and data.money.bank or 0)
     LoadPlayerJob(data.job.label, data.job.grade.name)
+end)
+
+RegisterNetEvent("QBCore:Client:OnMoneyChange")
+AddEventHandler("QBCore:Client:OnMoneyChange", function()
+    RefreshQBCoreMoney(100)
+end)
+
+RegisterNetEvent("hud:client:OnMoneyChange")
+AddEventHandler("hud:client:OnMoneyChange", function()
+    RefreshQBCoreMoney(100)
+end)
+
+RegisterNetEvent("inventory:client:UpdatePlayerInventory")
+AddEventHandler("inventory:client:UpdatePlayerInventory", function()
+    RefreshQBCoreMoney(100)
+end)
+
+RegisterNetEvent("inventory:client:ItemBox")
+AddEventHandler("inventory:client:ItemBox", function(itemData)
+    if itemData and itemData.name == "cash" then
+        RefreshQBCoreMoney(50)
+    end
 end)
 
 RegisterNetEvent('esx:setAccountMoney')
@@ -89,7 +134,7 @@ function LoadPlayerInformations()
             job_grade_label = PlayerData["job"].grade_label      
         else
             local PlayerData = Core.Functions.GetPlayerData()
-            cash = PlayerData["money"].cash
+            cash = GetQBCoreCashAmount(PlayerData)
             bank = PlayerData["money"].bank
             job_label = PlayerData["job"].label
             job_grade_label = PlayerData["job"].grade.name  

@@ -55,6 +55,12 @@ local Config = {
         {coords = vector3(2035.85, 4985.85, 41.10), radius = 50.0, name = "Farmer"},
         -- Elektrikçi
         {coords = vector3(724.85, 134.05, 80.75), radius = 50.0, name = "Electrician"},
+        {coords = vector3(-56.61, -1099.26, 26.86), radius = 40.0, name = "Vehicle Shop"},
+        {coords = vector3(440.72, -1013.17, 27.62), radius = 40.0, name = "Police Shop"},
+        {coords = vector3(-706.262, -1360.31, 4.1021), radius = 40.0, name = "Boat Shop"},
+        {coords = vector3(1729.02, 3293.57, 40.19), radius = 40.0, name = "Aircraft Shop"},
+        {coords = vector3(324.88, -229.86, 54.22), radius = 40.0, name = "Pinkcage Motel"},
+        {coords = vector3(-655.18, -2401.98, 13.96), radius = 40.0, name = "Illegal Mechanic"},
         -- Buraya yeni meslek lokasyonları eklenebilir
     }
 }
@@ -71,6 +77,48 @@ local function IsInProtectedZone(coords)
             return true, zone.name
         end
     end
+    return false
+end
+
+local function ShouldPreservePed(ped, playerPed)
+    if ped == 0 or ped == playerPed or not DoesEntityExist(ped) then
+        return true
+    end
+
+    if IsPedAPlayer(ped) or IsEntityAMissionEntity(ped) then
+        return true
+    end
+
+    local populationType = GetEntityPopulationType(ped)
+    if populationType == 6 or populationType == 7 then
+        return true
+    end
+
+    if IsEntityPositionFrozen(ped) or GetEntityInvincible(ped) then
+        return true
+    end
+
+    return false
+end
+
+local function ShouldPreserveVehicle(vehicle)
+    if vehicle == 0 or not DoesEntityExist(vehicle) then
+        return true
+    end
+
+    if IsEntityAMissionEntity(vehicle) then
+        return true
+    end
+
+    local populationType = GetEntityPopulationType(vehicle)
+    if populationType == 6 or populationType == 7 then
+        return true
+    end
+
+    if IsEntityPositionFrozen(vehicle) or GetEntityInvincible(vehicle) then
+        return true
+    end
+
     return false
 end
 
@@ -117,7 +165,7 @@ CreateThread(function()
         
         -- Uzaktaki yayaları temizle (ama meslek NPC'lerini koru)
         for ped in EnumeratePeds() do
-            if ped ~= playerPed and not IsPedAPlayer(ped) then
+            if not ShouldPreservePed(ped, playerPed) then
                 local pedCoords = GetEntityCoords(ped)
                 local distance = #(playerCoords - pedCoords)
                 
@@ -136,7 +184,7 @@ CreateThread(function()
             local driver = GetPedInVehicleSeat(vehicle, -1)
             
             -- Eğer araçta oyuncu yoksa
-            if not IsPedAPlayer(driver) then
+            if not IsPedAPlayer(driver) and not ShouldPreserveVehicle(vehicle) then
                 local vehCoords = GetEntityCoords(vehicle)
                 local distance = #(playerCoords - vehCoords)
                 

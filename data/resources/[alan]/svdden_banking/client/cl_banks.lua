@@ -61,7 +61,9 @@ CreateThread(function()
 
     point.Inside = function()
       if IsControlJustReleased(0, 38) then
-        manageUI(true, "BANKINGVISABLITY", Callbacks.Await("fetchAccountData"), true)
+        Config.hideText()
+        local accountData = Callbacks.Await("fetchAccountData") or {}
+        manageUI(true, "BANKINGVISABLITY", accountData, true)
       end
     end
 
@@ -91,7 +93,7 @@ RegisterNUICallback("bankingAction", function(A0_2, A1_2)
 
   SendNUIMessage({
     action = "resyncBankingData",
-    data = Callbacks.Await("fetchAccountData"),
+    data = Callbacks.Await("fetchAccountData") or {},
   })
   A1_2("ok")
 end)
