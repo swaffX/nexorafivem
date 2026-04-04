@@ -15,7 +15,7 @@ Config.ShowDebug = false -- If you set this to `true`, the debug messages will b
 Config.ShowMapOnFoot = true -- If `true` is set, the player can see the map when not in the vehicle. If `false`, the map will only be visible when in the vehicle.
 Config.SendStatusAlert = false -- If this option is `true`, the player will be notified if the hunger or thirst value falls below 20. Tick `false` if you do not want to use this system
 Config.StressSystem = true -- If you make `true`, stress will come next to the status bars. You will be able to see your stress values. You need to use a script for qb-stress esx for QBCore
-Config.DisableRightCorner = false -- Sağ köşe aktif ama server_infos gizli
+Config.DisableRightCorner = true -- Sağ köşeyi tamamen kapat (logo ve cash sorunlu)
 Config.DisableMapAnimation = true -- If you set it to `true`, the minimap loading animation will be disabled. If you set it to `false`, the minimap loading animation will be enabled.
 Config.MusicSystem = {
     --[[
