@@ -34,11 +34,11 @@ Config.QBLogs = false --  true (optional)
  -- UM - Multi Character | Main Settings
 -----------------------------------------------------------------------------------------------------------------
 
-Config.Lang = 'en' -- [locales/.lua]
+Config.Lang = 'tr' -- [locales/.lua]
 
 Config.ConvertQBoxLicense = false -- If you are using QBox set true,
 
-Config.Clothing = 'qb-clothing' -- illenium-appearance, fivem-appearance (old illenium for qb), qb-clothing, custom
+Config.Clothing = 'fivem-appearance' -- illenium-appearance, fivem-appearance (old illenium for qb), qb-clothing, custom
 
 Config.SkinTable = 'playerskins' -- If you are using skins inside players just set 'skin' | playerskins or skin
 
@@ -72,9 +72,9 @@ Config.CustomHud = function(bool)
 end
 
 Config.StarterItems = {
-    ['phone'] = {
+    ['white_phone'] = {
         amount = 1,
-        item = 'phone'
+        item = 'white_phone'
     },
     ['id_card'] = {
         amount = 1,
@@ -83,6 +83,14 @@ Config.StarterItems = {
     ['driver_license'] = {
         amount = 1,
         item = 'driver_license',
+    },
+    ['sandwich'] = {
+        amount = 2,
+        item = 'sandwich',
+    },
+    ['cola'] = {
+        amount = 2,
+        item = 'cola',
     },
 }
 
@@ -109,7 +117,7 @@ Config.QBEvents = {
 --[[
      if you are not using a custom event don't change it illenium-appearance
      and old illenium fivem-appearance and qb-clothing support it
-]]   createFirstCharacter = 'qb-clothes:client:CreateFirstCharacter'
+]]   createFirstCharacter = 'fivem-appearance:client:CreateFirstCharacter'
 }
 
 
@@ -117,7 +125,7 @@ Config.QBEvents = {
  -- UM - Multi Character | New Character | UM Spawn Last Location
 -----------------------------------------------------------------------------------------------------------------
 
-Config.ApartmentStart = true -- If you make it true, the [new character] will spawn at Apartment.
+Config.ApartmentStart = false -- If you make it true, the [new character] will spawn at Apartment.
 
 Config.DefaultSpawn = { -- If ApartmentStart is false, it spawns the [new character here]
     Random = false, -- If you want to spawn randomly, you can make it true. [list/defaulspawncoords.lua]
