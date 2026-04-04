@@ -1,5 +1,4 @@
 # Güvenlik - Hassas Dosyalar
-server.cfg
 server.cfg.bkp
 server.cfg.example
 *.sql
@@ -29,7 +28,6 @@ txData/
 /.replxx_history
 /minimal.cfg
 /test.cfg
-/myLogo.png
 
 # Oyuncu Verileri
 data/playerskins/
