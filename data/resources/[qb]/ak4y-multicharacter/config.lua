@@ -14,7 +14,7 @@ AK4Y.CustomFrameWorkExport = "qb-core"
 
 AK4Y.TebexLink = "https://discord.com/invite/qdev"
 AK4Y.Translate = {
-    title = "HİGH V",
+    title = "NEXORA ROLEPLAY",
     character = "RP",
     selector = "",
     firstDesc = "",

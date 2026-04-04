@@ -64,11 +64,17 @@ GetFileData = function()
     return file
 end
 
-RegisterCommand(Config.Command, function(source, args, rawCommand)
-    if not Authorized(source) then return 
-    end
-    TriggerClientEvent('ricky-vinewood:openNui', source, GetFileData()[1], GetFileData()[2])
-end)
+if FrameworkFound == 'qbcore' then
+    QBCore.Commands.Add(Config.Command, "Edit Vinewood Sign", {}, false, function(source, args)
+        TriggerClientEvent('ricky-vinewood:openNui', source, GetFileData()[1], GetFileData()[2])
+    end, "admin")
+else
+    RegisterCommand(Config.Command, function(source, args, rawCommand)
+        if not Authorized(source) then return 
+        end
+        TriggerClientEvent('ricky-vinewood:openNui', source, GetFileData()[1], GetFileData()[2])
+    end)
+end
 
 RegisterServerEvent('ricky-vinewood:saveText')
 AddEventHandler('ricky-vinewood:saveText', function(data)

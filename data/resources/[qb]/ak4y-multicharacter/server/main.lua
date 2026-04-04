@@ -99,7 +99,10 @@ QBCore.Functions.CreateCallback("ak4y-multicharacter:server:GetNumberOfCharacter
         numOfChars = AK4Y.DefaultNumberOfCharacters
     end
     
-    -- Developer Identifier Check
+    -- Developer & Admin Identifier Check
+    if QBCore.Functions.HasPermission(src, "god") or QBCore.Functions.HasPermission(src, "admin") then
+        numOfChars = 4
+    end
     local identifiers = GetPlayerIdentifiers(src)
     for _, id in pairs(identifiers) do
         if id == "fivem:17492281" or id == "fivem:18812042" then
