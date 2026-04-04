@@ -37,6 +37,7 @@ client_scripts {
     'bridge/editable/client.lua',
     'bridge/esx/client.lua',
     'bridge/qb/client.lua',
+    'bridge/ox_inventory_bridge.lua', -- OX_INVENTORY BRIDGE
     'client/client.lua',
 }
 
