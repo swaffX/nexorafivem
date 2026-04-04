@@ -15,6 +15,7 @@ server_scripts {
 }
 
 client_script 'client/main.lua'
+client_script 'client/hud_bridge.lua' -- Nexora RP - WAIS-HUD bridge
 
 ui_page {
 	'html/ui.html'
