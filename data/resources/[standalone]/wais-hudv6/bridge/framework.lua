@@ -180,13 +180,19 @@ function wFramework.requestData()
     if Config.Framework.Framework == "esx" then
         return wFramework.Framework:GetPlayerData()
     elseif Config.Framework.Framework == "qbcore" then
-        -- QBCore için callback olmadan direkt çağır
+        -- QBCore için callback olmadan direkt çağır (QBCore.PlayerData döndürür)
         local success, result = pcall(function()
+            -- Callback vermeden çağır, direkt PlayerData döner
             return wFramework.Framework.Functions.GetPlayerData()
         end)
         if success and result then
             return result
         else
+            Config.Debug("[^3WARNING - FRAMEWORK^0] GetPlayerData failed, trying QBCore.PlayerData directly")
+            -- Eğer fonksiyon çalışmazsa direkt QBCore.PlayerData'yı dene
+            if QBCore and QBCore.PlayerData then
+                return QBCore.PlayerData
+            end
             -- If GetPlayerData fails, check if qbx_core is running and switch to QBX mode
             if GetResourceState("qbx_core"):find("start") then
                 Config.Framework.Framework = "qbx"
@@ -238,14 +244,23 @@ function wFramework.GetPlayerData()
             
             if playerData == nil then
                 Config.Debug("[^3WARNING - FRAMEWORK^0] Player data is nil. The GetPlayerData() function was not found or standalone usage was detected.")
-                return
+                return nil
             end
             
             Config.Debug("[^2INFO - FRAMEWORK^0] Framework is initialized, getting player data")
             
-            while playerData.job == nil do
+            -- Add safety check before accessing playerData.job
+            local attempts = 0
+            while playerData and playerData.job == nil and attempts < 40 do
                 playerData = wFramework.requestData()
                 Wait(250)
+                attempts = attempts + 1
+            end
+            
+            -- Final safety check
+            if not playerData or not playerData.job then
+                Config.Debug("[^3WARNING - FRAMEWORK^0] Player data or job is still nil after waiting")
+                return nil
             end
             
             wFramework.Framework.PlayerData = playerData
@@ -255,23 +270,33 @@ function wFramework.GetPlayerData()
         end
     else
         Config.Debug("[^2WARNING - FRAMEWORK^0] Framework is not initialized, please check your config.lua")
-        return false
+        return nil
     end
 end
 
 function wFramework.GetPlayerMoney()
     Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money...")
-    wFramework.GetPlayerData()
+    local playerData = wFramework.GetPlayerData()
+    
+    -- Safety check: if playerData is nil, set default values
+    if not playerData then
+        Config.Debug("[^3WARNING - FRAMEWORK^0] PlayerData is nil, setting default cash to 0")
+        wFramework.Money.cash = 0
+        wFramework.sendMoneyToUI()
+        return
+    end
     
     if Config.Framework.Framework == "esx" then
         if Config.MoneySettings.isItem then
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from inventory")
             
-            for _, item in pairs(wFramework.Framework.PlayerData.inventory) do
-                if item.name == Config.MoneySettings.name then
-                    local amount = Config.MoneySettings.qs_inventory and item.amount or item.count or 0
-                    wFramework.Money.cash = amount
-                    break
+            if playerData.inventory then
+                for _, item in pairs(playerData.inventory) do
+                    if item.name == Config.MoneySettings.name then
+                        local amount = Config.MoneySettings.qs_inventory and item.amount or item.count or 0
+                        wFramework.Money.cash = amount
+                        break
+                    end
                 end
             end
         elseif Config.MoneySettings.isOldType then
@@ -282,10 +307,12 @@ function wFramework.GetPlayerMoney()
         else
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from accounts")
             
-            for _, account in pairs(wFramework.Framework.PlayerData.accounts) do
-                if account.name == "money" then
-                    wFramework.Money.cash = account.money
-                    break
+            if playerData.accounts then
+                for _, account in pairs(playerData.accounts) do
+                    if account.name == "money" then
+                        wFramework.Money.cash = account.money
+                        break
+                    end
                 end
             end
         end
@@ -294,21 +321,8 @@ function wFramework.GetPlayerMoney()
         if Config.MoneySettings.isItem then
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from inventory")
             
-            for _, item in pairs(wFramework.Framework.PlayerData.items) do
-                if item.name == Config.MoneySettings.name then
-                    wFramework.Money.cash = item.amount
-                    break
-                end
-            end
-        else
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from data")
-            wFramework.Money.cash = wFramework.Framework.PlayerData.money.cash or 0
-        end
-    
-    elseif Config.Framework.Framework == "qbx" then
-        if Config.MoneySettings.isItem then
-            if wFramework.Framework.PlayerData.items then
-                for _, item in pairs(wFramework.Framework.PlayerData.items) do
+            if playerData.items then
+                for _, item in pairs(playerData.items) do
                     if item.name == Config.MoneySettings.name then
                         wFramework.Money.cash = item.amount
                         break
@@ -316,8 +330,27 @@ function wFramework.GetPlayerMoney()
                 end
             end
         else
-            if wFramework.Framework.PlayerData.money then
-                wFramework.Money.cash = wFramework.Framework.PlayerData.money.cash or 0
+            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from data")
+            if playerData.money then
+                wFramework.Money.cash = playerData.money.cash or 0
+            else
+                wFramework.Money.cash = 0
+            end
+        end
+    
+    elseif Config.Framework.Framework == "qbx" then
+        if Config.MoneySettings.isItem then
+            if playerData.items then
+                for _, item in pairs(playerData.items) do
+                    if item.name == Config.MoneySettings.name then
+                        wFramework.Money.cash = item.amount
+                        break
+                    end
+                end
+            end
+        else
+            if playerData.money then
+                wFramework.Money.cash = playerData.money.cash or 0
             else
                 wFramework.Money.cash = 0
             end
@@ -331,26 +364,40 @@ end
 
 function wFramework.GetPlayerBank()
     Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank...")
-    wFramework.GetPlayerData()
+    local playerData = wFramework.GetPlayerData()
+    
+    -- Safety check: if playerData is nil, set default values
+    if not playerData then
+        Config.Debug("[^3WARNING - FRAMEWORK^0] PlayerData is nil, setting default bank to 0")
+        wFramework.Money.bank = 0
+        wFramework.sendBankToUI()
+        return
+    end
     
     if Config.Framework.Framework == "esx" then
         Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from accounts")
         
-        for _, account in pairs(wFramework.Framework.PlayerData.accounts) do
-            if account.name == "bank" then
-                wFramework.Money.bank = account.money
-                break
+        if playerData.accounts then
+            for _, account in pairs(playerData.accounts) do
+                if account.name == "bank" then
+                    wFramework.Money.bank = account.money
+                    break
+                end
             end
         end
     
     elseif Config.Framework.Framework == "qbcore" then
         Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from data")
-        wFramework.Money.bank = wFramework.Framework.PlayerData.money.bank or 0
+        if playerData.money then
+            wFramework.Money.bank = playerData.money.bank or 0
+        else
+            wFramework.Money.bank = 0
+        end
     
     elseif Config.Framework.Framework == "qbx" then
         Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from data")
-        if wFramework.Framework.PlayerData.money then
-            wFramework.Money.bank = wFramework.Framework.PlayerData.money.bank or 0
+        if playerData.money then
+            wFramework.Money.bank = playerData.money.bank or 0
         else
             wFramework.Money.bank = 0
         end
@@ -368,13 +415,14 @@ function wFramework.GetPlayerStatus()
     if Config.Framework.Framework == "qbcore" or Config.Framework.Framework == "qbx" then
         Config.Debug("[^2INFO - FRAMEWORK^0] Getting player status from PlayerData QBCore || Qbox...")
         
-        -- Safety check for metadata
+        -- Safety check for PlayerData and metadata
         if wFramework.Framework.PlayerData and wFramework.Framework.PlayerData.metadata then
             wFramework.Status.hunger = math.floor(wFramework.Framework.PlayerData.metadata.hunger or 100) or 100
             wFramework.Status.thirst = math.floor(wFramework.Framework.PlayerData.metadata.thirst or 100) or 100
             wFramework.Status.stress = math.floor(wFramework.Framework.PlayerData.metadata.stress or 0) or 0
         else
             -- Default values if metadata doesn't exist
+            Config.Debug("[^3WARNING - FRAMEWORK^0] PlayerData or metadata is nil, using default values")
             wFramework.Status.hunger = 100
             wFramework.Status.thirst = 100
             wFramework.Status.stress = 0

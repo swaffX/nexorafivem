@@ -58,13 +58,13 @@ end)
 RegisterNetEvent('hud:client:UpdateMoney', function(money)
     if money then
         -- Para bilgisini güncelle
-        local PlayerData = wFramework.Framework.Functions.GetPlayerData()
-        if PlayerData then
-            PlayerData.money = money
+        if wFramework and wFramework.Framework and wFramework.Framework.PlayerData then
+            wFramework.Framework.PlayerData.money = money
             -- HUD'ı güncelle
             Wait(100)
             wFramework.GetPlayerBank()
             wFramework.GetPlayerMoney()
+            Config.Debug("[^2INFO - QB^0] Para güncellendi: Cash=" .. (money.cash or 0) .. ", Bank=" .. (money.bank or 0))
         end
     end
 end)

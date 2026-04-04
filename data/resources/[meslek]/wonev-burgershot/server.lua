@@ -617,16 +617,22 @@ RegisterNetEvent('wonev:SellItem', function (amount, type)
     end
 end)
 
+-- Kasa para güncelleme eventi
 RegisterNetEvent("wonev:Updatemoney")
 AddEventHandler("wonev:Updatemoney", function()
     local src = source
     local result = MySQL.Sync.fetchAll("SELECT money FROM burgershot_money WHERE id = 1")
     if result and result[1] then
         totalmoney = result[1].money or 0
-        -- Stokları client'a gönder
+        -- Para bilgisini client'a gönder
         TriggerClientEvent("wonev:UpdatemoneyClient", src, totalmoney)
+        print('[Burgershot] Kasa parası güncellendi: $' .. totalmoney)
     else
-        print("Veritabanından stoklar alınamadı!")
+        -- Eğer veritabanında kayıt yoksa, 0 ile başlat
+        totalmoney = 0
+        MySQL.Async.execute("INSERT INTO burgershot_money (id, money) VALUES (1, 0) ON DUPLICATE KEY UPDATE money = 0")
+        TriggerClientEvent("wonev:UpdatemoneyClient", src, 0)
+        print('[Burgershot] Veritabanında kasa kaydı bulunamadı, 0 ile başlatıldı!')
     end
 end)
 
@@ -709,32 +715,24 @@ QBCore.Functions.CreateUseableItem('wonev_chickenburgermenu2', function(source, 
 end)
 
 
--- Kasa para güncelleme eventi (eksikti)
-RegisterNetEvent('wonev:Updatemoney', function()
-    local src = source
-    -- qb-management veya qb-bossmenu'den kasa parasını al
-    local job = 'burgershot' -- Config'den alınabilir
+-- Oyuncu ilk yüklendiğinde kasa parasını ve stokları yükle
+AddEventHandler('QBCore:Server:PlayerLoaded', function(Player)
+    local src = Player.PlayerData.source
+    -- Stokları yükle
+    local result = MySQL.Sync.fetchAll("SELECT etburger_amount, tavukburger_amount, potato_amount, cola_amount, lemonade_amount FROM burgershot_stocks WHERE id = 1")
+    if result and result[1] then
+        EtBurgerstocks = result[1].etburger_amount or 0
+        TavukBurgerstocks = result[1].tavukburger_amount or 0
+        PatatesStocks = result[1].potato_amount or 0
+        KolaStocks = result[1].cola_amount or 0
+        LimonataStocks = result[1].lemonade_amount or 0
+    end
     
-    -- qb-management kullanıyorsa
-    if GetResourceState('qb-management') == 'started' then
-        exports['qb-management']:GetAccount(job, function(account)
-            if account then
-                totalmoney = account
-                TriggerClientEvent('wonev:UpdatemoneyClient', src, totalmoney)
-            else
-                totalmoney = 0
-                TriggerClientEvent('wonev:UpdatemoneyClient', src, 0)
-            end
-        end)
-    -- qb-bossmenu kullanıyorsa
-    elseif GetResourceState('qb-bossmenu') == 'started' then
-        local account = exports['qb-bossmenu']:GetAccount(job)
-        totalmoney = account or 0
-        TriggerClientEvent('wonev:UpdatemoneyClient', src, totalmoney)
+    -- Kasa parasını yükle
+    local moneyResult = MySQL.Sync.fetchAll("SELECT money FROM burgershot_money WHERE id = 1")
+    if moneyResult and moneyResult[1] then
+        totalmoney = moneyResult[1].money or 0
     else
-        -- Hiçbiri yoksa 0 gönder
         totalmoney = 0
-        TriggerClientEvent('wonev:UpdatemoneyClient', src, 0)
-        print('[Burgershot] qb-management veya qb-bossmenu bulunamadı!')
     end
 end)

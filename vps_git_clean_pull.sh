@@ -14,21 +14,21 @@ echo "1. Mevcut değişiklikleri kontrol ediliyor..."
 git status
 
 echo ""
-echo "2. Silinen dosyalar temizleniyor..."
-# Silinen dosyaları git'ten kaldır
-git ls-files --deleted -z | xargs -0 git rm
-
-echo ""
-echo "3. Local değişiklikler stash'leniyor..."
+echo "2. Local değişiklikler stash'leniyor..."
 git stash
 
 echo ""
-echo "4. Remote'dan çekiliyor..."
-git pull origin main
+echo "3. Remote'dan çekiliyor..."
+git fetch origin main
 
 echo ""
-echo "5. Silinen dosyalar temizleniyor (git clean)..."
-# Tracked olmayan dosyaları sil
+echo "4. Hard reset ile remote ile senkronize ediliyor..."
+# Bu komut local'deki tüm değişiklikleri siler ve remote ile tamamen senkronize eder
+git reset --hard origin/main
+
+echo ""
+echo "5. Tracked olmayan dosyalar temizleniyor..."
+# Tracked olmayan dosyaları ve dizinleri sil
 git clean -fd
 
 echo ""
@@ -40,7 +40,11 @@ echo "==================================="
 echo "✅ Tamamlandı!"
 echo "==================================="
 echo ""
+echo "⚠️  NOT: Local değişiklikler stash'lendi."
+echo "Geri almak için: git stash pop"
+echo ""
 echo "Şimdi sunucuyu restart et:"
 echo "  restart qb-core"
 echo "  restart qb-inventory"
 echo "  restart wais-hudv6"
+echo "  restart wonev-burgershot"

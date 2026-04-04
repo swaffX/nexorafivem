@@ -10,7 +10,7 @@ RegisterNetEvent('QBCore:Player:SetPlayerData', function(PlayerData)
         Wait(500) -- Biraz bekle ki inventory güncellensin
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
         
-        if Config.ShowDebug then
+        if Config and Config.ShowDebug then
             print(string.format('[QB-Inventory → WAIS-HUD] Para güncellendi: Cash=%d, Bank=%d', 
                 PlayerData.money.cash or 0, 
                 PlayerData.money.bank or 0))
@@ -24,7 +24,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     local PlayerData = QBCore.Functions.GetPlayerData()
     if PlayerData and PlayerData.money then
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
-        if Config.ShowDebug then
+        if Config and Config.ShowDebug then
             print('[QB-Inventory → WAIS-HUD] Oyuncu yüklendi, para senkronize edildi')
         end
     end
@@ -36,7 +36,7 @@ RegisterNetEvent('hud:client:OnMoneyChange', function(type, amount, reason)
     local PlayerData = QBCore.Functions.GetPlayerData()
     if PlayerData and PlayerData.money then
         TriggerEvent('hud:client:UpdateMoney', PlayerData.money)
-        if Config.ShowDebug then
+        if Config and Config.ShowDebug then
             print(string.format('[QB-Inventory] Para değişti: %s, Miktar: %d, Sebep: %s', type, amount, reason or 'unknown'))
         end
     end
