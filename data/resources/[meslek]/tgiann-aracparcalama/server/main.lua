@@ -1,7 +1,5 @@
-QBCore = nil
+local QBCore = exports['qb-core']:GetCoreObject()
 local lastCd = 0
-
-TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
 
 RegisterServerEvent("tgiann-aracparcalama:esya-verme")
 AddEventHandler("tgiann-aracparcalama:esya-verme", function(class, key)

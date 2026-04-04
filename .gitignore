@@ -54,3 +54,17 @@ package-lock.json
 # Özel Notlar
 NOTLAR.txt
 TODO.txt
+data/_replaced_resources/
+/RoadsOfEuropeDE/
+/RoadsOfEuropeDE.tar
+/ReadMe.txt
+
+# VPS runtime artifacts
+data/.replxx_history
+backups/
+/backups/
+*.tar
+*.tar.gz
+*.zip
+resources
+/resources

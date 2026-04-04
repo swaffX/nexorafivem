@@ -8,6 +8,7 @@ local playerCoords = GetEntityCoords(playerPed)
 local lastCoords = playerCoords
 local nearbyDoors, closestDoor = {}, {}
 local paused = false
+local usingAdvanced = false
 local doorData = {}
 
 -- Functions
@@ -23,9 +24,9 @@ function Draw3DText(coords, str)
 		SetTextProportional(1)
 		SetTextOutline()
 		SetTextCentre(1)
-        BeginTextCommandDisplayText("STRING")
-        AddTextComponentSubstringPlayerName(str)
-        EndTextCommandDisplayText(worldX, worldY)
+        SetTextEntry("STRING")
+        AddTextComponentString(str)
+        DrawText(worldX, worldY)
     end
 end
 
@@ -91,6 +92,12 @@ end
 local function getTextCoords(door)
 	if door.setText then return door.textCoords end
 	return setTextCoords(door)
+end
+
+local function round(value, numDecimalPlaces)
+	if not numDecimalPlaces then return math.floor(value + 0.5) end
+    local power = 10 ^ numDecimalPlaces
+    return math.floor((value * power) + 0.5) / (power)
 end
 
 local function loadAnimDict(dict)
@@ -288,6 +295,37 @@ local function updateDoors(specificDoor)
     lastCoords = playerCoords
 end
 
+local function lockpickFinish(success)
+	if success then
+		QBCore.Functions.Notify(Lang:t("success.lockpick_success"), 'success', 2500)
+		if closestDoor.data.coords then
+			TaskTurnPedToFaceCoord(playerPed, closestDoor.data.doors[1].objCoords.x, closestDoor.data.doors[1].objCoords.y, closestDoor.data.doors[1].objCoords.z, 0)
+		else
+			TaskTurnPedToFaceCoord(playerPed, closestDoor.data.objCoords.x, closestDoor.data.objCoords.y, closestDoor.data.objCoords.z, 0)
+		end
+		Wait(300)
+		local count = 0
+		while GetIsTaskActive(playerPed, 225) do
+			Wait(10)
+			if count == 150 then break end
+			count += 1
+		end
+		Wait(1800)
+		TriggerServerEvent('qb-doorlock:server:updateState', closestDoor.id, false, false, true, false) -- Broadcast new state of the door to everyone
+	else
+		QBCore.Functions.Notify(Lang:t("error.lockpick_fail"), 'error', 2500)
+		if math.random(1,100) <= 17 then
+			if usingAdvanced then
+				TriggerServerEvent("qb-doorlock:server:removeLockpick", "advancedlockpick")
+				TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["advancedlockpick"], "remove")
+			else
+				TriggerServerEvent("qb-doorlock:server:removeLockpick", "lockpick")
+				TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["lockpick"], "remove")
+			end
+		end
+	end
+end
+
 local function isAuthorized(door)
 	if door.allAuthorized then return true end
 
@@ -359,7 +397,7 @@ RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
 	PlayerData = val
 end)
 
-RegisterNetEvent('qb-doorlock:client:setState', function(serverId, doorID, state, src, enableSounds, enableAnimation)
+RegisterNetEvent('qb-doorlock:client:setState', function(serverId, doorID, state, src, enableAnimation, enableSounds)
 	if not Config.DoorList[doorID] then return end
 	if enableAnimation == nil then enableAnimation = true end
 	if enableSounds == nil then enableSounds = true end
@@ -404,7 +442,7 @@ RegisterNetEvent('qb-doorlock:client:setState', function(serverId, doorID, state
 						return
 					end
 				else
-					if QBCore.Shared.Round(v.currentHeading, 0) == QBCore.Shared.Round(v.objYaw or v.objHeading, 0) then
+					if round(v.currentHeading, 0) == round(v.objYaw or v.objHeading, 0) then
 						DoorSystemSetDoorState(v.doorHash, 4, false, false)
 					end
 				end
@@ -436,7 +474,7 @@ RegisterNetEvent('qb-doorlock:client:setState', function(serverId, doorID, state
 				playSound(current, src, enableSounds)
 				return
 			else
-				if QBCore.Shared.Round(current.currentHeading, 0) == QBCore.Shared.Round(current.objYaw or current.objHeading, 0) then
+				if round(current.currentHeading, 0) == round(current.objYaw or current.objHeading, 0) then
 					DoorSystemSetDoorState(current.doorHash, 4, false, false)
 				end
 			end
@@ -446,40 +484,9 @@ RegisterNetEvent('qb-doorlock:client:setState', function(serverId, doorID, state
 end)
 
 RegisterNetEvent('lockpicks:UseLockpick', function(isAdvanced)
-    if not closestDoor.data or not next(closestDoor.data) or PlayerData.metadata['isdead'] or PlayerData.metadata['ishandcuffed'] or (not closestDoor.data.pickable and not closestDoor.data.lockpick) or not closestDoor.data.locked then
-        return
-    end
-
-    local difficulty = isAdvanced and 'easy' or 'medium' -- Use 'easy' difficulty for advanced lockpicks, medium for others
-    local success = exports['qb-minigames']:Skillbar(difficulty)
-    if success then
-        QBCore.Functions.Notify(Lang:t("success.lockpick_success"), 'success', 2500)
-        -- Determine which coordinates to face based on door data
-        local coordsToFace = closestDoor.data.doors and closestDoor.data.doors[1].objCoords or closestDoor.data.objCoords
-        TaskTurnPedToFaceCoord(playerPed, coordsToFace.x, coordsToFace.y, coordsToFace.z, 0)
-        -- Wait for the ped to turn towards the door
-        Wait(300)
-        local count = 0
-        while GetIsTaskActive(playerPed, 225) and count < 150 do
-            Wait(10)
-            count = count + 1
-        end
-        Wait(1800)
-        -- Unlock the door
-        TriggerServerEvent('qb-doorlock:server:updateState', closestDoor.id, false, false, true, false)
-    else
-        QBCore.Functions.Notify(Lang:t("error.lockpick_fail"), 'error', 2500)
-        if isAdvanced then
-            local chanceToRemove = math.random(1,100) <= 17
-            if chanceToRemove then
-                TriggerServerEvent("qb-doorlock:server:removeLockpick", "advancedlockpick")
-                TriggerEvent('qb-inventory:client:ItemBox', QBCore.Shared.Items["advancedlockpick"], "remove")
-            end
-        else
-            TriggerServerEvent("qb-doorlock:server:removeLockpick", "lockpick")
-            TriggerEvent('qb-inventory:client:ItemBox', QBCore.Shared.Items["lockpick"], "remove")
-        end
-    end
+	if not closestDoor.data or not next(closestDoor.data) or PlayerData.metadata['isdead'] or PlayerData.metadata['ishandcuffed'] or (not closestDoor.data.pickable and not closestDoor.data.lockpick) or not closestDoor.data.locked then return end
+	usingAdvanced = isAdvanced
+	TriggerEvent('qb-lockpick:client:openLockpick', lockpickFinish)
 end)
 
 RegisterNetEvent('qb-doorlock:client:addNewDoor', function()
@@ -532,25 +539,11 @@ RegisterNetEvent('qb-doorlock:client:addNewDoor', function()
 				default = Config.SaveDoorDialog and doorData.job,
 			},
 			{
-				text = Lang:t("general.jobGrade_authorisation_menu"),
-				name = "jobGrade",
-				type = "number",
-				isRequired = false,
-				default = Config.SaveDoorDialog and doorData.jobGrade,
-			},
-			{
 				text = Lang:t("general.gang_authorisation_menu"),
 				name = "gang",
 				type = "text",
 				isRequired = false,
 				default = Config.SaveDoorDialog and doorData.gang,
-			},
-			{
-				text = Lang:t("general.gangGrade_authorisation_menu"),
-				name = "gangGrade",
-				type = "number",
-				isRequired = false,
-				default = Config.SaveDoorDialog and doorData.gangGrade,
 			},
 			{
 				text = Lang:t("general.citizenid_authorisation_menu"),
@@ -598,9 +591,7 @@ RegisterNetEvent('qb-doorlock:client:addNewDoor', function()
 
 	if doorData.configfile == '' then doorData.configfile = false end
 	if doorData.job == '' then doorData.job = false end
-	if doorData.jobGrade == '' then doorData.jobGrade = nil end
 	if doorData.gang == '' then doorData.gang = false end
-	if doorData.gangGrade == '' then doorData.gangGrade = nil end
 	if doorData.cid == '' then doorData.cid = false end
 	if doorData.item == '' then doorData.item = false end
 	if doorData.doorlabel == '' then doorData.doorlabel = nil end
@@ -892,20 +883,4 @@ CreateThread(function()
 		end
 		Wait(sleep)
 	end
-end)
-
-exports('GetClosestDoor', function()
-	return closestDoor
-end)
-
-exports('GetNearbyDoors', function()
-	return nearbyDoors
-end)
-
-exports('GetDoorList', function()
-	return Config.DoorList
-end)
-
-exports('GetDoorStates', function()
-	return Config.DoorStates
 end)

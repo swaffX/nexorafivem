@@ -7,7 +7,7 @@ This doorlock system is based on [nui_doorlock by thelindat](https://github.com/
 
 * [qb-core](https://github.com/qbcore-framework/qb-core)
 * [qb-input](https://github.com/qbcore-framework/qb-input) - For Making New Doors
-* [qb-minigames](https://github.com/qbcore-framework/qb-minigames) - For Lockpicking Doors
+* [qb-lockpick](https://github.com/qbcore-framework/qb-lockpick) - For Lockpicking Doors
 
 ## Features
 
@@ -97,7 +97,7 @@ This doorlock system is based on [nui_doorlock by thelindat](https://github.com/
 # License
 
     QBCore Framework
-    Copyright (C) 2021 Hawaii_Beach, Linden, Joshua Eger
+    Copyright (C) 2021 Joshua Eger
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

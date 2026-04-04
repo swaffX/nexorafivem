@@ -38,61 +38,38 @@ L1_1 = RegisterNetEvent
 L2_1 = "wais:firedepartment:startFire"
 function L3_1(A0_2, A1_2)
   local L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2
-  L2_2 = A1_2.type
-  if "group" == L2_2 then
-    L2_2 = Group
-    L2_2 = L2_2.active
-    if L2_2 then
-      L2_2 = Group
-      L2_2 = L2_2.groupId
-      L3_2 = A1_2.id
-    end
+  L2_2 = false
+  if "group" == A1_2.type and Group.active then
+    L2_2 = Group.groupId == A1_2.id
   end
-  L2_2 = L2_2 == L3_2
-  L3_2 = A1_2.type
-  if "player" == L3_2 then
-    L3_2 = GetPlayerServerId
-    L4_2 = PlayerId
-    L4_2, L5_2, L6_2, L7_2, L8_2, L9_2 = L4_2()
-    L3_2 = L3_2(L4_2, L5_2, L6_2, L7_2, L8_2, L9_2)
-    L4_2 = tonumber
-    L5_2 = A1_2.id
-    L4_2 = L4_2(L5_2)
-    if L3_2 == L4_2 then
-      goto lbl_51
-    end
+  L3_2 = false
+  if "player" == A1_2.type then
+    L4_2 = GetPlayerServerId
+    L5_2 = PlayerId
+    L5_2, L6_2, L7_2, L8_2, L9_2 = L5_2()
+    L3_2 = L4_2(L5_2, L6_2, L7_2, L8_2, L9_2) == tonumber(A1_2.id)
+  elseif "group" == A1_2.type and Group.active then
+    L3_2 = Group.groupId == A1_2.id
   end
-  L3_2 = A1_2.type
-  if "group" == L3_2 then
-    L3_2 = Group
-    L3_2 = L3_2.active
-    if L3_2 then
-      L3_2 = Group
-      L3_2 = L3_2.groupId
-      L4_2 = A1_2.id
-      ::lbl_51::
-      if L3_2 == L4_2 then
-        L3_2 = Fire
-        L4_2 = L3_2
-        L3_2 = L3_2.newFire
-        L5_2 = A0_2
-        L6_2 = L2_2
-        L7_2 = A1_2
-        L3_2 = L3_2(L4_2, L5_2, L6_2, L7_2)
-        FireEvent = L3_2
-    end
-  end
+  if L3_2 then
+    L4_2 = Fire
+    L5_2 = L4_2
+    L4_2 = L4_2.newFire
+    L6_2 = A0_2
+    L7_2 = L2_2
+    L8_2 = A1_2
+    L4_2 = L4_2(L5_2, L6_2, L7_2, L8_2)
+    FireEvent = L4_2
   else
-    L3_2 = FireEvents
-    L4_2 = A1_2.id
-    L5_2 = Fire
-    L6_2 = L5_2
-    L5_2 = L5_2.newFire
-    L7_2 = A0_2
-    L8_2 = L2_2
-    L9_2 = A1_2
-    L5_2 = L5_2(L6_2, L7_2, L8_2, L9_2)
-    L3_2[L4_2] = L5_2
+    L4_2 = FireEvents
+    L5_2 = A1_2.id
+    L6_2 = Fire
+    L7_2 = L6_2
+    L6_2 = L6_2.newFire
+    L8_2 = A0_2
+    L9_2 = L2_2
+    L6_2 = L6_2(L7_2, L8_2, L9_2, A1_2)
+    L4_2[L5_2] = L6_2
   end
 end
 L1_1(L2_1, L3_1)

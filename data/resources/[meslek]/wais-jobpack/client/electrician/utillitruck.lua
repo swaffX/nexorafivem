@@ -159,38 +159,25 @@ function L16_1(A0_2)
     L5_2 = L5_2[L6_2]
     L1_2(L2_2, L3_2, L4_2, L5_2)
   end
-  if 1 == A0_2 then
-    L1_2 = L6_1
-    L1_2 = L1_2[2]
-    if L1_2 >= 1 then
-      goto lbl_56
-    end
-  end
-  if -1 == A0_2 then
-    L1_2 = L6_1
-    L1_2 = L1_2[2]
-    ::lbl_56::
-    if 0 == L1_2 then
-      if 1 == A0_2 then
-        L1_2 = 0.0
-        if L1_2 then
-          goto lbl_62
-        end
-      end
+  L1_2 = L6_1
+  L1_2 = L1_2[2]
+  if (1 == A0_2 and L1_2 >= 1) or (-1 == A0_2 and 0 == L1_2) then
+    if 1 == A0_2 then
+      L1_2 = 0.0
+    else
       L1_2 = 1.0
-      ::lbl_62::
-      L2_2 = L6_1
-      L2_2[2] = L1_2
-      L2_2 = SetEntityAnimCurrentTime
-      L3_2 = L2_1
-      L4_2 = L4_1
-      L5_2 = L5_1
-      L6_2 = L1_2
-      L2_2(L3_2, L4_2, L5_2, L6_2)
-      L2_2 = Wait
-      L3_2 = 0
-      L2_2(L3_2)
     end
+    L2_2 = L6_1
+    L2_2[2] = L1_2
+    L2_2 = SetEntityAnimCurrentTime
+    L3_2 = L2_1
+    L4_2 = L4_1
+    L5_2 = L5_1
+    L6_2 = L1_2
+    L2_2(L3_2, L4_2, L5_2, L6_2)
+    L2_2 = Wait
+    L3_2 = 0
+    L2_2(L3_2)
   end
   L1_2 = SetEntityAnimSpeed
   L2_2 = L2_1

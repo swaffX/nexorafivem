@@ -1255,39 +1255,18 @@ function L6_1()
             L6_2 = L1_1
             L5_2 = L5_2[L6_2]
             L5_2 = L5_2.zoneRadius
-            if not (L3_2 >= L5_2) then
-              L5_2 = L0_1.gardens
-              L6_2 = L1_1
-              L5_2 = L5_2[L6_2]
-              L5_2 = L5_2.zoneRadius
-              if not (L4_2 >= L5_2) then
-                goto lbl_51
+            L6_2 = L3_2 >= L5_2 or L4_2 >= L5_2
+            if L6_2 then
+              L7_2 = L2_1
+              if not L7_2 then
+                L2_1 = true
+                L7_2 = L4_1
+                L7_2()
               end
-            end
-            L5_2 = L2_1
-            if not L5_2 then
-              L5_2 = true
-              L2_1 = L5_2
-              L5_2 = L4_1
-              L5_2()
-            ::lbl_51::
             else
-              L5_2 = L0_1.gardens
-              L6_2 = L1_1
-              L5_2 = L5_2[L6_2]
-              L5_2 = L5_2.zoneRadius
-              if L3_2 <= L5_2 then
-                L5_2 = L0_1.gardens
-                L6_2 = L1_1
-                L5_2 = L5_2[L6_2]
-                L5_2 = L5_2.zoneRadius
-                if L4_2 <= L5_2 then
-                  L5_2 = L2_1
-                  if L5_2 then
-                    L5_2 = false
-                    L2_1 = L5_2
-                  end
-                end
+              L7_2 = L2_1
+              if L7_2 then
+                L2_1 = false
               end
             end
           end

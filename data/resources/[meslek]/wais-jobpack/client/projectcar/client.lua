@@ -67,52 +67,36 @@ L2_1 = RegisterNetEvent
 L3_1 = "wais:projectcar:startProject"
 function L4_1(A0_2, A1_2)
   local L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2
-  L2_2 = A1_2.type
-  if "player" == L2_2 then
-    L2_2 = GetPlayerServerId
-    L3_2 = PlayerId
-    L3_2, L4_2, L5_2, L6_2, L7_2, L8_2 = L3_2()
-    L2_2 = L2_2(L3_2, L4_2, L5_2, L6_2, L7_2, L8_2)
-    L3_2 = tonumber
-    L4_2 = A1_2.id
-    L3_2 = L3_2(L4_2)
-    if L2_2 == L3_2 then
-      goto lbl_25
-    end
+  L2_2 = false
+  if "player" == A1_2.type then
+    L3_2 = GetPlayerServerId
+    L4_2 = PlayerId
+    L4_2, L5_2, L6_2, L7_2, L8_2 = L4_2()
+    L2_2 = L3_2(L4_2, L5_2, L6_2, L7_2, L8_2) == tonumber(A1_2.id)
+  elseif "group" == A1_2.type and Group.active then
+    L2_2 = Group.groupId == A1_2.id
   end
-  L2_2 = A1_2.type
-  if "group" == L2_2 then
-    L2_2 = Group
-    L2_2 = L2_2.active
-    if L2_2 then
-      L2_2 = Group
-      L2_2 = L2_2.groupId
-      L3_2 = A1_2.id
-      ::lbl_25::
-      if L2_2 == L3_2 then
-        L2_2 = ProjectCar
-        L3_2 = L2_2
-        L2_2 = L2_2.newProject
-        L4_2 = A0_2
-        L5_2 = A1_2
-        L6_2 = true
-        L2_2 = L2_2(L3_2, L4_2, L5_2, L6_2)
-        CurrentProject = L2_2
-    end
-  end
+  if L2_2 then
+    L3_2 = ProjectCar
+    L4_2 = L3_2
+    L3_2 = L3_2.newProject
+    L5_2 = A0_2
+    L6_2 = A1_2
+    L7_2 = true
+    L3_2 = L3_2(L4_2, L5_2, L6_2, L7_2)
+    CurrentProject = L3_2
   else
-    L2_2 = ProjectCars
-    L3_2 = tostring
-    L4_2 = A0_2
-    L3_2 = L3_2(L4_2)
-    L4_2 = ProjectCar
-    L5_2 = L4_2
-    L4_2 = L4_2.newProject
-    L6_2 = A0_2
-    L7_2 = A1_2
-    L8_2 = false
-    L4_2 = L4_2(L5_2, L6_2, L7_2, L8_2)
-    L2_2[L3_2] = L4_2
+    L3_2 = ProjectCars
+    L4_2 = tostring
+    L5_2 = A0_2
+    L4_2 = L4_2(L5_2)
+    L5_2 = ProjectCar
+    L6_2 = L5_2
+    L5_2 = L5_2.newProject
+    L7_2 = A0_2
+    L8_2 = A1_2
+    L5_2 = L5_2(L6_2, L7_2, L8_2, false)
+    L3_2[L4_2] = L5_2
   end
 end
 L2_1(L3_1, L4_1)

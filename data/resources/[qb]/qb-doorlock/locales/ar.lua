@@ -25,8 +25,6 @@ local Translations = {
         citizenid_authorisation_menu = "تصريح المواطن",
         gang_authorisation_menu = "العصابة",
         job_authorisation_menu = "الوظيفة",
-        jobGrade_authorisation_menu = "درجة الوظيفة (اختياري)",
-        gangGrade_authorisation_menu = "مستوى العصابة (اختياري)",
         doortype_title = "نوع الباب",
         doortype_door = "باب",
         doortype_double = "بابين",
@@ -51,10 +49,7 @@ local Translations = {
     }
 }
 
-if GetConvar('qb_locale', 'en') == 'ar' then
-    Lang = Locale:new({
-        phrases = Translations,
-        warnOnMissing = true,
-        fallbackLang = Lang,
-    })
-end
+Lang = Locale:new({
+    phrases = Translations,
+    warnOnMissing = true
+})

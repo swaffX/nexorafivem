@@ -25,8 +25,6 @@ local Translations = {
         citizenid_authorisation_menu = "Autorización de CitizenID",
         gang_authorisation_menu = "Autorización de banda",
         job_authorisation_menu = "Autorización de trabajo",
-        jobGrade_authorisation_menu = "Grado del puesto (opcional)",
-        gangGrade_authorisation_menu = "Grado de pandilla (opcional)",
         doortype_title = "Tipo de puerta",
         doortype_door = "Puerta individual",
         doortype_double = "Puerta doble",
@@ -51,10 +49,7 @@ local Translations = {
     }
 }
 
-if GetConvar('qb_locale', 'en') == 'es' then
-    Lang = Locale:new({
-        phrases = Translations,
-        warnOnMissing = true,
-        fallbackLang = Lang,
-    })
-end
+Lang = Locale:new({
+    phrases = Translations,
+    warnOnMissing = true
+})

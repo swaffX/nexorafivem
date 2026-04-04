@@ -21,8 +21,6 @@ local Translations = {
         citizenid_authorisation_menu = "Autorisation CitizenID",
         gang_authorisation_menu = "Autorisation Gang",
         job_authorisation_menu = "Autorisation Job",
-        jobGrade_authorisation_menu = "Niveau de poste (facultatif)",
-        gangGrade_authorisation_menu = "Niveau de gang (optionnel)",
         doortype_title = "Type de Porte",
         doortype_door = "Porte Simple",
         doortype_double = "Porte Double",
@@ -34,7 +32,6 @@ local Translations = {
         submit_text = "Soummetre",
         newdoor_menu_title = "Ajouter une nouvelle porte",
         newdoor_command_description = "Ajouter une porte au système Doorlock",
-        doordebug_command_description = "Activer le mode debug",
         warning = "Attention",
         created_by = "créer par",
         warn_no_permission_newdoor = "%{player} (%{license}) à essayé d'ajouter une porte sans permission (source: %{source})",
@@ -46,10 +43,7 @@ local Translations = {
     }
 }
 
-if GetConvar('qb_locale', 'en') == 'fr' then
-    Lang = Locale:new({
-        phrases = Translations,
-        warnOnMissing = true,
-        fallbackLang = Lang,
-    })
-end
+Lang = Locale:new({
+    phrases = Translations,
+    warnOnMissing = true
+})
