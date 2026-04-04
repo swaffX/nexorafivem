@@ -62,5 +62,4 @@ backups/
 *.tar
 *.tar.gz
 *.zip
-resources
 /resources
