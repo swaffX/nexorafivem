@@ -107,7 +107,24 @@ RegisterNetEvent('swx_speaker:server:addToHistory', function(url, title)
     end
 end)
 
--- Müzik geçmişinden sil
+-- Müzik geçmişinden sil (URL bazlı - tüm duplicate'leri sil)
+RegisterNetEvent('swx_speaker:server:removeFromHistoryByUrl', function(url)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    
+    if Player then
+        local citizenid = Player.PlayerData.citizenid
+        
+        MySQL.Async.execute('DELETE FROM speaker_history WHERE citizenid = @citizenid AND url = @url', {
+            ['@citizenid'] = citizenid,
+            ['@url'] = url
+        }, function(affectedRows)
+            print('[SWX Speaker Server] Silindi: ' .. affectedRows .. ' kayıt (URL: ' .. url .. ')')
+        end)
+    end
+end)
+
+-- Müzik geçmişinden sil (eski - timestamp bazlı)
 RegisterNetEvent('swx_speaker:server:removeFromHistory', function(url, timestamp)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)

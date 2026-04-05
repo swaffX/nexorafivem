@@ -602,14 +602,23 @@ function SongActionMenu(song)
                 description = 'Bu şarkıyı geçmişten kaldır',
                 icon = 'trash',
                 onSelect = function()
-                    for i, v in ipairs(musicHistory) do
-                        if v.url == song.url and v.timestamp == song.timestamp then
+                    -- Aynı URL'ye sahip TÜM kayıtları sil (duplicate temizliği)
+                    local deletedCount = 0
+                    for i = #musicHistory, 1, -1 do
+                        if musicHistory[i].url == song.url then
                             table.remove(musicHistory, i)
-                            TriggerServerEvent('swx_speaker:server:removeFromHistory', song.url, song.timestamp)
-                            QBCore.Functions.Notify('Geçmişten silindi', 'success')
-                            break
+                            deletedCount = deletedCount + 1
                         end
                     end
+                    
+                    -- Server'dan da sil (URL bazlı - tüm duplicate'ler)
+                    TriggerServerEvent('swx_speaker:server:removeFromHistoryByUrl', song.url)
+                    
+                    QBCore.Functions.Notify('Geçmişten silindi (' .. deletedCount .. ' kayıt)', 'success')
+                    
+                    -- Menüyü yenile
+                    Wait(100)
+                    MusicHistoryMenu()
                 end
             }
         }
