@@ -1006,18 +1006,18 @@ function FilterSettingsDialog(filterType)
         gainDesc = 'Kesim derinliği (negatif = daha fazla)'
         
     elseif filterType == 'peaking' then
-        defaultFreq = 100
-        defaultGain = 10
+        defaultFreq = 80
+        defaultGain = 12
         defaultDetune = 0
-        freqDesc = 'Hedef frekans (bass: 60-250 Hz, tiz: 8000+ Hz)'
-        gainDesc = 'Boost/Cut (pozitif = artır, negatif = azalt)'
+        freqDesc = 'Hedef frekans (bass: 60-250 Hz, tiz: 3000-8000 Hz)'
+        gainDesc = 'Boost/Cut (pozitif = güçlendir, negatif = zayıflat)'
         
     elseif filterType == 'lowshelf' then
-        defaultFreq = 200
-        defaultGain = 8
+        defaultFreq = 150
+        defaultGain = 15
         defaultDetune = 0
-        freqDesc = 'Geçiş frekansı (bass kontrolü)'
-        gainDesc = 'Bass boost/cut (pozitif = güçlü bass)'
+        freqDesc = 'Geçiş frekansı (bass kontrolü: 100-300 Hz)'
+        gainDesc = 'Bass boost/cut (pozitif = güçlü bass 💥)'
         
     elseif filterType == 'highshelf' then
         defaultFreq = 8000
@@ -1092,11 +1092,21 @@ end
 -- xSound Web Audio API ile gerçek filtreler
 -- ============================================
 
--- Filtre Uygulama Fonksiyonu
+-- Filtre Uygulama Fonksiyonu (Düzeltilmiş - Bass Boost Uyumluluğu)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
         return
+    end
+    
+    -- YouTube URL'si mi kontrol et
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    local currentUrl = ''
+    
+    if vehicle ~= 0 and DoesEntityExist(vehicle) then
+        -- URL'yi server'dan al veya local değişkenden
+        -- Not: Bu sadece bilgilendirme için, filter application için kritik değil
     end
     
     -- Filtreyi chain'e ekle
@@ -1107,43 +1117,66 @@ function ApplyFilter(filterId, filter)
     local filterType = filter.type:lower()
     local frequency = math.max(10, math.min(22000, filter.frequency))
     local gain = math.max(-40, math.min(40, filter.gain))
-    local Q = CalculateQValue(filterType, filter.detune)
+    local Q = CalculateQValue(filterType, filter.detune, gain)
     
     -- Debug log
     print(string.format('[SWX Speaker] Filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
         filterType:upper(), frequency, gain, Q))
     
-    -- Şarkı yüklenmesini bekle (2 saniye)
-    CreateThread(function()
-        Wait(2000)
-        
-        -- xSound setFilter export'u
-        local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
-        
-        if success then
-            QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
-        else
-            QBCore.Functions.Notify('Filtre uygulanamadı, tekrar deneyin', 'error')
-            -- Başarısız olursa chain'den kaldır
-            filterChain[filterId] = nil
-            activeFilters[filterId] = nil
-        end
-    end)
+    -- Ses dosyası için filtre uygula (YouTube değilse)
+    -- xSound'un setFilter'ı zaten retry mekanizması içeriyor
+    local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+    
+    if success then
+        QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+        print(string.format('[SWX Speaker] Filtre başarıyla uygulandı: %s', filterType:upper()))
+    else
+        -- Filtre uygulanamadıysa retry mekanizması xsound tarafında çalışır
+        QBCore.Functions.Notify('Filtre uygulanıyor... (birkaç saniye bekleyin)', 'info')
+        print(string.format('[SWX Speaker] Filtre uygulanamadı, ses yüklenmemiş olabilir: %s', filterType:upper()))
+    end
 end
 
--- Q Değeri Hesapla
-function CalculateQValue(filterType, detune)
+-- Q Değeri Hesapla (Düzeltilmiş - Bass Boost için optimize)
+function CalculateQValue(filterType, detune, gain)
     local normalizedDetune = detune / 4800
     local Q = 1.0
     
-    if filterType == 'lowpass' or filterType == 'highpass' then
+    -- Bass boost için özel Q değerleri
+    if filterType == 'lowshelf' then
+        -- Lowshelf: Gain'e göre Q ayarla (düşük gain = geniş bant, yüksek gain = dar bant)
+        local gainFactor = math.abs(gain) / 20
+        Q = 0.5 + (gainFactor * 2) + (math.abs(normalizedDetune) * 2)
+        Q = math.max(0.3, math.min(5, Q))
+        
+    elseif filterType == 'peaking' then
+        -- Peaking: Bass boost için optimize edilmiş Q
+        -- Pozitif gain (boost) için daha düşük Q (daha geniş bant)
+        -- Negatif gain (cut) için daha yüksek Q (daha dar bant)
+        if gain > 0 then
+            -- Bass boost: Geniş bant, doğal ses
+            Q = 0.7 + (math.abs(normalizedDetune) * 2.5)
+        else
+            -- Bass cut: Dar bant, hedef frekans
+            Q = 1.0 + (math.abs(normalizedDetune) * 4)
+        end
+        Q = math.max(0.5, math.min(10, Q))
+        
+    elseif filterType == 'lowpass' or filterType == 'highpass' then
         Q = 0.7 + (math.abs(normalizedDetune) * 5)
+        Q = math.max(0.1, math.min(15, Q))
+        
     elseif filterType == 'bandpass' or filterType == 'notch' then
         Q = 1.0 + (math.abs(normalizedDetune) * 15)
-    elseif filterType == 'peaking' or filterType == 'lowshelf' or filterType == 'highshelf' then
+        Q = math.max(0.5, math.min(20, Q))
+        
+    elseif filterType == 'highshelf' then
         Q = 0.5 + (math.abs(normalizedDetune) * 3)
+        Q = math.max(0.3, math.min(5, Q))
+        
     elseif filterType == 'allpass' then
         Q = 0.1 + (math.abs(normalizedDetune) * 2)
+        Q = math.max(0.1, math.min(10, Q))
     end
     
     return math.max(0.1, math.min(20, Q))

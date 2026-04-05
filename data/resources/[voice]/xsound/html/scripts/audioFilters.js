@@ -54,10 +54,10 @@ class AudioFilterManager {
             gainNode.connect(ctx.destination);
             this.soundFilters[soundId].connected = true;
 
-            console.log('[xSound Filters] Initialized for:', soundId);
+            console.log('[xSound Filters] ✅ Initialized filter chain for:', soundId);
             return true;
         } catch (error) {
-            console.error('[xSound Filters] Init error:', error);
+            console.error('[xSound Filters] ❌ Init error:', error);
             return false;
         }
     }
@@ -81,17 +81,25 @@ class AudioFilterManager {
 
             // Yeni filtre oluştur
             const filter = ctx.createBiquadFilter();
-            filter.type = filterType; // lowpass, highpass, bandpass, etc.
+            filter.type = filterType; // lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass
             filter.frequency.value = frequency;
             filter.Q.value = Q;
             filter.gain.value = gain;
 
+            // Bass filter'ları için özel log
+            if (filterType === 'lowshelf' || filterType === 'peaking') {
+                console.log(`[xSound Filters] 🎵 BASS FILTER APPLIED: ${filterType} | Freq: ${frequency}Hz | Gain: ${gain}dB | Q: ${Q}`);
+            } else {
+                console.log(`[xSound Filters] Applied ${filterType}: freq=${frequency}Hz, Q=${Q}, gain=${gain}dB`);
+            }
+
             // Chain'i yeniden bağla
             this.reconnectChain(soundId, filterId, filter);
-
-            console.log(`[xSound Filters] Applied ${filterType}: freq=${frequency}Hz, Q=${Q}, gain=${gain}dB`);
+            
+            return true;
         } catch (error) {
             console.error('[xSound Filters] Set filter error:', error);
+            return false;
         }
     }
 
