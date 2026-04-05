@@ -1203,6 +1203,14 @@ function ApplyFilter(filterId, filter)
     end)
     
     if success then
+        -- Filtre uygulandıktan sonra müziği resume et (xsound bug workaround)
+        Citizen.CreateThread(function()
+            Wait(100) -- Kısa bekleme
+            if currentMusicId and isPlaying then
+                exports.xsound:Resume(currentMusicId)
+            end
+        end)
+        
         QBCore.Functions.Notify('🎵 Filtre uygulandı: ' .. filterType:upper(), 'success')
     else
         QBCore.Functions.Notify('Filtre uygulanamadı! Müziğin yüklenmesini bekleyin.', 'error')
