@@ -249,8 +249,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 172) then
                 local newPos = vector3(coords.x, coords.y, coords.z + moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    -- Z koordinatını değiştir ama animasyonu koru
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
+                    -- Pozisyonu değiştir - collision olmadan
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, true)
                     SendNUIMessage({ type = "keyActive", key = "move_up" })
 
                     TriggerServerEvent(
@@ -265,8 +265,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 173) then
                 local newPos = vector3(coords.x, coords.y, coords.z - moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    -- Z koordinatını değiştir ama animasyonu koru
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
+                    -- Pozisyonu değiştir - collision olmadan
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, true)
                     SendNUIMessage({ type = "keyActive", key = "move_down" })
 
                     TriggerServerEvent(
