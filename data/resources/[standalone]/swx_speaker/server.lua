@@ -35,7 +35,7 @@ QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, 
     end, 'GET')
 end)
 
--- YouTube Audio Extract (Kendi localhost extractor servisini kullan)
+-- YouTube Audio Extract (Kendi VPS extractor servisini kullan)
 RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, musicId, volume, distance, coords)
     local src = source
     
@@ -49,7 +49,7 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
     
     print('[SWX Speaker Server] YouTube audio extract başlatılıyor: ' .. videoId)
     
-    -- Kendi localhost extractor servisimiz
+    -- Kendi localhost extractor servisimiz (server tarafında çalışıyor)
     local extractorUrl = 'http://localhost:3000/extract?url=' .. videoUrl
     
     print('[SWX Speaker Server] Extractor çağrılıyor: ' .. extractorUrl)
@@ -63,8 +63,14 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
                 print('[SWX Speaker Server] Başlık: ' .. (data.title or 'Bilinmiyor'))
                 print('[SWX Speaker Server] Süre: ' .. (data.duration or 0) .. ' saniye')
                 
+                -- Client'ın erişebileceği proxy URL'sine çevir
+                -- localhost:3000 -> VPS_IP:3000
+                local clientProxyUrl = data.url:gsub('localhost', '194.105.5.37')
+                
+                print('[SWX Speaker Server] Client URL: ' .. clientProxyUrl)
+                
                 -- Client'a audio URL'sini gönder
-                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title)
+                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, clientProxyUrl, musicId, volume, distance, coords, data.title)
             else
                 print('[SWX Speaker Server] HATA: Extractor yanıtı geçersiz!')
                 TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı. Extractor servisini kontrol edin!', 'error')

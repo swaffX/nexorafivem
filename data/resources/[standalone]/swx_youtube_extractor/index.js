@@ -4,7 +4,8 @@ const { exec } = require('child_process');
 const http = require('http');
 const https = require('https');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0'; // Dışarıdan erişim için
 
 app.use(cors());
 app.use(express.json());
@@ -153,9 +154,9 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'SWX YouTube Extractor' });
 });
 
-app.listen(PORT, () => {
-    console.log(`[SWX Extractor] Server running on port ${PORT}`);
-    console.log(`[SWX Extractor] Health check: http://localhost:${PORT}/health`);
-    console.log(`[SWX Extractor] Extract: http://localhost:${PORT}/extract?url=YOUTUBE_URL`);
-    console.log(`[SWX Extractor] Proxy: http://localhost:${PORT}/proxy?url=AUDIO_URL`);
+app.listen(PORT, HOST, () => {
+    console.log(`[SWX Extractor] Server running on ${HOST}:${PORT}`);
+    console.log(`[SWX Extractor] Health check: http://${HOST}:${PORT}/health`);
+    console.log(`[SWX Extractor] Extract: http://${HOST}:${PORT}/extract?url=YOUTUBE_URL`);
+    console.log(`[SWX Extractor] Proxy: http://${HOST}:${PORT}/proxy?url=AUDIO_URL`);
 });
