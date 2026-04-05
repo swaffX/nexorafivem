@@ -25,7 +25,13 @@ end)
 RegisterNetEvent('swx_speaker:client:receiveHistory', function(history)
     musicHistory = history
     historyLoaded = true
+    
+    -- Debug: Gelen geçmişi detaylı logla
     print('[SWX Speaker] Müzik geçmişi yüklendi: ' .. #musicHistory .. ' şarkı')
+    for i, song in ipairs(musicHistory) do
+        print(string.format('[SWX Speaker] Şarkı %d: Title="%s" | URL="%s"', 
+            i, song.title or 'NIL', song.url or 'NIL'))
+    end
 end)
 
 -- K tuşu ile menü aç
@@ -434,11 +440,10 @@ function MusicHistoryMenu()
         Wait(500) -- Server'dan cevap bekle
     end
     
-    -- Debug: Geçmişi kontrol et
+    -- Debug: musicHistory içeriğini logla
+    print('[SWX Speaker Debug] MusicHistoryMenu açılıyor')
     print('[SWX Speaker Debug] Geçmiş sayısı: ' .. #musicHistory)
-    for i, song in ipairs(musicHistory) do
-        print('[SWX Speaker Debug] Şarkı ' .. i .. ': ' .. (song.title or 'Bilinmeyen'))
-    end
+    print('[SWX Speaker Debug] historyLoaded: ' .. tostring(historyLoaded))
     
     if #musicHistory == 0 then
         QBCore.Functions.Notify('Müzik geçmişi boş! Bir şarkı çalın.', 'error')
@@ -450,8 +455,23 @@ function MusicHistoryMenu()
     local seenUrls = {}
     
     for i, song in ipairs(musicHistory) do
+        -- Debug: Her şarkıyı kontrol et
+        print(string.format('[SWX Speaker Debug] İşleniyor %d: song=%s | url=%s | title=%s', 
+            i, tostring(song), tostring(song.url), tostring(song.title)))
+        
         if song and song.url and not seenUrls[song.url] then
-            table.insert(uniqueSongs, song)
+            -- Title kontrolü ve fallback
+            local songTitle = song.title
+            if not songTitle or songTitle == '' or songTitle == 'nil' then
+                songTitle = 'Bilinmeyen Şarkı #' .. i
+                print('[SWX Speaker Debug] Title boş, fallback kullanıldı: ' .. songTitle)
+            end
+            
+            table.insert(uniqueSongs, {
+                url = song.url,
+                title = songTitle,
+                timestamp = song.timestamp
+            })
             seenUrls[song.url] = true
         end
     end
@@ -466,13 +486,13 @@ function MusicHistoryMenu()
     for i, song in ipairs(uniqueSongs) do
         local songTitle = song.title or 'Bilinmeyen Şarkı'
         
-        -- Debug: Her şarkıyı logla
-        print('[SWX Speaker Debug] Menüye ekleniyor: ' .. songTitle)
+        -- Debug: Menüye eklenen her şarkıyı logla
+        print('[SWX Speaker Debug] Menüye ekleniyor: "' .. songTitle .. '"')
         
         table.insert(options, {
             title = songTitle,
             icon = 'music',
-            arrow = true, -- Ok işareti ekle
+            arrow = true,
             onSelect = function()
                 SongActionMenu(song)
             end

@@ -40,6 +40,10 @@ RegisterNetEvent('swx_speaker:server:addToHistory', function(url, title)
         local citizenid = Player.PlayerData.citizenid
         local timestamp = os.time()
         
+        -- Debug log
+        print(string.format('[SWX Speaker Server] Geçmişe ekleniyor: Title="%s" | URL="%s"', 
+            title or 'NIL', url or 'NIL'))
+        
         MySQL.Async.execute('INSERT INTO speaker_history (citizenid, url, title, played_at) VALUES (@citizenid, @url, @title, @timestamp)', {
             ['@citizenid'] = citizenid,
             ['@url'] = url,
@@ -47,6 +51,8 @@ RegisterNetEvent('swx_speaker:server:addToHistory', function(url, title)
             ['@timestamp'] = timestamp
         }, function(affectedRows)
             if affectedRows > 0 then
+                print('[SWX Speaker Server] Başarıyla kaydedildi: ' .. affectedRows .. ' satır')
+                
                 -- Eski kayıtları temizle (50'den fazlaysa)
                 MySQL.Async.execute([[
                     DELETE FROM speaker_history 
@@ -62,6 +68,8 @@ RegisterNetEvent('swx_speaker:server:addToHistory', function(url, title)
                 ]], {
                     ['@citizenid'] = citizenid
                 })
+            else
+                print('[SWX Speaker Server] HATA: Kayıt başarısız!')
             end
         end)
     end
