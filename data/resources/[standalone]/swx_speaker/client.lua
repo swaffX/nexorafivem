@@ -10,6 +10,12 @@ local musicHistory = {} -- Müzik geçmişi
 local activeFilters = {} -- Aktif filtreler
 local historyLoaded = false -- Geçmiş yüklendi mi?
 
+-- Filtre sistemi değişkenleri
+local filterChain = {} -- Aktif filtre zinciri
+local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
+local currentFilteredVolume = Config.DefaultVolume -- Filtreli ses seviyesi
+local isTransitioning = false -- Geçiş animasyonu aktif mi?
+
 -- Oyuncu spawn olduğunda geçmişi yükle
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent('swx_speaker:server:loadHistory')
@@ -212,7 +218,7 @@ function PlayMusic(url, title)
         currentFilteredVolume = currentVolume
         
         -- Aktif filtreleri uygula (eğer varsa) - Smooth transition ile
-        if next(activeFilters) ~= nil then
+        if filterChain and next(filterChain) ~= nil then
             CreateThread(function()
                 Wait(1500) -- Şarkı yüklenmesini bekle
                 RecalculateFilterChain()
@@ -296,7 +302,7 @@ function VolumeRangeDialog()
             exports.xsound:Distance(currentMusicId, currentDistance)
             
             -- Filtreler varsa yeniden hesapla, yoksa direkt ayarla
-            if next(filterChain) ~= nil then
+            if filterChain and next(filterChain) ~= nil then
                 RecalculateFilterChain()
             else
                 exports.xsound:setVolume(currentMusicId, currentVolume)
@@ -428,6 +434,12 @@ function MusicHistoryMenu()
         Wait(500) -- Server'dan cevap bekle
     end
     
+    -- Debug: Geçmişi kontrol et
+    print('[SWX Speaker Debug] Geçmiş sayısı: ' .. #musicHistory)
+    for i, song in ipairs(musicHistory) do
+        print('[SWX Speaker Debug] Şarkı ' .. i .. ': ' .. (song.title or 'Bilinmeyen'))
+    end
+    
     if #musicHistory == 0 then
         QBCore.Functions.Notify('Müzik geçmişi boş! Bir şarkı çalın.', 'error')
         return
@@ -438,13 +450,13 @@ function MusicHistoryMenu()
     local seenUrls = {}
     
     for i, song in ipairs(musicHistory) do
-        if not seenUrls[song.url] then
+        if song and song.url and not seenUrls[song.url] then
             table.insert(uniqueSongs, song)
             seenUrls[song.url] = true
         end
     end
     
-    -- Eğer tüm şarkılar duplicate ise
+    -- Eğer tüm şarkılar duplicate veya geçersizse
     if #uniqueSongs == 0 then
         QBCore.Functions.Notify('Müzik geçmişi boş!', 'error')
         return
@@ -452,9 +464,10 @@ function MusicHistoryMenu()
     
     local options = {}
     for i, song in ipairs(uniqueSongs) do
+        local songTitle = song.title or 'Bilinmeyen Şarkı'
         table.insert(options, {
-            title = song.title, -- Şarkı adı title'da
-            description = song.title, -- Şarkı adı description'da da (kısa versiyon)
+            title = songTitle, -- Şarkı adı title'da
+            description = songTitle, -- Şarkı adı description'da da
             icon = 'music',
             onSelect = function()
                 SongActionMenu(song)
@@ -464,7 +477,7 @@ function MusicHistoryMenu()
     
     lib.registerContext({
         id = 'music_history_menu',
-        title = 'Hoparlör geçmişi',
+        title = 'Hoparlör geçmişi (' .. #uniqueSongs .. ' şarkı)',
         menu = 'other_menu',
         options = options
     })
@@ -965,19 +978,27 @@ function RecalculateFilterChain()
         return
     end
     
+    -- filterChain nil kontrolü
+    if not filterChain then
+        filterChain = {}
+        return
+    end
+    
     -- Başlangıç: Orijinal volume
     local targetVolume = baseVolume
     local volumeMultiplier = 1.0
     
     -- Tüm aktif filtreleri chain olarak uygula
     for filterId, filter in pairs(filterChain) do
-        local filterType = filter.type:lower()
-        local gain = filter.gain
-        local frequency = filter.frequency
-        
-        -- Her filtre tipine göre volume çarpanı hesapla
-        local filterMultiplier = CalculateFilterMultiplier(filterType, gain, frequency)
-        volumeMultiplier = volumeMultiplier * filterMultiplier
+        if filter and filter.type then
+            local filterType = filter.type:lower()
+            local gain = filter.gain or 0
+            local frequency = filter.frequency or 350
+            
+            -- Her filtre tipine göre volume çarpanı hesapla
+            local filterMultiplier = CalculateFilterMultiplier(filterType, gain, frequency)
+            volumeMultiplier = volumeMultiplier * filterMultiplier
+        end
     end
     
     -- Hedef volume'u hesapla (safe limits)
@@ -1081,6 +1102,24 @@ function ClearAllFilters()
         currentFilteredVolume = baseVolume
         activeFilters = {}
         QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
+    end
+end
+
+-- Filtre Kaldırma (Chain'den çıkar ve yeniden hesapla)
+function RemoveFilter(filterId)
+    if activeFilters[filterId] then
+        local filterType = activeFilters[filterId].type
+        
+        -- Chain'den kaldır
+        if filterChain then
+            filterChain[filterId] = nil
+        end
+        activeFilters[filterId] = nil
+        
+        -- Kalan filtreleri yeniden hesapla
+        RecalculateFilterChain()
+        
+        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
     end
 end
 
