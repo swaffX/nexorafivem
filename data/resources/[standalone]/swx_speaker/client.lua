@@ -207,10 +207,11 @@ function PlayMusic(url, title)
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('nexora-speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
-        -- Aktif filtreleri uygula
-        for filterId, filter in pairs(activeFilters) do
-            ApplyFilter(filterId, filter)
-        end
+        -- NOT: Filtreler şu an devre dışı (xsound limiti)
+        -- Aktif filtreleri kaydet ama uygulama
+        -- for filterId, filter in pairs(activeFilters) do
+        --     ApplyFilter(filterId, filter)
+        -- end
         
         CreateThread(function()
             while isPlaying and DoesEntityExist(vehicle) do
@@ -772,56 +773,64 @@ function FilterTypeMenu()
         menu = 'filters_menu',
         options = {
             {
-                title = 'Lowpass',
+                title = 'Lowpass (Alçak Geçiren)',
+                description = 'Boğuk, kapalı ses - Araba camı kapalı efekti',
                 icon = 'wave-square',
                 onSelect = function()
                     FilterSettingsDialog('lowpass')
                 end
             },
             {
-                title = 'Highshelf',
-                icon = 'wave-square',
-                onSelect = function()
-                    FilterSettingsDialog('highshelf')
-                end
-            },
-            {
-                title = 'Peaking',
-                icon = 'wave-square',
-                onSelect = function()
-                    FilterSettingsDialog('peaking')
-                end
-            },
-            {
-                title = 'Highpass',
+                title = 'Highpass (Yüksek Geçiren)',
+                description = 'İnce, telefon sesi - Radyo/telefon efekti',
                 icon = 'wave-square',
                 onSelect = function()
                     FilterSettingsDialog('highpass')
                 end
             },
             {
-                title = 'Notch',
-                icon = 'wave-square',
-                onSelect = function()
-                    FilterSettingsDialog('notch')
-                end
-            },
-            {
-                title = 'Lowshelf',
-                icon = 'wave-square',
-                onSelect = function()
-                    FilterSettingsDialog('lowshelf')
-                end
-            },
-            {
-                title = 'Bandpass',
+                title = 'Bandpass (Bant Geçiren)',
+                description = 'Dar, filtrelenmiş ses - Telsiz efekti',
                 icon = 'wave-square',
                 onSelect = function()
                     FilterSettingsDialog('bandpass')
                 end
             },
             {
-                title = 'Allpass',
+                title = 'Notch (Bant Kesici)',
+                description = 'Belirli frekansı keser - Cızırtı temizleme',
+                icon = 'wave-square',
+                onSelect = function()
+                    FilterSettingsDialog('notch')
+                end
+            },
+            {
+                title = 'Peaking (Tepe Artırma)',
+                description = 'Bass boost veya tiz boost',
+                icon = 'wave-square',
+                onSelect = function()
+                    FilterSettingsDialog('peaking')
+                end
+            },
+            {
+                title = 'Lowshelf (Alt Raf)',
+                description = 'Tüm bassları yükseltir - Subwoofer efekti',
+                icon = 'wave-square',
+                onSelect = function()
+                    FilterSettingsDialog('lowshelf')
+                end
+            },
+            {
+                title = 'Highshelf (Üst Raf)',
+                description = 'Parlaklık artışı - Müziği daha net yapar',
+                icon = 'wave-square',
+                onSelect = function()
+                    FilterSettingsDialog('highshelf')
+                end
+            },
+            {
+                title = 'Allpass (Tüm Geçiren)',
+                description = 'Faz değişimi - Echo/reverb altyapısı',
                 icon = 'wave-square',
                 onSelect = function()
                     FilterSettingsDialog('allpass')
@@ -885,88 +894,25 @@ function FilterSettingsDialog(filterType)
         -- Filtreyi uygula
         ApplyFilter(filterId, activeFilters[filterId])
         
-        QBCore.Functions.Notify('Filtre aktifleştirildi: ' .. filterType:upper(), 'success')
+        QBCore.Functions.Notify('Filtre kaydedildi: ' .. filterType:upper() .. ' (UI only - xsound limiti)', 'info')
     end
 end
 
--- Filtre Uygulama Fonksiyonu (Gerçek Audio İşlevleri)
+-- Filtre Uygulama Fonksiyonu (Gerçek Audio İşlevleri - xsound Limitleri ile)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         return
     end
     
-    -- xsound'da gerçek filter API'si yok, ancak volume ve EQ simülasyonu yapabiliriz
-    local volumeModifier = 1.0
-    local frequencyRange = filter.frequency
-    local gainValue = filter.gain
+    -- xsound'da gerçek filter API'si yok, sadece volume kontrolü var
+    -- Bu yüzden filtreleri devre dışı bırakıyoruz (ses bozulmasını önlemek için)
     
-    -- Her filtre tipinin gerçek audio işlevi
-    if filter.type == 'lowpass' then
-        -- Düşük frekansları geçir, yüksek frekansları kes
-        -- Frequency değeri kesim noktası (Hz)
-        -- Gain negatif olmalı (yüksek frekansları azaltır)
-        if frequencyRange < 1000 then
-            volumeModifier = 0.7 + (gainValue / 200) -- Daha fazla kesim
-        else
-            volumeModifier = 0.9 + (gainValue / 150)
-        end
-        
-    elseif filter.type == 'highpass' then
-        -- Yüksek frekansları geçir, düşük frekansları kes
-        -- Frequency değeri kesim noktası (Hz)
-        if frequencyRange > 5000 then
-            volumeModifier = 0.7 + (gainValue / 200) -- Daha fazla kesim
-        else
-            volumeModifier = 0.9 + (gainValue / 150)
-        end
-        
-    elseif filter.type == 'peaking' then
-        -- Belirli frekansı artır veya azalt (EQ)
-        -- Gain pozitif = artır, negatif = azalt
-        volumeModifier = 1.0 + (gainValue / 50)
-        
-    elseif filter.type == 'lowshelf' then
-        -- Düşük frekansları toplu olarak artır/azalt
-        -- Frequency altındaki tüm frekanslar etkilenir
-        if frequencyRange < 500 then
-            volumeModifier = 1.0 + (gainValue / 40) -- Bass boost/cut
-        else
-            volumeModifier = 1.0 + (gainValue / 60)
-        end
-        
-    elseif filter.type == 'highshelf' then
-        -- Yüksek frekansları toplu olarak artır/azalt
-        -- Frequency üstündeki tüm frekanslar etkilenir
-        if frequencyRange > 8000 then
-            volumeModifier = 1.0 + (gainValue / 40) -- Treble boost/cut
-        else
-            volumeModifier = 1.0 + (gainValue / 60)
-        end
-        
-    elseif filter.type == 'notch' then
-        -- Belirli frekansı tamamen kes (band-stop)
-        -- Dar bir frekans aralığını siler
-        volumeModifier = 1.0 - (math.abs(gainValue) / 80)
-        
-    elseif filter.type == 'bandpass' then
-        -- Sadece belirli frekans aralığını geçir
-        -- Frequency merkezindeki dar bant geçer
-        local bandwidth = 1000 -- Hz
-        volumeModifier = 0.8 + (math.abs(gainValue) / 100)
-        
-    elseif filter.type == 'allpass' then
-        -- Tüm frekansları geçir, sadece faz değişimi
-        -- Detune değeri faz kaymasını belirler
-        volumeModifier = 1.0 + (filter.detune / 10000)
-    end
+    -- NOT: Gerçek audio filter için custom xsound fork veya farklı ses sistemi gerekir
+    -- Şu anki implementasyon sadece UI gösterimi için
     
-    -- Volume modifier'ı güvenli aralıkta tut (0.1 - 1.5)
-    local newVolume = math.max(0.1, math.min(1.5, currentVolume * volumeModifier))
+    print(string.format('[Nexora Speaker] Filtre kaydedildi (UI only): %s | Freq: %d Hz | Gain: %d dB', 
+        filter.type:upper(), filter.frequency, filter.gain))
     
-    if currentMusicId then
-        exports.xsound:setVolume(currentMusicId, newVolume)
-    end
-    
-    print(string.format('[Nexora Speaker] Filtre uygulandı: %s | Freq: %d Hz | Gain: %d dB | Volume: %.2f', 
-        filter.type:upper(), filter.frequency, filter.gain, newVolume))
+    -- Filtreyi sadece kaydet, ses üzerinde değişiklik yapma
+    -- Bu sayede ses bozulması olmaz
 end

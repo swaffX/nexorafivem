@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-author 'Nexora RP'
+author 'SWX Scripts'
 description 'Araç Hoparlör Sistemi - ox_lib Context Menu'
 version '1.2.0'
 
