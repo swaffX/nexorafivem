@@ -285,31 +285,8 @@ function PlayMusic(url, title)
             -- Server'a kaydet (kalıcı)
             TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
             
-            -- xsound'un müziği yüklemesini bekle, sonra position thread'i başlat
-            CreateThread(function()
-                -- xsound'un müziği tanıması için kısa bekleme
-                Wait(500)
-                
-                -- Müzik hala aktif mi kontrol et
-                local initialMusicId = currentMusicId
-                if not initialMusicId then
-                    print('[SWX Speaker] Position thread iptal edildi (müzik yok)')
-                    return
-                end
-                
-                local threadMusicId = initialMusicId
-                while isPlaying and DoesEntityExist(vehicle) do
-                    -- Eğer bu thread artık aktif müzik değilse, çık
-                    if currentMusicId ~= threadMusicId then
-                        print('[SWX Speaker] Position thread sonlandırılıyor (eski thread): ' .. threadMusicId)
-                        break
-                    end
-                    
-                    local newCoords = GetEntityCoords(vehicle)
-                    exports.xsound:Position(threadMusicId, newCoords)
-                    Wait(500)
-                end
-            end)
+            -- NOT: xsound PlayUrlPos ile otomatik position tracking yapıyor
+            -- Gereksiz Position thread'ine gerek yok!
             
             QBCore.Functions.Notify('Müzik çalıyor!', 'success')
             print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
@@ -321,90 +298,45 @@ end
 
 -- Server'dan gelen extracted audio URL'sini çal
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl)
-    print('[SWX Speaker] Extracted audio URL alındı: ' .. audioUrl)
-    print('[SWX Speaker] Başlık: ' .. (title or 'Bilinmiyor'))
-    print('[SWX Speaker] Orijinal URL: ' .. (originalUrl or 'Yok'))
-    print('[SWX Speaker] Music ID: ' .. musicId)
-    
     -- localhost URL'sini VPS IP'sine çevir
     audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
-    
-    print('[SWX Speaker] Client URL (düzeltilmiş): ' .. audioUrl)
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- ÖNEMLİ: Önce mevcut müziği tamamen temizle
-        if currentMusicId and currentMusicId ~= musicId then
-            print('[SWX Speaker] Çakışan müzik temizleniyor: ' .. currentMusicId)
+        -- Önceki müziği hızlıca temizle
+        if currentMusicId then
             exports.xsound:Destroy(currentMusicId)
-            Wait(100) -- Temizlik için bekle
         end
         
-        -- Eğer müzik zaten çalıyorsa, önce durdur
-        if isPlaying and currentMusicId then
-            print('[SWX Speaker] Çalan müzik durduruluyor...')
-            exports.xsound:Destroy(currentMusicId)
-            Wait(100)
-        end
+        -- State'leri sıfırla
+        isPlaying = false
+        isPaused = false
         
-        -- Extracted audio URL'sini çal
-        print('[SWX Speaker] Yeni müzik çalınıyor: ' .. musicId)
+        -- Yeni müziği çal
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
         exports.xsound:Distance(musicId, distance)
-        
-        -- Şarkı bitince otomatik kapanmasın
         exports.xsound:destroyOnFinish(musicId, false)
         
         -- State'leri güncelle
         isPlaying = true
-        isPaused = false
         currentMusicId = musicId
         
-        print('[SWX Speaker] State güncellendi: isPlaying=' .. tostring(isPlaying) .. ' | currentMusicId=' .. currentMusicId)
-        
-        -- Geçmişe ekle - ÖNEMLİ: Orijinal YouTube URL'sini kaydet (proxy URL'sini değil!)
+        -- Geçmişe ekle (orijinal YouTube URL'si)
         local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
-            url = originalUrl or audioUrl,  -- Orijinal YouTube URL'si varsa onu kaydet
-            proxyUrl = audioUrl,  -- Proxy URL'sini de sakla (gerekirse diye)
+            url = originalUrl or audioUrl,
+            proxyUrl = audioUrl,
             title = title or 'YouTube Şarkı',
             timestamp = timestamp
         })
         
-        -- Geçmişi 50 ile sınırla
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
         end
         
-        -- xsound'un müziği yüklemesini bekle, sonra position thread'i başlat
-        CreateThread(function()
-            -- xsound'un müziği tanıması için kısa bekleme
-            Wait(500)
-            
-            -- Müzik hala aktif mi kontrol et
-            if currentMusicId ~= musicId then
-                print('[SWX Speaker] Position thread iptal edildi (müzik değişti): ' .. musicId)
-                return
-            end
-            
-            local threadMusicId = musicId
-            while isPlaying and DoesEntityExist(vehicle) do
-                -- Eğer bu thread artık aktif müzik değilse, çık
-                if currentMusicId ~= threadMusicId then
-                    print('[SWX Speaker] Position thread sonlandırılıyor (eski thread): ' .. threadMusicId)
-                    break
-                end
-                
-                local newCoords = GetEntityCoords(vehicle)
-                exports.xsound:Position(threadMusicId, newCoords)
-                Wait(500)
-            end
-        end)
-        
-        QBCore.Functions.Notify('YouTube müziği çalıyor! (Bass boost çalışır)', 'success')
-        print('[SWX Speaker] Extracted audio başlatıldı: ' .. musicId)
+        QBCore.Functions.Notify('🎵 ' .. (title or 'YouTube Şarkı'), 'success')
     else
         QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
     end
