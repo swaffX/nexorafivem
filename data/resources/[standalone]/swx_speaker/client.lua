@@ -414,8 +414,16 @@ function MusicHistoryMenu()
     
     local options = {}
     for i, song in ipairs(musicHistory) do
-        -- Timestamp'i tarih formatına çevir
-        local timeText = os.date('%d/%m/%Y %H:%M', song.timestamp)
+        -- Timestamp'i tarih formatına çevir (FiveM uyumlu)
+        local timeText = 'Bilinmeyen zaman'
+        if song.timestamp then
+            local dateTable = os.date('*t', song.timestamp)
+            if dateTable then
+                timeText = string.format('%02d/%02d/%04d %02d:%02d', 
+                    dateTable.day, dateTable.month, dateTable.year, 
+                    dateTable.hour, dateTable.min)
+            end
+        end
         
         table.insert(options, {
             title = song.title,
@@ -898,21 +906,22 @@ function FilterSettingsDialog(filterType)
     end
 end
 
--- Filtre Uygulama Fonksiyonu (Gerçek Audio İşlevleri - xsound Limitleri ile)
+-- Filtre Uygulama Fonksiyonu (xsound limiti - sadece UI)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         return
     end
     
-    -- xsound'da gerçek filter API'si yok, sadece volume kontrolü var
-    -- Bu yüzden filtreleri devre dışı bırakıyoruz (ses bozulmasını önlemek için)
+    -- ÖNEMLİ: xsound'da gerçek audio filter API'si YOK!
+    -- Sadece volume, position, distance kontrolü var
+    -- Gerçek filter için custom xsound fork veya farklı ses sistemi gerekir
     
-    -- NOT: Gerçek audio filter için custom xsound fork veya farklı ses sistemi gerekir
-    -- Şu anki implementasyon sadece UI gösterimi için
+    -- Filtreleri sadece UI'da göster, ses üzerinde değişiklik yapma
+    -- Bu sayede ses bozulması ve hata olmaz
     
-    print(string.format('[Nexora Speaker] Filtre kaydedildi (UI only): %s | Freq: %d Hz | Gain: %d dB', 
-        filter.type:upper(), filter.frequency, filter.gain))
-    
-    -- Filtreyi sadece kaydet, ses üzerinde değişiklik yapma
-    -- Bu sayede ses bozulması olmaz
+    -- Log (debug için)
+    if GetConvarInt('swx_speaker_debug', 0) == 1 then
+        print(string.format('[SWX Speaker] Filtre UI kaydı: %s | Freq: %d Hz | Gain: %d dB', 
+            filter.type:upper(), filter.frequency, filter.gain))
+    end
 end
