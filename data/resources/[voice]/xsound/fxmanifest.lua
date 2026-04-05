@@ -18,6 +18,7 @@ client_scripts {
 	"client/exports/play.lua",
 	"client/exports/manipulation.lua",
 	"client/exports/events.lua",
+	"client/exports/filters.lua",
 	"client/effects/main.lua",
 
 	"client/emulator/interact_sound/client.lua",
@@ -44,6 +45,7 @@ files {
 	"html/scripts/listener.js",
 	"html/scripts/SoundPlayer.js",
 	"html/scripts/functions.js",
+	"html/scripts/audioFilters.js",
 
 	"html/sounds/*.ogg",
 	"html/sounds/*.mp3",

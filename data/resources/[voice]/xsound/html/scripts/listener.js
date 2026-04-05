@@ -123,6 +123,11 @@ $(function () {
                     sound.destroyYoutubeApi();
                     sound.delete();
                     delete soundList[item.name];
+                    
+                    // Filtre cleanup
+                    if (window.audioFilterManager) {
+                        window.audioFilterManager.cleanup(item.name);
+                    }
                 }
                 break;
             case "repeat":
@@ -159,6 +164,38 @@ $(function () {
                 sound = soundList[item.name];
                 if (sound != null) {
                     sound.setLoop(item.loop);
+                }
+                break;
+            case "setFilter":
+                sound = soundList[item.name];
+                if (sound != null && window.audioFilterManager) {
+                    // İlk kez filtre ekleniyorsa initialize et
+                    if (!window.audioFilterManager.soundFilters[item.name]) {
+                        const howlInstance = sound.getAudioPlayer();
+                        if (howlInstance) {
+                            window.audioFilterManager.initializeFilters(item.name, howlInstance);
+                        }
+                    }
+                    // Filtreyi uygula
+                    window.audioFilterManager.setFilter(
+                        item.name,
+                        item.filterType,
+                        item.frequency,
+                        item.Q,
+                        item.gain
+                    );
+                }
+                break;
+            case "clearFilter":
+                sound = soundList[item.name];
+                if (sound != null && window.audioFilterManager) {
+                    window.audioFilterManager.removeFilter(item.name, item.filterType);
+                }
+                break;
+            case "clearAllFilters":
+                sound = soundList[item.name];
+                if (sound != null && window.audioFilterManager) {
+                    window.audioFilterManager.clearAllFilters(item.name);
                 }
                 break;
             case "unmuteAll":

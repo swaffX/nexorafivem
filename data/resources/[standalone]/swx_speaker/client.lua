@@ -724,18 +724,56 @@ end)
 
 -- Filtreler Menüsü
 function FiltersMenu()
+    local activeCount = 0
+    for _ in pairs(activeFilters) do
+        activeCount = activeCount + 1
+    end
+    
+    local options = {
+        {
+            title = 'Yeni filtre ekle',
+            description = 'Ses çıkışını değiştir',
+            icon = 'sliders',
+            onSelect = function()
+                FilterTypeMenu()
+            end
+        }
+    }
+    
+    -- Aktif filtreleri göster
+    if activeCount > 0 then
+        table.insert(options, 1, {
+            title = 'Aktif filtreler (' .. activeCount .. ')',
+            description = 'Filtreleri yönet ve kaldır',
+            icon = 'filter',
+            onSelect = function()
+                ActiveFiltersMenu()
+            end
+        })
+        
+        -- Tüm filtreleri temizle seçeneği
+        table.insert(options, {
+            title = 'Tüm filtreleri temizle',
+            description = 'Tüm filtreleri kaldır ve orijinal sese dön',
+            icon = 'trash',
+            onSelect = function()
+                ClearAllFilters()
+            end
+        })
+    else
+        table.insert(options, 1, {
+            title = 'Toplam 0 aktif filtre',
+            description = 'Henüz filtre eklenmedi',
+            icon = 'filter',
+            disabled = true
+        })
+    end
+    
     lib.registerContext({
         id = 'filters_menu',
         title = 'Hoparlör filtreleri',
         menu = 'other_menu',
-        options = {
-            {
-                title = 'Filtre sistemi devre dışı',
-                description = 'xSound şu anda audio filtrelerini desteklemiyor',
-                icon = 'info-circle',
-                disabled = true
-            }
-        }
+        options = options
     })
     
     lib.showContext('filters_menu')
@@ -1049,28 +1087,86 @@ function FilterSettingsDialog(filterType)
 end
 
 -- ============================================
--- FİLTRE SİSTEMİ KALDIRILDI
+-- GERÇEK AUDIO FİLTRE SİSTEMİ v4.0
 -- ============================================
--- xSound Howler.js kullanıyor ve gerçek Web Audio API filtreleri desteklemiyor
--- Filtre özelliği devre dışı bırakıldı
+-- xSound Web Audio API ile gerçek filtreler
 -- ============================================
 
--- Filtre fonksiyonları placeholder olarak bırakıldı
+-- Filtre Uygulama Fonksiyonu
 function ApplyFilter(filterId, filter)
-    QBCore.Functions.Notify('Filtre sistemi şu anda desteklenmiyor', 'error')
+    if not currentMusicId then
+        QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
+        return
+    end
+    
+    -- Filtreyi chain'e ekle
+    filterChain[filterId] = filter
+    activeFilters[filterId] = filter
+    
+    -- xSound'a gerçek filtre uygula
+    local filterType = filter.type:lower()
+    local frequency = math.max(10, math.min(22000, filter.frequency))
+    local gain = math.max(-40, math.min(40, filter.gain))
+    local Q = CalculateQValue(filterType, filter.detune)
+    
+    -- Debug log
+    print(string.format('[SWX Speaker] Filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
+        filterType:upper(), frequency, gain, Q))
+    
+    -- xSound setFilter export'u
+    exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+    
+    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
 end
 
+-- Q Değeri Hesapla
+function CalculateQValue(filterType, detune)
+    local normalizedDetune = detune / 4800
+    local Q = 1.0
+    
+    if filterType == 'lowpass' or filterType == 'highpass' then
+        Q = 0.7 + (math.abs(normalizedDetune) * 5)
+    elseif filterType == 'bandpass' or filterType == 'notch' then
+        Q = 1.0 + (math.abs(normalizedDetune) * 15)
+    elseif filterType == 'peaking' or filterType == 'lowshelf' or filterType == 'highshelf' then
+        Q = 0.5 + (math.abs(normalizedDetune) * 3)
+    elseif filterType == 'allpass' then
+        Q = 0.1 + (math.abs(normalizedDetune) * 2)
+    end
+    
+    return math.max(0.1, math.min(20, Q))
+end
+
+-- Tüm Filtreleri Temizle
 function ClearAllFilters()
+    if not currentMusicId then
+        return
+    end
+    
+    exports.xsound:clearAllFilters(currentMusicId)
+    
     filterChain = {}
     activeFilters = {}
-    QBCore.Functions.Notify('Filtreler temizlendi', 'info')
+    
+    QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
+    print('[SWX Speaker] Tüm filtreler kaldırıldı')
 end
 
+-- Tek Filtre Kaldır
 function RemoveFilter(filterId)
-    if activeFilters[filterId] then
-        local filterType = activeFilters[filterId].type
-        filterChain[filterId] = nil
-        activeFilters[filterId] = nil
-        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
+    if not activeFilters[filterId] then
+        return
     end
+    
+    local filterType = activeFilters[filterId].type:lower()
+    
+    if currentMusicId then
+        exports.xsound:clearFilter(currentMusicId, filterType)
+    end
+    
+    filterChain[filterId] = nil
+    activeFilters[filterId] = nil
+    
+    QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
+    print('[SWX Speaker] Filtre kaldırıldı: ' .. filterType:upper())
 end

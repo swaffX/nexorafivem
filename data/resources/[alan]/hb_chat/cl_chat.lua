@@ -359,7 +359,7 @@ Citizen.CreateThread(function()
             local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
             if ped ~= -1 and DoesEntityExist(ped) then
                 local coords = GetPedBoneCoords(ped, 0x796e, 0.0, 0.0, 0.0) -- Head bone
-                local x, y, z = coords.x, coords.y, coords.z + 0.8 -- Yükseklik artırıldı (0.5'ten 0.8'e)
+                local x, y, z = coords.x, coords.y, coords.z + 0.5 -- Yükseklik azaltıldı (0.8'den 0.5'e)
                 
                 -- Animasyonlu noktalar oluştur
                 local dots = ""
