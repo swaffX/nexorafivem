@@ -231,11 +231,15 @@ function AddToQueueDialog()
 end
 
 function PlayMusic(url, title)
+    -- ÖNEMLİ: Önce eski müziği tamamen temizle
     if currentMusicId then
+        print('[SWX Speaker] Eski müzik temizleniyor: ' .. currentMusicId)
         exports.xsound:Destroy(currentMusicId)
+        Wait(100) -- xsound'un temizlenmesi için kısa bekleme
     end
     
     currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
+    print('[SWX Speaker] Yeni müzik ID: ' .. currentMusicId)
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
@@ -268,6 +272,7 @@ function PlayMusic(url, title)
             local timestamp = GetGameTimer()
             table.insert(musicHistory, 1, {
                 url = url,
+                proxyUrl = nil,  -- Direkt dosya olduğu için proxy yok
                 title = title or 'Bilinmeyen Şarkı',
                 timestamp = timestamp
             })
@@ -280,10 +285,28 @@ function PlayMusic(url, title)
             -- Server'a kaydet (kalıcı)
             TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
             
+            -- xsound'un müziği yüklemesini bekle, sonra position thread'i başlat
             CreateThread(function()
+                -- xsound'un müziği tanıması için kısa bekleme
+                Wait(500)
+                
+                -- Müzik hala aktif mi kontrol et
+                local initialMusicId = currentMusicId
+                if not initialMusicId then
+                    print('[SWX Speaker] Position thread iptal edildi (müzik yok)')
+                    return
+                end
+                
+                local threadMusicId = initialMusicId
                 while isPlaying and DoesEntityExist(vehicle) do
+                    -- Eğer bu thread artık aktif müzik değilse, çık
+                    if currentMusicId ~= threadMusicId then
+                        print('[SWX Speaker] Position thread sonlandırılıyor (eski thread): ' .. threadMusicId)
+                        break
+                    end
+                    
                     local newCoords = GetEntityCoords(vehicle)
-                    exports.xsound:Position(currentMusicId, newCoords)
+                    exports.xsound:Position(threadMusicId, newCoords)
                     Wait(500)
                 end
             end)
@@ -291,13 +314,17 @@ function PlayMusic(url, title)
             QBCore.Functions.Notify('Müzik çalıyor!', 'success')
             print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
         end
+    else
+        QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
     end
 end
 
 -- Server'dan gelen extracted audio URL'sini çal
-RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title)
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl)
     print('[SWX Speaker] Extracted audio URL alındı: ' .. audioUrl)
     print('[SWX Speaker] Başlık: ' .. (title or 'Bilinmiyor'))
+    print('[SWX Speaker] Orijinal URL: ' .. (originalUrl or 'Yok'))
+    print('[SWX Speaker] Music ID: ' .. musicId)
     
     -- localhost URL'sini VPS IP'sine çevir
     audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
@@ -308,31 +335,40 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- xsound'un YouTube detection'ını bypass etmek için URL'yi kısaltalım
-        -- Proxy URL'sini kullan ama xsound'a direkt ses dosyası gibi göster
-        
-        -- Önce eski müziği temizle
+        -- ÖNEMLİ: Önce mevcut müziği tamamen temizle
         if currentMusicId and currentMusicId ~= musicId then
+            print('[SWX Speaker] Çakışan müzik temizleniyor: ' .. currentMusicId)
             exports.xsound:Destroy(currentMusicId)
+            Wait(100) -- Temizlik için bekle
+        end
+        
+        -- Eğer müzik zaten çalıyorsa, önce durdur
+        if isPlaying and currentMusicId then
+            print('[SWX Speaker] Çalan müzik durduruluyor...')
+            exports.xsound:Destroy(currentMusicId)
+            Wait(100)
         end
         
         -- Extracted audio URL'sini çal
-        -- ÖNEMLİ: xsound:PlayUrlPos kullanıyoruz (YouTube değil, direkt URL)
+        print('[SWX Speaker] Yeni müzik çalınıyor: ' .. musicId)
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
         exports.xsound:Distance(musicId, distance)
         
         -- Şarkı bitince otomatik kapanmasın
         exports.xsound:destroyOnFinish(musicId, false)
         
+        -- State'leri güncelle
         isPlaying = true
         isPaused = false
         currentMusicId = musicId
         
-        -- Geçmişe ekle
+        print('[SWX Speaker] State güncellendi: isPlaying=' .. tostring(isPlaying) .. ' | currentMusicId=' .. currentMusicId)
+        
+        -- Geçmişe ekle - ÖNEMLİ: Orijinal YouTube URL'sini kaydet (proxy URL'sini değil!)
         local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
-            url = audioUrl,
-            originalUrl = nil,
+            url = originalUrl or audioUrl,  -- Orijinal YouTube URL'si varsa onu kaydet
+            proxyUrl = audioUrl,  -- Proxy URL'sini de sakla (gerekirse diye)
             title = title or 'YouTube Şarkı',
             timestamp = timestamp
         })
@@ -342,11 +378,27 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
             table.remove(musicHistory, #musicHistory)
         end
         
-        -- Aracın konumu değişirse güncelle
+        -- xsound'un müziği yüklemesini bekle, sonra position thread'i başlat
         CreateThread(function()
+            -- xsound'un müziği tanıması için kısa bekleme
+            Wait(500)
+            
+            -- Müzik hala aktif mi kontrol et
+            if currentMusicId ~= musicId then
+                print('[SWX Speaker] Position thread iptal edildi (müzik değişti): ' .. musicId)
+                return
+            end
+            
+            local threadMusicId = musicId
             while isPlaying and DoesEntityExist(vehicle) do
+                -- Eğer bu thread artık aktif müzik değilse, çık
+                if currentMusicId ~= threadMusicId then
+                    print('[SWX Speaker] Position thread sonlandırılıyor (eski thread): ' .. threadMusicId)
+                    break
+                end
+                
                 local newCoords = GetEntityCoords(vehicle)
-                exports.xsound:Position(musicId, newCoords)
+                exports.xsound:Position(threadMusicId, newCoords)
                 Wait(500)
             end
         end)

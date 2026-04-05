@@ -63,8 +63,8 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
                 print('[SWX Speaker Server] Başlık: ' .. (data.title or 'Bilinmiyor'))
                 print('[SWX Speaker Server] Süre: ' .. (data.duration or 0) .. ' saniye')
                 
-                -- Client'a audio URL'sini gönder (client localhost'u IP'ye çevirecek)
-                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title)
+                -- Client'a hem proxy URL hem orijinal YouTube URL gönder
+                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl)
             else
                 print('[SWX Speaker Server] HATA: Extractor yanıtı geçersiz!')
                 TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı. Extractor servisini kontrol edin!', 'error')
