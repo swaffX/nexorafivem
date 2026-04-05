@@ -1,10 +1,10 @@
--- Nexora Speaker - Server Side
+-- SWX Speaker - Server Side
 -- Kalıcı Müzik Geçmişi Sistemi
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
 -- Müzik geçmişini yükle
-RegisterNetEvent('nexora-speaker:server:loadHistory', function()
+RegisterNetEvent('swx_speaker:server:loadHistory', function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     
@@ -23,14 +23,16 @@ RegisterNetEvent('nexora-speaker:server:loadHistory', function()
                         timestamp = row.played_at
                     })
                 end
-                TriggerClientEvent('nexora-speaker:client:receiveHistory', src, history)
+                TriggerClientEvent('swx_speaker:client:receiveHistory', src, history)
+            else
+                TriggerClientEvent('swx_speaker:client:receiveHistory', src, {})
             end
         end)
     end
 end)
 
 -- Müzik geçmişine ekle
-RegisterNetEvent('nexora-speaker:server:addToHistory', function(url, title)
+RegisterNetEvent('swx_speaker:server:addToHistory', function(url, title)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     
@@ -66,7 +68,7 @@ RegisterNetEvent('nexora-speaker:server:addToHistory', function(url, title)
 end)
 
 -- Müzik geçmişinden sil
-RegisterNetEvent('nexora-speaker:server:removeFromHistory', function(url, timestamp)
+RegisterNetEvent('swx_speaker:server:removeFromHistory', function(url, timestamp)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     
@@ -82,7 +84,7 @@ RegisterNetEvent('nexora-speaker:server:removeFromHistory', function(url, timest
 end)
 
 -- Tüm geçmişi temizle
-RegisterNetEvent('nexora-speaker:server:clearHistory', function()
+RegisterNetEvent('swx_speaker:server:clearHistory', function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     

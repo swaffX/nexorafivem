@@ -12,14 +12,14 @@ local historyLoaded = false -- Geçmiş yüklendi mi?
 
 -- Oyuncu spawn olduğunda geçmişi yükle
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    TriggerServerEvent('nexora-speaker:server:loadHistory')
+    TriggerServerEvent('swx_speaker:server:loadHistory')
 end)
 
 -- Geçmişi al
-RegisterNetEvent('nexora-speaker:client:receiveHistory', function(history)
+RegisterNetEvent('swx_speaker:client:receiveHistory', function(history)
     musicHistory = history
     historyLoaded = true
-    print('[Nexora Speaker] Müzik geçmişi yüklendi: ' .. #musicHistory .. ' şarkı')
+    print('[SWX Speaker] Müzik geçmişi yüklendi: ' .. #musicHistory .. ' şarkı')
 end)
 
 -- K tuşu ile menü aç
@@ -191,8 +191,8 @@ function PlayMusic(url, title)
         isPlaying = true
         isPaused = false -- Yeni müzik başladı, pause durumunu sıfırla
         
-        -- Geçmişe ekle (local)
-        local timestamp = os.time()
+        -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+        local timestamp = GetGameTimer() -- Milisaniye cinsinden
         table.insert(musicHistory, 1, {
             url = url,
             title = title or 'Bilinmeyen Şarkı',
@@ -205,7 +205,7 @@ function PlayMusic(url, title)
         end
         
         -- Server'a kaydet (kalıcı)
-        TriggerServerEvent('nexora-speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
+        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
         -- NOT: Filtreler şu an devre dışı (xsound limiti)
         -- Aktif filtreleri kaydet ama uygulama
@@ -407,22 +407,35 @@ function ManageQueueMenu()
 end
 
 function MusicHistoryMenu()
+    -- Geçmiş yüklenmemişse yükle
+    if not historyLoaded then
+        TriggerServerEvent('swx_speaker:server:loadHistory')
+        Wait(500) -- Server'dan cevap bekle
+    end
+    
     if #musicHistory == 0 then
-        QBCore.Functions.Notify('Müzik geçmişi boş!', 'error')
+        QBCore.Functions.Notify('Müzik geçmişi boş! Bir şarkı çalın.', 'error')
         return
     end
     
     local options = {}
     for i, song in ipairs(musicHistory) do
-        -- Timestamp'i tarih formatına çevir (FiveM uyumlu)
+        -- Timestamp'i tarih formatına çevir (FiveM uyumlu - GetGameTimer yerine timestamp kullan)
         local timeText = 'Bilinmeyen zaman'
-        if song.timestamp then
-            local dateTable = os.date('*t', song.timestamp)
-            if dateTable then
-                timeText = string.format('%02d/%02d/%04d %02d:%02d', 
-                    dateTable.day, dateTable.month, dateTable.year, 
-                    dateTable.hour, dateTable.min)
-            end
+        if song.timestamp and type(song.timestamp) == 'number' then
+            -- Unix timestamp'i tarih formatına çevir
+            local seconds = song.timestamp
+            local days = math.floor(seconds / 86400)
+            local hours = math.floor((seconds % 86400) / 3600)
+            local minutes = math.floor((seconds % 3600) / 60)
+            local secs = seconds % 60
+            
+            -- Basit tarih formatı (timestamp'ten hesapla)
+            local year = 1970 + math.floor(days / 365.25)
+            local month = math.floor((days % 365.25) / 30.44) + 1
+            local day = math.floor((days % 365.25) % 30.44) + 1
+            
+            timeText = string.format('%02d/%02d/%04d %02d:%02d', day, month, year, hours, minutes)
         end
         
         table.insert(options, {
@@ -442,7 +455,7 @@ function MusicHistoryMenu()
         icon = 'trash',
         onSelect = function()
             musicHistory = {}
-            TriggerServerEvent('nexora-speaker:server:clearHistory')
+            TriggerServerEvent('swx_speaker:server:clearHistory')
             QBCore.Functions.Notify('Müzik geçmişi temizlendi', 'success')
         end
     })
@@ -499,7 +512,7 @@ function SongActionMenu(song)
                     for i, v in ipairs(musicHistory) do
                         if v.url == song.url and v.timestamp == song.timestamp then
                             table.remove(musicHistory, i)
-                            TriggerServerEvent('nexora-speaker:server:removeFromHistory', song.url, song.timestamp)
+                            TriggerServerEvent('swx_speaker:server:removeFromHistory', song.url, song.timestamp)
                             QBCore.Functions.Notify('Geçmişten silindi', 'success')
                             break
                         end
