@@ -18,8 +18,8 @@ Config.StressSystem = true -- If you make `true`, stress will come next to the s
 Config.DisableRightCorner = false -- If you want to disable the top right corner, set it to `true`. This will hide all server and player information. If set to `false`, users can see and customize the top right corner.
 Config.DisableMapAnimation = true -- Harita animasyonunu kapat (beyaz kaplama)
 Config.MusicSystem = {
-    ["disable"] = true, -- Müzik sistemini kapat (script.js hatası için)
-    ["distance"] = 10.0,
+    ["disable"] = false, -- Müzik sistemi aktif (xsound entegrasyonu ile)
+    ["distance"] = 30.0, -- 30 metre mesafe
 }
 
 Config.PostalMap = {
