@@ -313,7 +313,7 @@ RegisterNetEvent("chat:displayTyping", function(playerId, isTyping)
     end
 end)
 
--- 3D text çizme fonksiyonu
+-- 3D text çizme fonksiyonu (Küçük boyut)
 function DrawText3D(x, y, z, text)
     local onScreen, _x, _y = World3dToScreen2d(x, y, z)
     local px, py, pz = table.unpack(GetGameplayCamCoords())
@@ -323,7 +323,7 @@ function DrawText3D(x, y, z, text)
     scale = scale * (1 / GetGameplayCamFov()) * 100
 
     if onScreen then
-        SetTextScale(0.85, 0.85)
+        SetTextScale(0.35, 0.35) -- Küçültüldü (0.85'ten 0.35'e)
         SetTextFont(4)
         SetTextProportional(1)
         SetTextColour(255, 255, 255, 215) -- Beyaz renk
@@ -359,7 +359,7 @@ Citizen.CreateThread(function()
             local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
             if ped ~= -1 and DoesEntityExist(ped) then
                 local coords = GetPedBoneCoords(ped, 0x796e, 0.0, 0.0, 0.0) -- Head bone
-                local x, y, z = coords.x, coords.y, coords.z + 0.5
+                local x, y, z = coords.x, coords.y, coords.z + 0.8 -- Yükseklik artırıldı (0.5'ten 0.8'e)
                 
                 -- Animasyonlu noktalar oluştur
                 local dots = ""
