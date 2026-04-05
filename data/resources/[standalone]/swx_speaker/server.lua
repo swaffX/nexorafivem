@@ -35,7 +35,7 @@ QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, 
     end, 'GET')
 end)
 
--- YouTube Audio Extract (Invidious API + alternatif servisler kullanarak)
+-- YouTube Audio Extract (Kendi localhost extractor servisini kullan)
 RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, musicId, volume, distance, coords)
     local src = source
     
@@ -49,107 +49,34 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
     
     print('[SWX Speaker Server] YouTube audio extract başlatılıyor: ' .. videoId)
     
-    -- YTDLP benzeri alternatif servisler (daha güvenilir)
-    local extractServices = {
-        -- Invidious API (resmi YouTube alternatif arayüzü)
-        {
-            url = 'https://inv.tux.pizza/api/v1/videos/' .. videoId,
-            parse = function(data)
-                if data and data.formatStreams then
-                    -- Video + audio birleşik stream'leri kontrol et
-                    for _, stream in ipairs(data.formatStreams) do
-                        if stream.quality == 'tiny' or (stream.audioQuality and string.find(stream.audioQuality, 'AUDIO_QUALITY')) then
-                            return stream.url, data.title
-                        end
-                    end
-                    -- İlk stream'i dene
-                    if data.formatStreams[1] then
-                        return data.formatStreams[1].url, data.title
-                    end
-                elseif data and data.adaptiveFormats then
-                    -- Adaptive formatlardan ses'i bul
-                    for _, format in ipairs(data.adaptiveFormats) do
-                        if format.mimeType and string.find(format.mimeType, 'audio') then
-                            return format.url, data.title
-                        end
-                    end
-                end
-                return nil, nil
-            end
-        },
-        -- Alternative Invidious instances
-        {
-            url = 'https://invidious.fdn.fr/api/v1/videos/' .. videoId,
-            parse = function(data)
-                if data and data.formatStreams and #data.formatStreams > 0 then
-                    return data.formatStreams[1].url, data.title
-                elseif data and data.adaptiveFormats then
-                    for _, format in ipairs(data.adaptiveFormats) do
-                        if format.mimeType and string.find(format.mimeType, 'audio') then
-                            return format.url, data.title
-                        end
-                    end
-                end
-                return nil, nil
-            end
-        },
-        {
-            url = 'https://vid.puffyan.us/api/v1/videos/' .. videoId,
-            parse = function(data)
-                if data and data.formatStreams and #data.formatStreams > 0 then
-                    return data.formatStreams[1].url, data.title
-                elseif data and data.adaptiveFormats then
-                    for _, format in ipairs(data.adaptiveFormats) do
-                        if format.mimeType and string.find(format.mimeType, 'audio') then
-                            return format.url, data.title
-                        end
-                    end
-                end
-                return nil, nil
-            end
-        }
-    }
+    -- Kendi localhost extractor servisimiz
+    local extractorUrl = 'http://localhost:3000/extract?url=' .. videoUrl
     
-    local function tryNextService(index)
-        if index > #extractServices then
-            print('[SWX Speaker Server] HATA: Tüm extract servisleri başarısız oldu!')
-            TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı. Lütfen direkt MP3 URL kullanın!', 'error')
-            return
-        end
-        
-        local service = extractServices[index]
-        print('[SWX Speaker Server] Deniyor: ' .. service.url)
-        
-        PerformHttpRequest(service.url, function(statusCode, response, headers)
-            if statusCode == 200 and response then
-                local success, data = pcall(function() return json.decode(response) end)
+    print('[SWX Speaker Server] Extractor çağrılıyor: ' .. extractorUrl)
+    
+    PerformHttpRequest(extractorUrl, function(statusCode, response, headers)
+        if statusCode == 200 and response then
+            local success, data = pcall(function() return json.decode(response) end)
+            
+            if success and data and data.success and data.url then
+                print('[SWX Speaker Server] Audio URL bulundu!')
+                print('[SWX Speaker Server] Başlık: ' .. (data.title or 'Bilinmiyor'))
+                print('[SWX Speaker Server] Süre: ' .. (data.duration or 0) .. ' saniye')
                 
-                if success and data then
-                    local audioUrl, title = service.parse(data)
-                    
-                    if audioUrl then
-                        print('[SWX Speaker Server] Audio URL bulundu!')
-                        print('[SWX Speaker Server] Başlık: ' .. (title or 'Bilinmiyor'))
-                        
-                        -- Client'a audio URL'sini gönder
-                        TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, audioUrl, musicId, volume, distance, coords, title)
-                    else
-                        print('[SWX Speaker Server] HATA: Audio stream bulunamadı!')
-                        tryNextService(index + 1)
-                    end
-                else
-                    print('[SWX Speaker Server] JSON parse hatası!')
-                    tryNextService(index + 1)
-                end
+                -- Client'a audio URL'sini gönder
+                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title)
             else
-                print('[SWX Speaker Server] HTTP hatası: ' .. statusCode .. ' - Bir sonraki servis deneniyor...')
-                tryNextService(index + 1)
+                print('[SWX Speaker Server] HATA: Extractor yanıtı geçersiz!')
+                TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı. Extractor servisini kontrol edin!', 'error')
             end
-        end, 'GET')
-    end
-    
-    -- İlk servisi dene
-    tryNextService(1)
+        elseif statusCode == 0 then
+            print('[SWX Speaker Server] HATA: Extractor servisine bağlanılamadı! Port 3000 açık mı?')
+            TriggerClientEvent('QBCore:Notify', src, 'YouTube extractor servisi çalışmıyor! (Port 3000)', 'error')
+        else
+            print('[SWX Speaker Server] HTTP hatası: ' .. statusCode)
+            TriggerClientEvent('QBCore:Notify', src, 'Extractor hatası! (' .. statusCode .. ')', 'error')
+        end
+    end, 'GET')
 end)
 
 -- Müzik geçmişini yükle
