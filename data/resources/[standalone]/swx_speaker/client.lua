@@ -482,11 +482,9 @@ function ManageQueueMenu()
 end
 
 function MusicHistoryMenu()
-    -- Geçmiş yüklenmemişse yükle
-    if not historyLoaded then
-        TriggerServerEvent('swx_speaker:server:loadHistory')
-        Wait(500) -- Server'dan cevap bekle
-    end
+    -- Her açılışta server'dan fresh data çek
+    TriggerServerEvent('swx_speaker:server:loadHistory')
+    Wait(300) -- Server'dan cevap bekle
     
     -- Debug: musicHistory içeriğini logla
     print('[SWX Speaker Debug] MusicHistoryMenu açılıyor')
@@ -602,7 +600,10 @@ function SongActionMenu(song)
                 description = 'Bu şarkıyı geçmişten kaldır',
                 icon = 'trash',
                 onSelect = function()
-                    -- Aynı URL'ye sahip TÜM kayıtları sil (duplicate temizliği)
+                    -- Server'dan sil (URL bazlı - tüm duplicate'ler)
+                    TriggerServerEvent('swx_speaker:server:removeFromHistoryByUrl', song.url)
+                    
+                    -- Local array'den de sil
                     local deletedCount = 0
                     for i = #musicHistory, 1, -1 do
                         if musicHistory[i].url == song.url then
@@ -611,14 +612,13 @@ function SongActionMenu(song)
                         end
                     end
                     
-                    -- Server'dan da sil (URL bazlı - tüm duplicate'ler)
-                    TriggerServerEvent('swx_speaker:server:removeFromHistoryByUrl', song.url)
-                    
                     QBCore.Functions.Notify('Geçmişten silindi (' .. deletedCount .. ' kayıt)', 'success')
                     
-                    -- Menüyü yenile
-                    Wait(100)
-                    MusicHistoryMenu()
+                    -- Menüyü yenile (kısa bekleme ile)
+                    CreateThread(function()
+                        Wait(200)
+                        MusicHistoryMenu()
+                    end)
                 end
             }
         }
