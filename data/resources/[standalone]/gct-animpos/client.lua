@@ -102,6 +102,13 @@ function animPosition()
         175
     )
 
+    -- Emote'u iptal edilemez yap (animpose sırasında korunsun)
+    if exports['rpemotes'] then
+        pcall(function()
+            exports['rpemotes']:CanCancelEmote(false)
+        end)
+    end
+
     -- FreezeEntityPosition kaldırıldı - emote animasyonunu bozmamak için
     local posChanged = false
 
@@ -242,8 +249,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 172) then
                 local newPos = vector3(coords.x, coords.y, coords.z + moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    -- Emote aktifken Z koordinatını değiştirmek için SetEntityCoords kullan
-                    SetEntityCoords(ped, newPos.x, newPos.y, newPos.z, false, false, false, true)
+                    -- Z koordinatını değiştir ama animasyonu koru
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
                     SendNUIMessage({ type = "keyActive", key = "move_up" })
 
                     TriggerServerEvent(
@@ -258,8 +265,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 173) then
                 local newPos = vector3(coords.x, coords.y, coords.z - moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    -- Emote aktifken Z koordinatını değiştirmek için SetEntityCoords kullan
-                    SetEntityCoords(ped, newPos.x, newPos.y, newPos.z, false, false, false, true)
+                    -- Z koordinatını değiştir ama animasyonu koru
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
                     SendNUIMessage({ type = "keyActive", key = "move_down" })
 
                     TriggerServerEvent(
@@ -281,6 +288,13 @@ function animPosition()
                     type = "hideUI"
                 })
                 ResetEntityAlpha(ped)
+                
+                -- Emote'u tekrar iptal edilebilir yap
+                if exports['rpemotes'] then
+                    pcall(function()
+                        exports['rpemotes']:CanCancelEmote(true)
+                    end)
+                end
 
                 TriggerServerEvent(
                     "gct-animpos:server:syncPed",
@@ -299,6 +313,14 @@ function animPosition()
                 )
                 SetEntityHeading(ped, OriginalPos.heading)
                 ResetEntityAlpha(ped)
+                
+                -- Emote'u tekrar iptal edilebilir yap
+                if exports['rpemotes'] then
+                    pcall(function()
+                        exports['rpemotes']:CanCancelEmote(true)
+                    end)
+                end
+                
                 TriggerServerEvent(
                     "gct-animpos:server:syncPed",
                     OriginalPos.coords,
@@ -330,6 +352,14 @@ function animPosition()
             )
             SetEntityHeading(ped, OriginalPos.heading)
             ResetEntityAlpha(ped)
+            
+            -- Emote'u tekrar iptal edilebilir yap
+            if exports['rpemotes'] then
+                pcall(function()
+                    exports['rpemotes']:CanCancelEmote(true)
+                end)
+            end
+            
             TriggerServerEvent(
                 "gct-animpos:server:syncPed",
                 OriginalPos.coords,
@@ -348,6 +378,14 @@ function animPosition()
     if not posChanged then
         animPos = false
         ResetEntityAlpha(ped)
+        
+        -- Emote'u tekrar iptal edilebilir yap
+        if exports['rpemotes'] then
+            pcall(function()
+                exports['rpemotes']:CanCancelEmote(true)
+            end)
+        end
+        
         TriggerServerEvent(
             "gct-animpos:server:syncPed",
             OriginalPos.coords,
