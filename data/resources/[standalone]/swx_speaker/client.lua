@@ -319,6 +319,7 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         -- Önceki müziği tamamen durdur
         if currentMusicId and currentMusicId ~= musicId then
+            print('[SWX Speaker] Destroying old musicId:', currentMusicId)
             exports.xsound:Destroy(currentMusicId)
         end
         
@@ -326,14 +327,22 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         isPlaying = false
         isPaused = false
         
+        print('[SWX Speaker] Calling xsound:PlayUrlPos...')
+        print('[SWX Speaker] Music ID:', musicId)
+        print('[SWX Speaker] Volume:', volume, 'Distance:', distance)
+        
         -- Yeni müziği çal
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
         exports.xsound:Distance(musicId, distance)
         exports.xsound:destroyOnFinish(musicId, false)
         
+        print('[SWX Speaker] xsound:PlayUrlPos called successfully')
+        
         -- State'leri güncelle
         isPlaying = true
         currentMusicId = musicId
+        
+        print('[SWX Speaker] State updated: isPlaying=true, currentMusicId=' .. musicId)
         
         -- Geçmişe ekle (orijinal YouTube URL'si)
         local timestamp = GetGameTimer()
