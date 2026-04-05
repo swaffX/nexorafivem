@@ -246,11 +246,14 @@ function PlayMusic(url, title)
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
         exports.xsound:Distance(currentMusicId, currentDistance)
         
+        -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
+        exports.xsound:destroyOnFinish(currentMusicId, false)
+        
         isPlaying = true
-        isPaused = false -- Yeni müzik başladı, pause durumunu sıfırla
+        isPaused = false
         
         -- Geçmişe ekle (local) - FiveM uyumlu timestamp
-        local timestamp = GetGameTimer() -- Milisaniye cinsinden
+        local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
             url = url,
             title = title or 'Bilinmeyen Şarkı',
@@ -274,6 +277,7 @@ function PlayMusic(url, title)
         end)
         
         QBCore.Functions.Notify('Müzik çalıyor!', 'success')
+        print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
     end
 end
 
@@ -678,18 +682,28 @@ function PlaylistSongActionMenu(song, index)
     lib.showContext('playlist_song_action_menu')
 end
 
--- Araçtan inince durdur
+-- Araçtan inince durdur (Geliştirilmiş kontrol)
 CreateThread(function()
     local wasInVehicle = false
+    local lastVehicle = nil
     
     while true do
         Wait(1000)
         
-        if isPlaying then
+        if isPlaying and currentMusicId then
             local ped = PlayerPedId()
-            local inVehicle = IsPedInAnyVehicle(ped, false)
+            local currentVehicle = GetVehiclePedIsIn(ped, false)
+            local inVehicle = currentVehicle ~= 0
             
+            -- Debug log
+            if wasInVehicle ~= inVehicle then
+                print(string.format('[SWX Speaker Debug] Araç durumu değişti: wasInVehicle=%s, inVehicle=%s, vehicle=%d', 
+                    tostring(wasInVehicle), tostring(inVehicle), currentVehicle))
+            end
+            
+            -- Sadece araçtan tamamen indiğinde durdur
             if wasInVehicle and not inVehicle then
+                print('[SWX Speaker] Araçtan indi, müzik durduruluyor')
                 if currentMusicId then
                     exports.xsound:Destroy(currentMusicId)
                     currentMusicId = nil
@@ -699,242 +713,32 @@ CreateThread(function()
             end
             
             wasInVehicle = inVehicle
+            lastVehicle = currentVehicle
+        else
+            -- Müzik çalmıyorsa durumu sıfırla
+            wasInVehicle = false
+            lastVehicle = nil
         end
     end
 end)
 
 -- Filtreler Menüsü
 function FiltersMenu()
-    local activeCount = 0
-    for _ in pairs(activeFilters) do
-        activeCount = activeCount + 1
-    end
-    
-    local options = {
-        {
-            title = 'Preset filtreler',
-            description = 'Hazır ses efektleri',
-            icon = 'star',
-            onSelect = function()
-                FilterPresetsMenu()
-            end
-        },
-        {
-            title = 'Özel filtre oluştur',
-            description = 'Manuel ayarlarla filtre ekle',
-            icon = 'sliders',
-            onSelect = function()
-                FilterTypeMenu()
-            end
-        }
-    }
-    
-    -- Aktif filtreleri göster
-    if activeCount > 0 then
-        table.insert(options, 1, {
-            title = 'Aktif filtreler (' .. activeCount .. ')',
-            description = 'Filtreleri yönet ve kaldır',
-            icon = 'filter',
-            onSelect = function()
-                ActiveFiltersMenu()
-            end
-        })
-        
-        -- Tüm filtreleri temizle seçeneği
-        table.insert(options, {
-            title = 'Tüm filtreleri temizle',
-            description = 'Tüm filtreleri kaldır ve orijinal sese dön',
-            icon = 'trash',
-            onSelect = function()
-                ClearAllFilters()
-            end
-        })
-    else
-        table.insert(options, 1, {
-            title = 'Toplam 0 aktif filtre.',
-            description = 'Henüz filtre eklenmedi',
-            icon = 'filter',
-            disabled = true
-        })
-    end
-    
     lib.registerContext({
         id = 'filters_menu',
         title = 'Hoparlör filtreleri',
         menu = 'other_menu',
-        options = options
-    })
-    
-    lib.showContext('filters_menu')
-end
-
--- Preset Filtreler Menüsü
-function FilterPresetsMenu()
-    lib.registerContext({
-        id = 'filter_presets_menu',
-        title = 'Preset Filtreler',
-        menu = 'filters_menu',
         options = {
             {
-                title = '🔊 Güçlü Bass Boost',
-                description = 'Subwoofer efekti - Güçlü bas sesi',
-                icon = 'volume-up',
-                onSelect = function()
-                    ApplyPreset('bass_boost')
-                end
-            },
-            {
-                title = '🎵 Parlak Tiz',
-                description = 'Kristal netlik - Parlak ses',
-                icon = 'music',
-                onSelect = function()
-                    ApplyPreset('bright')
-                end
-            },
-            {
-                title = '📻 Radyo Efekti',
-                description = 'Eski radyo sesi - Nostaljik',
-                icon = 'radio',
-                onSelect = function()
-                    ApplyPreset('radio')
-                end
-            },
-            {
-                title = '🚗 Araba Camı Kapalı',
-                description = 'Boğuk ses - Dışarıdan dinleme',
-                icon = 'car',
-                onSelect = function()
-                    ApplyPreset('muffled')
-                end
-            },
-            {
-                title = '📞 Telefon Sesi',
-                description = 'İnce, filtrelenmiş ses',
-                icon = 'phone',
-                onSelect = function()
-                    ApplyPreset('phone')
-                end
-            },
-            {
-                title = '🎧 Konser Salonu',
-                description = 'Geniş, yankılı ses',
-                icon = 'headphones',
-                onSelect = function()
-                    ApplyPreset('concert')
-                end
+                title = 'Filtre sistemi devre dışı',
+                description = 'xSound şu anda audio filtrelerini desteklemiyor',
+                icon = 'info-circle',
+                disabled = true
             }
         }
     })
     
-    lib.showContext('filter_presets_menu')
-end
-
--- Preset Uygula
-function ApplyPreset(presetName)
-    if not currentMusicId then
-        QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
-        return
-    end
-    
-    -- Önce tüm filtreleri temizle
-    ClearAllFilters()
-    
-    Wait(100)
-    
-    if presetName == 'bass_boost' then
-        -- Güçlü Bass Boost: Lowshelf +12dB @ 200Hz
-        local filterId = 'preset_bass_' .. math.random(1000, 9999)
-        activeFilters[filterId] = {
-            type = 'lowshelf',
-            frequency = 150,
-            gain = 15,
-            detune = 0
-        }
-        ApplyFilter(filterId, activeFilters[filterId])
-        QBCore.Functions.Notify('Preset uygulandı: Güçlü Bass Boost 🔊', 'success')
-        
-    elseif presetName == 'bright' then
-        -- Parlak Tiz: Highshelf +8dB @ 8000Hz
-        local filterId = 'preset_bright_' .. math.random(1000, 9999)
-        activeFilters[filterId] = {
-            type = 'highshelf',
-            frequency = 8000,
-            gain = 10,
-            detune = 0
-        }
-        ApplyFilter(filterId, activeFilters[filterId])
-        QBCore.Functions.Notify('Preset uygulandı: Parlak Tiz 🎵', 'success')
-        
-    elseif presetName == 'radio' then
-        -- Radyo: Bandpass 1000-3000Hz
-        local filterId = 'preset_radio_' .. math.random(1000, 9999)
-        activeFilters[filterId] = {
-            type = 'bandpass',
-            frequency = 2000,
-            gain = 5,
-            detune = 3000
-        }
-        ApplyFilter(filterId, activeFilters[filterId])
-        QBCore.Functions.Notify('Preset uygulandı: Radyo Efekti 📻', 'success')
-        
-    elseif presetName == 'muffled' then
-        -- Boğuk: Lowpass 800Hz
-        local filterId = 'preset_muffled_' .. math.random(1000, 9999)
-        activeFilters[filterId] = {
-            type = 'lowpass',
-            frequency = 800,
-            gain = 0,
-            detune = 1200
-        }
-        ApplyFilter(filterId, activeFilters[filterId])
-        QBCore.Functions.Notify('Preset uygulandı: Araba Camı Kapalı 🚗', 'success')
-        
-    elseif presetName == 'phone' then
-        -- Telefon: Highpass 300Hz + Lowpass 3000Hz
-        local filterId1 = 'preset_phone_hp_' .. math.random(1000, 9999)
-        activeFilters[filterId1] = {
-            type = 'highpass',
-            frequency = 300,
-            gain = 0,
-            detune = 0
-        }
-        ApplyFilter(filterId1, activeFilters[filterId1])
-        
-        Wait(50)
-        
-        local filterId2 = 'preset_phone_lp_' .. math.random(1000, 9999)
-        activeFilters[filterId2] = {
-            type = 'lowpass',
-            frequency = 3000,
-            gain = 0,
-            detune = 0
-        }
-        ApplyFilter(filterId2, activeFilters[filterId2])
-        QBCore.Functions.Notify('Preset uygulandı: Telefon Sesi 📞', 'success')
-        
-    elseif presetName == 'concert' then
-        -- Konser: Bass boost + Tiz boost
-        local filterId1 = 'preset_concert_bass_' .. math.random(1000, 9999)
-        activeFilters[filterId1] = {
-            type = 'lowshelf',
-            frequency = 200,
-            gain = 8,
-            detune = 0
-        }
-        ApplyFilter(filterId1, activeFilters[filterId1])
-        
-        Wait(50)
-        
-        local filterId2 = 'preset_concert_treble_' .. math.random(1000, 9999)
-        activeFilters[filterId2] = {
-            type = 'highshelf',
-            frequency = 8000,
-            gain = 6,
-            detune = 0
-        }
-        ApplyFilter(filterId2, activeFilters[filterId2])
-        QBCore.Functions.Notify('Preset uygulandı: Konser Salonu 🎧', 'success')
-    end
+    lib.showContext('filters_menu')
 end
 
 -- Aktif Filtreler Menüsü
@@ -1245,101 +1049,28 @@ function FilterSettingsDialog(filterType)
 end
 
 -- ============================================
--- PROFESYONEL FİLTRE SİSTEMİ v3.0 - GERÇEK AUDIO FİLTRELER
+-- FİLTRE SİSTEMİ KALDIRILDI
 -- ============================================
--- xSound Web Audio API kullanarak gerçek filtre efektleri
--- Şarkıyı bozmadan profesyonel efektler
+-- xSound Howler.js kullanıyor ve gerçek Web Audio API filtreleri desteklemiyor
+-- Filtre özelliği devre dışı bırakıldı
 -- ============================================
 
--- Filtre Uygulama Fonksiyonu (xSound API ile gerçek filtre)
+-- Filtre fonksiyonları placeholder olarak bırakıldı
 function ApplyFilter(filterId, filter)
-    if not currentMusicId then
-        QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
-        return
-    end
-    
-    -- Filtreyi chain'e ekle
-    filterChain[filterId] = filter
-    activeFilters[filterId] = filter
-    
-    -- xSound'a gerçek filtre uygula
-    local filterType = filter.type:lower()
-    local frequency = math.max(10, math.min(22000, filter.frequency)) -- 10Hz - 22kHz
-    local gain = math.max(-40, math.min(40, filter.gain)) -- -40dB ile +40dB
-    local Q = CalculateQValue(filterType, filter.detune) -- Q değeri (keskinlik)
-    
-    -- Debug log
-    print(string.format('[SWX Speaker] Gerçek filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
-        filterType:upper(), frequency, gain, Q))
-    
-    -- xSound setFilter fonksiyonu (Web Audio API)
-    -- Format: exports.xsound:setFilter(soundId, filterType, frequency, Q, gain)
-    exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
-    
-    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+    QBCore.Functions.Notify('Filtre sistemi şu anda desteklenmiyor', 'error')
 end
 
--- Q Değeri Hesapla (Filtre keskinliği)
-function CalculateQValue(filterType, detune)
-    -- Detune'u Q değerine çevir (-4800 ile +4800 cents -> 0.1 ile 10 Q)
-    local normalizedDetune = detune / 4800 -- -1 ile +1 arası
-    local Q = 1.0 -- Varsayılan Q değeri
-    
-    if filterType == 'lowpass' or filterType == 'highpass' then
-        -- Lowpass/Highpass: Q değeri keskinliği belirler
-        Q = 0.7 + (math.abs(normalizedDetune) * 5) -- 0.7 ile 5.7 arası
-        
-    elseif filterType == 'bandpass' or filterType == 'notch' then
-        -- Bandpass/Notch: Yüksek Q = dar bant
-        Q = 1.0 + (math.abs(normalizedDetune) * 15) -- 1.0 ile 16.0 arası (dar bant)
-        
-    elseif filterType == 'peaking' or filterType == 'lowshelf' or filterType == 'highshelf' then
-        -- Peaking/Shelf: Q değeri etki alanını belirler
-        Q = 0.5 + (math.abs(normalizedDetune) * 3) -- 0.5 ile 3.5 arası
-        
-    elseif filterType == 'allpass' then
-        -- Allpass: Q değeri faz kaymasını etkiler
-        Q = 0.1 + (math.abs(normalizedDetune) * 2) -- 0.1 ile 2.1 arası
-    end
-    
-    return math.max(0.1, math.min(20, Q)) -- 0.1 ile 20 arası sınırla
-end
-
--- Tüm Filtreleri Temizle
 function ClearAllFilters()
-    if not currentMusicId then
-        return
-    end
-    
-    -- xSound'dan tüm filtreleri kaldır
-    for filterId, filter in pairs(filterChain) do
-        exports.xsound:clearFilter(currentMusicId, filter.type:lower())
-    end
-    
     filterChain = {}
     activeFilters = {}
-    
-    QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
-    print('[SWX Speaker] Tüm filtreler kaldırıldı')
+    QBCore.Functions.Notify('Filtreler temizlendi', 'info')
 end
 
--- Filtre Kaldırma (Tek filtre)
 function RemoveFilter(filterId)
-    if not activeFilters[filterId] then
-        return
+    if activeFilters[filterId] then
+        local filterType = activeFilters[filterId].type
+        filterChain[filterId] = nil
+        activeFilters[filterId] = nil
+        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
     end
-    
-    local filterType = activeFilters[filterId].type:lower()
-    
-    -- xSound'dan filtreyi kaldır
-    if currentMusicId then
-        exports.xsound:clearFilter(currentMusicId, filterType)
-    end
-    
-    -- Chain'den kaldır
-    filterChain[filterId] = nil
-    activeFilters[filterId] = nil
-    
-    QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
-    print('[SWX Speaker] Filtre kaldırıldı: ' .. filterType:upper())
 end
