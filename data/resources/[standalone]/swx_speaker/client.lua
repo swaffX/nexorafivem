@@ -118,17 +118,37 @@ function OpenSpeakerMenu()
     lib.showContext('speaker_menu')
 end
 
--- KONUM GÜNCELLEME THREAD
+-- KONUM GÜNCELLEME THREAD - Yüksek frekanslı ve velocity bazlı tahmin
 CreateThread(function()
     while true do
-        Wait(500)
-        local ped = PlayerPedId()
-        local vehicle = GetVehiclePedIsIn(ped, false)
-        if vehicle ~= 0 then
-            local musicId = GetVehicleMusicId(vehicle)
-            if musicId and exports.xsound:soundExists(musicId) then
-                local coords = GetEntityCoords(vehicle)
-                exports.xsound:Position(musicId, coords)
+        Wait(50) -- 50ms'de bir güncelle (çok daha smooth - 20fps)
+        
+        -- Tüm oyuncuların araçlarını kontrol et (networked audio için)
+        local vehicles = GetGamePool('CVehicle')
+        for _, vehicle in ipairs(vehicles) do
+            if DoesEntityExist(vehicle) then
+                local musicId = GetVehicleMusicId(vehicle)
+                if musicId and exports.xsound:soundExists(musicId) then
+                    local coords = GetEntityCoords(vehicle)
+                    local velocity = GetEntityVelocity(vehicle)
+                    
+                    -- Velocity bazlı tahmin (sesin aracı takip etmesi için)
+                    -- Hız vektörünü 50ms'lik gecikmeyi telafi etmek için biraz ileri kaydır
+                    local predictedCoords = vector3(
+                        coords.x + velocity.x * 0.05,
+                        coords.y + velocity.y * 0.05,
+                        coords.z + velocity.z * 0.05
+                    )
+                    
+                    -- Sadece sesin sahibi veya yakındaki oyuncular için güncelle
+                    local ped = PlayerPedId()
+                    local playerCoords = GetEntityCoords(ped)
+                    local dist = #(playerCoords - coords)
+                    
+                    if dist < currentDistance + 50.0 then -- Sadece duyabilecek mesafedekiler
+                        exports.xsound:Position(musicId, predictedCoords)
+                    end
+                end
             end
         end
     end
@@ -166,24 +186,47 @@ function PlayMusic(url, title)
     end
 end
 
--- GARANTİLİ BAŞLATMA
+-- GARANTİLİ BAŞLATMA - Smooth start, no kickback
 function StartAudio(musicId, url, volume, coords, distance)
+    -- Önce varsa eski sesi sessizce kapat (kickback önlemek için)
+    if exports.xsound:soundExists(musicId) then
+        exports.xsound:Destroy(musicId)
+        Wait(50) -- Kısa bekleme
+    end
+    
+    -- Yeni sesi başlat
     exports.xsound:PlayUrlPos(musicId, url, volume, coords, false)
     exports.xsound:Distance(musicId, distance)
     exports.xsound:destroyOnFinish(musicId, false)
     isPlaying = true
     isPaused = false
     
-    SetTimeout(2000, function()
-        if isPlaying and not exports.xsound:soundExists(musicId) then
-            exports.xsound:PlayUrlPos(musicId, url, volume, coords, false)
-            exports.xsound:Distance(musicId, distance)
+    -- Buffer için kısa bekle, sonra volume'u ayarla (fade-in efekti)
+    SetTimeout(100, function()
+        if exports.xsound:soundExists(musicId) then
+            exports.xsound:setVolume(musicId, 0.01) -- Sessiz başlat
+            -- Smooth fade-in
+            for i = 1, 10 do
+                SetTimeout(i * 50, function()
+                    if exports.xsound:soundExists(musicId) then
+                        exports.xsound:setVolume(musicId, volume * (i / 10))
+                    end
+                end)
+            end
         end
     end)
 end
 
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
-    if requestId and requestId < currentExtractRequest then return end
+    print('[SWX Speaker Client] playExtractedAudio event received!')
+    print('[SWX Speaker Client] requestId:', requestId, 'currentExtractRequest:', currentExtractRequest)
+    print('[SWX Speaker Client] audioUrl:', audioUrl and 'present' or 'nil')
+    print('[SWX Speaker Client] musicId:', musicId)
+    
+    if requestId and requestId < currentExtractRequest then 
+        print('[SWX Speaker Client] Request ID outdated, ignoring')
+        return 
+    end
     isExtracting = false
     
     local targetIp = serverIp or '194.105.5.37'
@@ -191,10 +234,14 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
+    print('[SWX Speaker Client] Vehicle:', vehicle, 'GetVehicleMusicId:', GetVehicleMusicId(vehicle), 'musicId:', musicId)
     if vehicle ~= 0 and GetVehicleMusicId(vehicle) == musicId then
+        print('[SWX Speaker Client] Starting audio...')
         StartAudio(musicId, audioUrl, volume, coords, distance)
         TriggerServerEvent('swx_speaker:server:addToHistory', originalUrl or audioUrl, title or 'YouTube Şarkı')
         QBCore.Functions.Notify('🎵 ' .. (title or 'YouTube Şarkı'), 'success')
+    else
+        print('[SWX Speaker Client] Vehicle check failed!')
     end
 end)
 
