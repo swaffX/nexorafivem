@@ -243,43 +243,109 @@ function PlayMusic(url, title)
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
         
-        exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
-        exports.xsound:Distance(currentMusicId, currentDistance)
+        -- YouTube URL'si kontrolü
+        local isYouTube = string.find(url, 'youtube.com') or string.find(url, 'youtu.be')
         
-        -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
-        exports.xsound:destroyOnFinish(currentMusicId, false)
+        if isYouTube then
+            -- YouTube URL'si ise server'a gönder, audio extract yapsın
+            QBCore.Functions.Notify('YouTube sesi işleniyor... (birkaç saniye)', 'info', 3000)
+            print('[SWX Speaker] YouTube URL tespit edildi, audio extract yapılıyor...')
+            
+            -- Server'a YouTube URL'sini gönder
+            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords)
+        else
+            -- Direkt ses dosyası ise normal çal
+            exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
+            exports.xsound:Distance(currentMusicId, currentDistance)
+            
+            -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
+            exports.xsound:destroyOnFinish(currentMusicId, false)
+            
+            isPlaying = true
+            isPaused = false
+            
+            -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+            local timestamp = GetGameTimer()
+            table.insert(musicHistory, 1, {
+                url = url,
+                title = title or 'Bilinmeyen Şarkı',
+                timestamp = timestamp
+            })
+            
+            -- Geçmişi 50 ile sınırla (local)
+            if #musicHistory > 50 then
+                table.remove(musicHistory, #musicHistory)
+            end
+            
+            -- Server'a kaydet (kalıcı)
+            TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
+            
+            CreateThread(function()
+                while isPlaying and DoesEntityExist(vehicle) do
+                    local newCoords = GetEntityCoords(vehicle)
+                    exports.xsound:Position(currentMusicId, newCoords)
+                    Wait(500)
+                end
+            end)
+            
+            QBCore.Functions.Notify('Müzik çalıyor!', 'success')
+            print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+        end
+    end
+end
+
+-- Server'dan gelen extracted audio URL'sini çal
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title)
+    print('[SWX Speaker] Extracted audio URL alındı: ' .. audioUrl)
+    print('[SWX Speaker] Başlık: ' .. (title or 'Bilinmiyor'))
+    
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    
+    if vehicle ~= 0 and DoesEntityExist(vehicle) then
+        -- Extracted audio URL'sini çal (direkt ses dosyası olduğu için filtre çalışır!)
+        exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
+        exports.xsound:Distance(musicId, distance)
+        
+        -- Şarkı bitince otomatik kapanmasın
+        exports.xsound:destroyOnFinish(musicId, false)
         
         isPlaying = true
         isPaused = false
         
-        -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+        -- Geçmişe ekle
         local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
-            url = url,
-            title = title or 'Bilinmeyen Şarkı',
+            url = audioUrl,  -- Audio URL'sini kaydet
+            originalUrl = nil,  -- Orijinal YouTube URL'si (opsiyonel)
+            title = title or 'YouTube Şarkı',
             timestamp = timestamp
         })
         
-        -- Geçmişi 50 ile sınırla (local)
+        -- Geçmişi 50 ile sınırla
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
         end
         
-        -- Server'a kaydet (kalıcı)
-        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
+        -- Server'a kaydet
+        TriggerServerEvent('swx_speaker:server:addToHistory', audioUrl, title or 'YouTube Şarkı')
         
+        -- Aracın konumu değişirse güncelle
         CreateThread(function()
             while isPlaying and DoesEntityExist(vehicle) do
                 local newCoords = GetEntityCoords(vehicle)
-                exports.xsound:Position(currentMusicId, newCoords)
+                exports.xsound:Position(musicId, newCoords)
                 Wait(500)
             end
         end)
         
-        QBCore.Functions.Notify('Müzik çalıyor!', 'success')
-        print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+        QBCore.Functions.Notify('YouTube müziği çalıyor! (Bass boost çalışır)', 'success')
+        print('[SWX Speaker] Extracted audio başlatıldı: ' .. musicId)
+    else
+        QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
     end
-end
+end)
+
 
 function PlayNextSong()
     if #playlist == 0 then
