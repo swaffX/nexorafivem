@@ -8,6 +8,19 @@ local playlist = {}
 local currentIndex = 0
 local musicHistory = {} -- Müzik geçmişi
 local activeFilters = {} -- Aktif filtreler
+local historyLoaded = false -- Geçmiş yüklendi mi?
+
+-- Oyuncu spawn olduğunda geçmişi yükle
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    TriggerServerEvent('nexora-speaker:server:loadHistory')
+end)
+
+-- Geçmişi al
+RegisterNetEvent('nexora-speaker:client:receiveHistory', function(history)
+    musicHistory = history
+    historyLoaded = true
+    print('[Nexora Speaker] Müzik geçmişi yüklendi: ' .. #musicHistory .. ' şarkı')
+end)
 
 -- K tuşu ile menü aç
 RegisterCommand('speaker', function()
@@ -178,17 +191,21 @@ function PlayMusic(url, title)
         isPlaying = true
         isPaused = false -- Yeni müzik başladı, pause durumunu sıfırla
         
-        -- Geçmişe ekle
+        -- Geçmişe ekle (local)
+        local timestamp = os.time()
         table.insert(musicHistory, 1, {
             url = url,
             title = title or 'Bilinmeyen Şarkı',
-            timestamp = GetGameTimer()
+            timestamp = timestamp
         })
         
-        -- Geçmişi 50 ile sınırla
+        -- Geçmişi 50 ile sınırla (local)
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
         end
+        
+        -- Server'a kaydet (kalıcı)
+        TriggerServerEvent('nexora-speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
         -- Aktif filtreleri uygula
         for filterId, filter in pairs(activeFilters) do
@@ -396,8 +413,8 @@ function MusicHistoryMenu()
     
     local options = {}
     for i, song in ipairs(musicHistory) do
-        local timeAgo = math.floor((GetGameTimer() - song.timestamp) / 1000) -- saniye cinsinden
-        local timeText = timeAgo < 60 and timeAgo .. ' saniye önce' or math.floor(timeAgo / 60) .. ' dakika önce'
+        -- Timestamp'i tarih formatına çevir
+        local timeText = os.date('%d/%m/%Y %H:%M', song.timestamp)
         
         table.insert(options, {
             title = song.title,
@@ -408,6 +425,18 @@ function MusicHistoryMenu()
             end
         })
     end
+    
+    -- Geçmişi temizle seçeneği ekle
+    table.insert(options, {
+        title = 'Tüm geçmişi temizle',
+        description = 'Tüm müzik geçmişini sil',
+        icon = 'trash',
+        onSelect = function()
+            musicHistory = {}
+            TriggerServerEvent('nexora-speaker:server:clearHistory')
+            QBCore.Functions.Notify('Müzik geçmişi temizlendi', 'success')
+        end
+    })
     
     lib.registerContext({
         id = 'music_history_menu',
@@ -461,6 +490,7 @@ function SongActionMenu(song)
                     for i, v in ipairs(musicHistory) do
                         if v.url == song.url and v.timestamp == song.timestamp then
                             table.remove(musicHistory, i)
+                            TriggerServerEvent('nexora-speaker:server:removeFromHistory', song.url, song.timestamp)
                             QBCore.Functions.Notify('Geçmişten silindi', 'success')
                             break
                         end

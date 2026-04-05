@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'Nexora RP'
 description 'Araç Hoparlör Sistemi - ox_lib Context Menu'
-version '1.0.0'
+version '1.2.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -16,10 +16,12 @@ client_scripts {
 }
 
 server_scripts {
+    '@oxmysql/lib/MySQL.lua',
     'server.lua'
 }
 
 dependencies {
     'ox_lib',
-    'xsound'
+    'xsound',
+    'oxmysql'
 }
