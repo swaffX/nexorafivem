@@ -1113,10 +1113,22 @@ function ApplyFilter(filterId, filter)
     print(string.format('[SWX Speaker] Filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
         filterType:upper(), frequency, gain, Q))
     
-    -- xSound setFilter export'u
-    exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
-    
-    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+    -- Şarkı yüklenmesini bekle (2 saniye)
+    CreateThread(function()
+        Wait(2000)
+        
+        -- xSound setFilter export'u
+        local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+        
+        if success then
+            QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+        else
+            QBCore.Functions.Notify('Filtre uygulanamadı, tekrar deneyin', 'error')
+            -- Başarısız olursa chain'den kaldır
+            filterChain[filterId] = nil
+            activeFilters[filterId] = nil
+        end
+    end)
 end
 
 -- Q Değeri Hesapla

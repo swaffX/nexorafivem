@@ -169,21 +169,48 @@ $(function () {
             case "setFilter":
                 sound = soundList[item.name];
                 if (sound != null && window.audioFilterManager) {
-                    // İlk kez filtre ekleniyorsa initialize et
+                    // İlk kez filtre ekleniyorsa initialize et (retry mekanizması ile)
                     if (!window.audioFilterManager.soundFilters[item.name]) {
                         const howlInstance = sound.getAudioPlayer();
                         if (howlInstance) {
-                            window.audioFilterManager.initializeFilters(item.name, howlInstance);
+                            // Retry mekanizması: 5 kez dene, her seferinde 500ms bekle
+                            let attempts = 0;
+                            const maxAttempts = 5;
+                            
+                            const tryInitialize = () => {
+                                attempts++;
+                                const success = window.audioFilterManager.initializeFilters(item.name, howlInstance);
+                                
+                                if (success) {
+                                    console.log('[xSound Filters] Initialized successfully on attempt', attempts);
+                                    // Filtreyi uygula
+                                    window.audioFilterManager.setFilter(
+                                        item.name,
+                                        item.filterType,
+                                        item.frequency,
+                                        item.Q,
+                                        item.gain
+                                    );
+                                } else if (attempts < maxAttempts) {
+                                    console.log('[xSound Filters] Retry', attempts, 'of', maxAttempts);
+                                    setTimeout(tryInitialize, 500);
+                                } else {
+                                    console.error('[xSound Filters] Failed to initialize after', maxAttempts, 'attempts');
+                                }
+                            };
+                            
+                            tryInitialize();
                         }
+                    } else {
+                        // Zaten initialize edilmiş, direkt filtreyi uygula
+                        window.audioFilterManager.setFilter(
+                            item.name,
+                            item.filterType,
+                            item.frequency,
+                            item.Q,
+                            item.gain
+                        );
                     }
-                    // Filtreyi uygula
-                    window.audioFilterManager.setFilter(
-                        item.name,
-                        item.filterType,
-                        item.frequency,
-                        item.Q,
-                        item.gain
-                    );
                 }
                 break;
             case "clearFilter":

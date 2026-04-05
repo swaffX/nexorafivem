@@ -17,14 +17,23 @@ class AudioFilterManager {
 
     // Ses için filtre chain'i oluştur
     initializeFilters(soundId, howlInstance) {
-        if (!howlInstance || this.soundFilters[soundId]) return;
+        if (!howlInstance || this.soundFilters[soundId]) return false;
 
         try {
             const ctx = this.getAudioContext();
             
             // Howler'ın internal node'unu al
-            const howlerNode = howlInstance._sounds[0]._node;
-            if (!howlerNode) return;
+            const sounds = howlInstance._sounds;
+            if (!sounds || sounds.length === 0) {
+                console.warn('[xSound Filters] No sounds array found');
+                return false;
+            }
+            
+            const howlerNode = sounds[0]._node;
+            if (!howlerNode) {
+                console.warn('[xSound Filters] No audio node found yet, sound may not be loaded');
+                return false;
+            }
 
             // Source node oluştur
             const source = ctx.createMediaElementSource(howlerNode);
@@ -46,8 +55,10 @@ class AudioFilterManager {
             this.soundFilters[soundId].connected = true;
 
             console.log('[xSound Filters] Initialized for:', soundId);
+            return true;
         } catch (error) {
             console.error('[xSound Filters] Init error:', error);
+            return false;
         }
     }
 
