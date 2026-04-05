@@ -23,15 +23,43 @@ end)
 
 -- Geçmişi al
 RegisterNetEvent('swx_speaker:client:receiveHistory', function(history)
-    musicHistory = history
-    historyLoaded = true
+    musicHistory = {}
     
     -- Debug: Gelen geçmişi detaylı logla
-    print('[SWX Speaker] Müzik geçmişi yüklendi: ' .. #musicHistory .. ' şarkı')
-    for i, song in ipairs(musicHistory) do
+    print('[SWX Speaker] Müzik geçmişi yüklendi: ' .. #history .. ' şarkı')
+    
+    for i, song in ipairs(history) do
+        -- Title kontrolü ve düzeltme
+        local fixedTitle = song.title
+        
+        if not fixedTitle or fixedTitle == '' or fixedTitle == 'nil' then
+            -- URL'den title çıkarmaya çalış
+            if song.url and string.find(song.url, 'youtube.com') or string.find(song.url, 'youtu.be') then
+                -- YouTube URL'sinden video ID'yi çıkar
+                local videoId = string.match(song.url, '[?&]v=([^&]+)') or string.match(song.url, 'youtu%.be/([^?]+)')
+                if videoId then
+                    fixedTitle = 'YouTube: ' .. videoId
+                else
+                    fixedTitle = 'YouTube Şarkısı #' .. i
+                end
+            else
+                fixedTitle = 'Şarkı #' .. i
+            end
+            
+            print(string.format('[SWX Speaker] Title boş, düzeltildi: "%s"', fixedTitle))
+        end
+        
+        table.insert(musicHistory, {
+            url = song.url,
+            title = fixedTitle,
+            timestamp = song.timestamp
+        })
+        
         print(string.format('[SWX Speaker] Şarkı %d: Title="%s" | URL="%s"', 
-            i, song.title or 'NIL', song.url or 'NIL'))
+            i, fixedTitle, song.url or 'NIL'))
     end
+    
+    historyLoaded = true
 end)
 
 -- K tuşu ile menü aç
@@ -143,15 +171,24 @@ function PlayMusicDialog()
         },
         {
             type = 'input',
-            label = 'Şarkı Adı (Opsiyonel)',
-            description = 'Şarkı adını girin',
-            icon = 'music'
+            label = 'Şarkı Adı',
+            description = 'Şarkı adını girin (önemli!)',
+            required = true, -- Artık zorunlu
+            icon = 'music',
+            placeholder = 'Örn: Samet Yıldırm - Turkish Airlines'
         }
     })
     
     if input then
         local url = input[1]
-        local title = input[2] or 'Bilinmeyen Şarkı'
+        local title = input[2]
+        
+        -- Title boş olamaz
+        if not title or title == '' then
+            QBCore.Functions.Notify('Şarkı adı boş olamaz!', 'error')
+            return
+        end
+        
         PlayMusic(url, title)
     end
 end
@@ -167,16 +204,27 @@ function AddToQueueDialog()
         },
         {
             type = 'input',
-            label = 'Şarkı Adı (Opsiyonel)',
-            description = 'Şarkı adını girin',
-            icon = 'music'
+            label = 'Şarkı Adı',
+            description = 'Şarkı adını girin (önemli!)',
+            required = true, -- Artık zorunlu
+            icon = 'music',
+            placeholder = 'Örn: Samet Yıldırm - Turkish Airlines'
         }
     })
     
     if input then
+        local url = input[1]
+        local title = input[2]
+        
+        -- Title boş olamaz
+        if not title or title == '' then
+            QBCore.Functions.Notify('Şarkı adı boş olamaz!', 'error')
+            return
+        end
+        
         table.insert(playlist, {
-            url = input[1],
-            title = input[2] or 'Bilinmeyen Şarkı'
+            url = url,
+            title = title
         })
         QBCore.Functions.Notify('Şarkı sıraya eklendi! (' .. #playlist .. ' şarkı)', 'success')
     end
