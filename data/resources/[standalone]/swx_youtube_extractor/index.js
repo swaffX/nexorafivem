@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
+const http = require('http');
+const https = require('https');
 const app = express();
 const PORT = 3000;
 
@@ -55,9 +57,13 @@ app.get('/extract', async (req, res) => {
                 
                 if (audioUrl) {
                     console.log('[SWX Extractor] Audio URL found:', audioUrl.substring(0, 100) + '...');
+                    
+                    // URL'yi proxy üzerinden ver (direkt Google URL'si yerine)
+                    const proxyUrl = `http://localhost:${PORT}/proxy?url=${encodeURIComponent(audioUrl)}`;
+                    
                     res.json({
                         success: true,
-                        url: audioUrl,
+                        url: proxyUrl,  // Proxy URL döndür
                         title: data.title || 'YouTube Video',
                         duration: data.duration || 0
                     });
@@ -76,6 +82,72 @@ app.get('/extract', async (req, res) => {
     }
 });
 
+// Audio proxy endpoint - Googlevideo URL'lerini stream eder
+app.get('/proxy', (req, res) => {
+    const { url } = req.query;
+    
+    if (!url) {
+        return res.status(400).json({ error: 'URL gerekli' });
+    }
+    
+    console.log('[SWX Extractor] Proxy request:', url.substring(0, 100) + '...');
+    
+    try {
+        const parsedUrl = new URL(url);
+        const client = parsedUrl.protocol === 'https:' ? https : http;
+        
+        const options = {
+            hostname: parsedUrl.hostname,
+            port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'audio/*;q=0.9,*/*;q=0.8',
+                'Accept-Encoding': 'identity',
+                'Connection': 'keep-alive'
+            }
+        };
+        
+        const proxyReq = client.request(options, (proxyRes) => {
+            // CORS headers
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Range');
+            res.header('Accept-Ranges', 'bytes');
+            
+            // Content headers
+            if (proxyRes.headers['content-type']) {
+                res.header('Content-Type', proxyRes.headers['content-type']);
+            } else {
+                res.header('Content-Type', 'audio/mp4');
+            }
+            
+            if (proxyRes.headers['content-length']) {
+                res.header('Content-Length', proxyRes.headers['content-length']);
+            }
+            
+            // Range support için
+            if (proxyRes.headers['accept-ranges']) {
+                res.header('Accept-Ranges', proxyRes.headers['accept-ranges']);
+            }
+            
+            res.writeHead(proxyRes.statusCode);
+            proxyRes.pipe(res);
+        });
+        
+        proxyReq.on('error', (err) => {
+            console.error('[SWX Extractor] Proxy error:', err.message);
+            res.status(500).json({ error: 'Proxy hatası' });
+        });
+        
+        proxyReq.end();
+    } catch (err) {
+        console.error('[SWX Extractor] Proxy setup error:', err);
+        res.status(500).json({ error: 'Sunucu hatası' });
+    }
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'SWX YouTube Extractor' });
@@ -85,4 +157,5 @@ app.listen(PORT, () => {
     console.log(`[SWX Extractor] Server running on port ${PORT}`);
     console.log(`[SWX Extractor] Health check: http://localhost:${PORT}/health`);
     console.log(`[SWX Extractor] Extract: http://localhost:${PORT}/extract?url=YOUTUBE_URL`);
+    console.log(`[SWX Extractor] Proxy: http://localhost:${PORT}/proxy?url=AUDIO_URL`);
 });
