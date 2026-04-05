@@ -55,6 +55,7 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
     local cached = audioCache[videoId]
     if cached and (os.time() - cached.timestamp) < CACHE_EXPIRY then
         print('[SWX Speaker Server] Cache hit: ' .. videoId)
+        print('[SWX Speaker Server] Sending to client with requestId:', requestId)
         
         -- Client'a cache'den gönder
         TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, cached.url, musicId, volume, distance, coords, cached.title, videoUrl, requestId)
@@ -78,6 +79,8 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
                     duration = data.duration or 0,
                     timestamp = os.time()
                 }
+                
+                print('[SWX Speaker Server] Sending to client with requestId:', requestId)
                 
                 -- Client'a gönder
                 TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId)

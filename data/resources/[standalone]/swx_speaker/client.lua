@@ -234,6 +234,8 @@ function AddToQueueDialog()
 end
 
 function PlayMusic(url, title)
+    print('[SWX Speaker] PlayMusic called with URL:', url:sub(1, 50) .. '...')
+    
     -- Önceki müziği tamamen durdur
     if currentMusicId then
         exports.xsound:Destroy(currentMusicId)
@@ -247,6 +249,8 @@ function PlayMusic(url, title)
     -- Request ID artır (stale response'ları engelle)
     currentExtractRequest = currentExtractRequest + 1
     local requestId = currentExtractRequest
+    
+    print('[SWX Speaker] New requestId:', requestId)
     
     currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
     
@@ -295,13 +299,19 @@ end
 
 -- Server'dan gelen extracted audio URL'sini çal
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId)
+    print('[SWX Speaker] playExtractedAudio event received!')
+    print('[SWX Speaker] musicId:', musicId)
+    print('[SWX Speaker] requestId:', requestId, 'currentExtractRequest:', currentExtractRequest)
+    
     -- STALE RESPONSE KONTROLÜ: Eğer bu eski bir request ise görmezden gel
     if requestId and requestId < currentExtractRequest then
+        print('[SWX Speaker] STALE RESPONSE - ignoring')
         return -- Bu eski bir response, yok say
     end
     
     -- localhost URL'sini VPS IP'sine çevir
     audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
+    print('[SWX Speaker] Audio URL:', audioUrl:sub(1, 80) .. '...')
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
