@@ -5,10 +5,7 @@ local isPaused = false
 local currentVolume = Config.DefaultVolume
 local currentDistance = Config.MaxDistance
 local playlist = {}
-local currentIndex = 0
 local musicHistory = {} 
-local activeFilters = {} 
-local historyLoaded = false 
 local isExtracting = false 
 
 -- Request tracking
@@ -22,14 +19,15 @@ end)
 -- Geçmişi al
 RegisterNetEvent('swx_speaker:client:receiveHistory', function(history)
     musicHistory = {}
-    for i, song in ipairs(history) do
-        table.insert(musicHistory, {
-            url = song.url,
-            title = song.title or 'Bilinmeyen Şarkı',
-            timestamp = song.timestamp
-        })
+    if history then
+        for i, song in ipairs(history) do
+            table.insert(musicHistory, {
+                url = song.url,
+                title = song.title or 'Bilinmeyen Şarkı',
+                timestamp = song.timestamp
+            })
+        end
     end
-    historyLoaded = true
 end)
 
 -- Araç plakasına göre benzersiz ID oluştur
@@ -61,31 +59,40 @@ function OpenSpeakerMenu()
     
     lib.registerContext({
         id = 'speaker_menu',
-        title = 'Nexora Hoparlör Sistemi',
+        title = 'Nexora Hoparlör v2',
         options = {
             {
                 title = 'Müzik Çal',
-                description = isExtracting and '⌛ Yükleniyor...' or 'YouTube veya Direkt URL',
+                description = isExtracting and '⌛ YouTube sesi işleniyor...' or 'YouTube veya Direkt URL girişi',
                 icon = 'play',
                 disabled = isExtracting,
                 onSelect = function() PlayMusicDialog() end
             },
             {
-                title = 'Müziği Duraklat / Devam Ettir',
-                description = isPaused and 'Müziği çalmaya devam et' or 'Müziği geçici olarak durdur',
+                title = 'Müzik Sıraya Al',
+                description = 'Şarkıyı listeye ekle',
+                icon = 'list',
+                onSelect = function() AddToQueueDialog() end
+            },
+            {
+                title = 'Playlist & Sırayı Yönet',
+                description = 'Sıradaki şarkıları gör ve temizle',
+                icon = 'bars',
+                onSelect = function() PlaylistMenu() end
+            },
+            {
+                title = isPaused and 'Müziği Devam Ettir' or 'Müziği Duraklat',
                 icon = isPaused and 'play' or 'pause',
                 disabled = not isPlaying and not isPaused,
                 onSelect = function() TogglePause() end
             },
             {
                 title = 'Ses ve Mesafe Ayarları',
-                description = 'Ses yüksekliği ve duyulma mesafesi',
                 icon = 'volume-up',
                 onSelect = function() VolumeRangeDialog() end
             },
             {
                 title = 'Müziği Tamamen Durdur',
-                description = 'Ses objesini yok eder',
                 icon = 'stop',
                 onSelect = function()
                     if musicId then
@@ -97,20 +104,12 @@ function OpenSpeakerMenu()
                 end
             },
             {
-                title = 'Playlist & Sıra',
-                description = 'Sıradaki şarkıları yönet',
-                icon = 'list',
-                onSelect = function() PlaylistMenu() end
-            },
-            {
-                title = 'Gelişmiş Filtreler',
-                description = 'Bass Boost, Telsiz Efekti vb.',
+                title = 'Gelişmiş Filtreler (Bass Boost)',
                 icon = 'filter',
                 onSelect = function() FiltersMenu() end
             },
             {
                 title = 'Müzik Geçmişi',
-                description = 'Son çalınan şarkılar',
                 icon = 'history',
                 onSelect = function() MusicHistoryMenu() end
             }
@@ -119,7 +118,7 @@ function OpenSpeakerMenu()
     lib.showContext('speaker_menu')
 end
 
--- KONUM GÜNCELLEME (ARACI TAKİP ETME)
+-- KONUM GÜNCELLEME THREAD
 CreateThread(function()
     while true do
         Wait(500)
@@ -135,14 +134,14 @@ CreateThread(function()
     end
 end)
 
--- MÜZİK BAŞLATMA MANTIĞI
+-- MÜZİK BAŞLATMA
 function PlayMusic(url, title)
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     if vehicle == 0 then return end
     local musicId = GetVehicleMusicId(vehicle)
     
-    exports.xsound:Destroy(musicId) -- Eski sesi sil
+    exports.xsound:Destroy(musicId)
     
     local coords = GetEntityCoords(vehicle)
     local isYouTube = string.find(url, 'youtube.com') or string.find(url, 'youtu.be')
@@ -155,7 +154,7 @@ function PlayMusic(url, title)
         SetTimeout(20000, function()
             if isExtracting and currentExtractRequest == requestId then
                 isExtracting = false
-                QBCore.Functions.Notify('YouTube işlemi zaman aşımına uğradı', 'error')
+                QBCore.Functions.Notify('Zaman aşımı: YouTube yanıt vermedi', 'error')
             end
         end)
         
@@ -163,11 +162,11 @@ function PlayMusic(url, title)
     else
         isExtracting = false
         StartAudio(musicId, url, currentVolume, coords, currentDistance)
-        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Direkt Müzik')
+        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Direkt URL')
     end
 end
 
--- GARANTİLİ BAŞLATMA (RETRY)
+-- GARANTİLİ BAŞLATMA
 function StartAudio(musicId, url, volume, coords, distance)
     exports.xsound:PlayUrlPos(musicId, url, volume, coords, false)
     exports.xsound:Distance(musicId, distance)
@@ -177,14 +176,12 @@ function StartAudio(musicId, url, volume, coords, distance)
     
     SetTimeout(2000, function()
         if isPlaying and not exports.xsound:soundExists(musicId) then
-            print('[SWX Speaker] Ses başlamadı, tekrar deneniyor...')
             exports.xsound:PlayUrlPos(musicId, url, volume, coords, false)
             exports.xsound:Distance(musicId, distance)
         end
     end)
 end
 
--- SERVER'DAN GELEN YOUTUBE SESİ
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
     if requestId and requestId < currentExtractRequest then return end
     isExtracting = false
@@ -201,7 +198,7 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     end
 end)
 
--- MENÜ DİALOGLARI VE ALT MENÜLER
+-- DİALOGLAR VE MENÜLER
 function PlayMusicDialog()
     local input = lib.inputDialog('Müzik Çal', {
         { type = 'input', label = 'YouTube veya Direkt URL', required = true, icon = 'link' }
@@ -209,24 +206,35 @@ function PlayMusicDialog()
     if input then PlayMusic(input[1], nil) end
 end
 
+function AddToQueueDialog()
+    local input = lib.inputDialog('Sıraya Ekle', {
+        { type = 'input', label = 'YouTube veya Direkt URL', required = true, icon = 'link' }
+    })
+    if input then
+        QBCore.Functions.TriggerCallback('swx_speaker:getYouTubeTitle', function(title)
+            table.insert(playlist, { url = input[1], title = title or 'Sıradaki Şarkı' })
+            QBCore.Functions.Notify('Şarkı sıraya eklendi', 'success')
+        end, input[1])
+    end
+end
+
 function PlaylistMenu()
     local options = {
         {
-            title = 'Sıradaki Şarkıyı Çal',
+            title = 'Sıradaki Şarkıya Geç',
+            icon = 'forward',
             disabled = #playlist == 0,
             onSelect = function() PlayNextSong() end
         },
         {
-            title = 'Sırayı Temizle',
+            title = 'Tüm Sırayı Temizle',
+            icon = 'trash',
             disabled = #playlist == 0,
-            onSelect = function() 
-                playlist = {} 
-                QBCore.Functions.Notify('Sıra temizlendi', 'info')
-            end
+            onSelect = function() playlist = {} QBCore.Functions.Notify('Sıra temizlendi', 'info') end
         }
     }
     for i, song in ipairs(playlist) do
-        table.insert(options, { title = i .. ". " .. (song.title or 'Bilinmeyen'), description = 'Tıkla ve çal' })
+        table.insert(options, { title = i .. ". " .. song.title, description = 'Çalmak için tıkla', onSelect = function() PlayMusic(song.url, song.title) table.remove(playlist, i) end })
     end
     lib.registerContext({ id = 'playlist_menu', title = 'Playlist', menu = 'speaker_menu', options = options })
     lib.showContext('playlist_menu')
@@ -235,14 +243,13 @@ end
 function FiltersMenu()
     lib.registerContext({
         id = 'filters_menu',
-        title = 'Ses Filtreleri',
+        title = 'Gelişmiş Filtreler',
         menu = 'speaker_menu',
         options = {
             { title = 'Bass Boost (Lowshelf)', onSelect = function() ApplyFilterDialog('lowshelf', 150, 15) end },
             { title = 'Boğuk Ses (Lowpass)', onSelect = function() ApplyFilterDialog('lowpass', 400, 10) end },
-            { title = 'Telsiz Sesi (Bandpass)', onSelect = function() ApplyFilterDialog('bandpass', 1500, 0) end },
-            { title = 'İnce Ses (Highpass)', onSelect = function() ApplyFilterDialog('highpass', 2000, 10) end },
-            { title = 'Filtreleri Temizle', icon = 'trash', onSelect = function()
+            { title = 'Telsiz Efekti (Bandpass)', onSelect = function() ApplyFilterDialog('bandpass', 1500, 0) end },
+            { title = 'Tüm Filtreleri Temizle', icon = 'trash', onSelect = function()
                 local musicId = GetVehicleMusicId(GetVehiclePedIsIn(PlayerPedId(), false))
                 if musicId then exports.xsound:clearAllFilters(musicId) end
                 QBCore.Functions.Notify('Filtreler temizlendi', 'info')
@@ -259,7 +266,13 @@ function ApplyFilterDialog(type, defFreq, defGain)
     })
     if input then
         local musicId = GetVehicleMusicId(GetVehiclePedIsIn(PlayerPedId(), false))
-        if musicId then exports.xsound:setFilter(musicId, type, input[1], 1.0, input[2]) end
+        if musicId then
+            -- Sesin yüklendiğinden emin olmak için 500ms bekle
+            SetTimeout(500, function()
+                exports.xsound:setFilter(musicId, type, input[1], 1.0, input[2])
+                QBCore.Functions.Notify('Filtre uygulandı', 'success')
+            end)
+        end
     end
 end
 
@@ -316,5 +329,7 @@ function PlayNextSong()
     if #playlist > 0 then
         local song = table.remove(playlist, 1)
         PlayMusic(song.url, song.title)
+    else
+        QBCore.Functions.Notify('Playlist bitti', 'info')
     end
 end
