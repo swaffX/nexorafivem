@@ -1092,21 +1092,19 @@ end
 -- xSound Web Audio API ile gerçek filtreler
 -- ============================================
 
--- Filtre Uygulama Fonksiyonu (Düzeltilmiş - Bass Boost Uyumluluğu)
+-- Filtre Uygulama Fonksiyonu (Düzeltilmiş - Bass Boost için optimize)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
         return
     end
     
-    -- YouTube URL'si mi kontrol et
-    local ped = PlayerPedId()
-    local vehicle = GetVehiclePedIsIn(ped, false)
-    local currentUrl = ''
-    
-    if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- URL'yi server'dan al veya local değişkenden
-        -- Not: Bu sadece bilgilendirme için, filter application için kritik değil
+    -- YouTube URL kontrolü - filtreler YouTube'da çalışmaz
+    -- Not: Şu anda current URL'yi track etmiyoruz, kullanıcıya bilgi verelim
+    local filterType = filter.type:lower()
+    if string.find(filterType, 'shelf') or filterType == 'peaking' then
+        print('[SWX Speaker] ⚠️  BASS BOOST NOTE: Filters work best with direct audio URLs, not YouTube')
+        print('[SWX Speaker] ℹ️  YouTube iframe players cannot be processed by Web Audio API')
     end
     
     -- Filtreyi chain'e ekle
@@ -1114,26 +1112,55 @@ function ApplyFilter(filterId, filter)
     activeFilters[filterId] = filter
     
     -- xSound'a gerçek filtre uygula
-    local filterType = filter.type:lower()
     local frequency = math.max(10, math.min(22000, filter.frequency))
     local gain = math.max(-40, math.min(40, filter.gain))
     local Q = CalculateQValue(filterType, filter.detune, gain)
     
-    -- Debug log
-    print(string.format('[SWX Speaker] Filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
-        filterType:upper(), frequency, gain, Q))
+    -- Debug log - detaylı bilgi
+    print(string.format('[SWX Speaker] 🎵 Applying filter: %s', filterType:upper()))
+    print(string.format('[SWX Speaker]   ├─ Frequency: %d Hz', frequency))
+    print(string.format('[SWX Speaker]   ├─ Gain: %d dB', gain))
+    print(string.format('[SWX Speaker]   ├─ Q: %.2f', Q))
+    print(string.format('[SWX Speaker]   └─ Music ID: %s', currentMusicId))
     
-    -- Ses dosyası için filtre uygula (YouTube değilse)
-    -- xSound'un setFilter'ı zaten retry mekanizması içeriyor
+    -- Bass boost için özel uyarılar
+    if filterType == 'lowshelf' and gain > 15 then
+        print('[SWX Speaker] ⚠️  HIGH BASS BOOST: Gain > 15dB may cause distortion')
+        print('[SWX Speaker] 💡 Recommendation: Use +10 to +15 dB for clean bass')
+    elseif filterType == 'peaking' and frequency < 60 then
+        print('[SWX Speaker] ⚠️  VERY LOW FREQUENCY: < 60Hz may not be audible on all speakers')
+    end
+    
+    -- xSound setFilter export'u çağır
     local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
     
     if success then
-        QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
-        print(string.format('[SWX Speaker] Filtre başarıyla uygulandı: %s', filterType:upper()))
+        -- Kullanıcıya bildirim
+        local effectText = ''
+        if gain > 0 then
+            effectText = string.format('+%d dB boost', gain)
+        else
+            effectText = string.format('%d dB cut', gain)
+        end
+        
+        QBCore.Functions.Notify(
+            string.format('Filtre uygulandı: %s (%s)', filterType:upper(), effectText), 
+            'success'
+        )
+        print(string.format('[SWX Speaker] ✅ Filter applied successfully: %s', filterType:upper()))
     else
-        -- Filtre uygulanamadıysa retry mekanizması xsound tarafında çalışır
-        QBCore.Functions.Notify('Filtre uygulanıyor... (birkaç saniye bekleyin)', 'info')
-        print(string.format('[SWX Speaker] Filtre uygulanamadı, ses yüklenmemiş olabilir: %s', filterType:upper()))
+        -- Filtre uygulanamadıysa kullanıcıya bilgi ver
+        QBCore.Functions.Notify(
+            'Filtre uygulanamadı. Müziğin yüklenmesini bekleyip tekrar deneyin.', 
+            'error',
+            5000
+        )
+        print(string.format('[SWX Speaker] ❌ Filter application failed: %s', filterType:upper()))
+        print('[SWX Speaker] 💡 Tip: Wait 2-3 seconds after music starts, then apply filter again')
+        
+        -- Başarısız olursa chain'den kaldır
+        filterChain[filterId] = nil
+        activeFilters[filterId] = nil
     end
 end
 
