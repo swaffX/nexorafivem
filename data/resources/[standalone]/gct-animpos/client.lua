@@ -45,6 +45,20 @@ function disableControls()
     EnableControlAction(0, 2, true)   -- Mouse Up/Down
     EnableControlAction(0, 4, true)
     EnableControlAction(0, 5, true)
+    
+    -- ANIMPOSE CONTROLS - Yukarı/Aşağı hareket için gerekli
+    EnableControlAction(0, 172, true) -- Arrow Up (Yukarı)
+    EnableControlAction(0, 173, true) -- Arrow Down (Aşağı)
+    EnableControlAction(0, 174, true) -- Arrow Left (Hız azalt)
+    EnableControlAction(0, 175, true) -- Arrow Right (Hız arttır)
+    EnableControlAction(0, 32, true)  -- W (İleri)
+    EnableControlAction(0, 33, true)  -- S (Geri)
+    EnableControlAction(0, 34, true)  -- A (Sol)
+    EnableControlAction(0, 35, true)  -- D (Sağ)
+    EnableControlAction(0, 38, true)  -- E (Sola dön)
+    EnableControlAction(0, 205, true) -- → (Sağa dön)
+    EnableControlAction(0, 191, true) -- Enter (Onayla)
+    EnableControlAction(0, 73, true)  -- X (İptal)
 end
 
 RegisterNetEvent("gct-animpos:AnimPosition", function()
@@ -228,7 +242,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 172) then
                 local newPos = vector3(coords.x, coords.y, coords.z + moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, true, true)
+                    -- Emote aktifken Z koordinatını değiştirmek için SetEntityCoords kullan
+                    SetEntityCoords(ped, newPos.x, newPos.y, newPos.z, false, false, false, true)
                     SendNUIMessage({ type = "keyActive", key = "move_up" })
 
                     TriggerServerEvent(
@@ -243,7 +258,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 173) then
                 local newPos = vector3(coords.x, coords.y, coords.z - moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, true, true)
+                    -- Emote aktifken Z koordinatını değiştirmek için SetEntityCoords kullan
+                    SetEntityCoords(ped, newPos.x, newPos.y, newPos.z, false, false, false, true)
                     SendNUIMessage({ type = "keyActive", key = "move_down" })
 
                     TriggerServerEvent(
