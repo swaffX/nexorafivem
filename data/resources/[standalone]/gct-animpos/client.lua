@@ -52,6 +52,17 @@ RegisterNetEvent("gct-animpos:AnimPosition", function()
         QBCore.Functions.Notify(Config.Language["notworking"], "error")
         return
     end
+    
+    -- Emote aktifse iptal et
+    if exports['rpemotes'] then
+        local success, result = pcall(function()
+            exports['rpemotes']:EmoteCancel()
+        end)
+        if success then
+            Wait(100) -- Emote'un tamamen iptal olması için kısa bir bekleme
+        end
+    end
+    
     animPosition()
 end)
 
