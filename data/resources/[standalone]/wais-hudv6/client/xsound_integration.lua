@@ -7,9 +7,14 @@ local isPlaying = false
 local currentVolume = 0.5
 local currentBass = 0
 
--- WAIS-HUD'dan müzik çalma (NUI'den gelecek)
-RegisterNUICallback('wais:playMusic', function(data, cb)
-    local url = data.url
+-- WAIS-HUD'ın kendi müzik sistemini override et
+AddEventHandler('wais:hudv6:client:playMusic', function(url)
+    TriggerEvent('wais:xsound:playMusic', { url = url })
+end)
+
+-- YouTube API yerine xsound kullan
+RegisterNUICallback('playMusic', function(data, cb)
+    local url = data.url or data.videoUrl
     
     if not url or url == "" then
         cb({ success = false, message = "URL boş" })
@@ -34,7 +39,7 @@ RegisterNUICallback('wais:playMusic', function(data, cb)
         local coords = GetEntityCoords(vehicle)
         
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
-        exports.xsound:Distance(currentMusicId, 30.0) -- 30 metre mesafe
+        exports.xsound:Distance(currentMusicId, 30.0)
         
         if currentBass ~= 0 then
             exports.xsound:setBassGain(currentMusicId, currentBass / 10)
@@ -53,18 +58,27 @@ RegisterNUICallback('wais:playMusic', function(data, cb)
         
         print('[WAIS-HUD xsound] Müzik çalıyor (araç): ' .. currentMusicId)
     else
-        -- Araç dışındaysa, sadece kendisi duyar (client-side)
+        -- Araç dışındaysa, sadece kendisi duyar
         exports.xsound:PlayUrl(currentMusicId, url, currentVolume, false)
         
         isPlaying = true
         print('[WAIS-HUD xsound] Müzik çalıyor (yaya): ' .. currentMusicId)
     end
     
-    cb({ success = true, musicId = currentMusicId })
+    -- NUI'ye başarılı yanıt gönder
+    cb({ 
+        success = true, 
+        musicId = currentMusicId,
+        videoData = {
+            title = "xsound Music",
+            duration = 0,
+            thumbnail = ""
+        }
+    })
 end)
 
 -- Müziği durdur
-RegisterNUICallback('wais:stopMusic', function(data, cb)
+RegisterNUICallback('stopMusic', function(data, cb)
     if currentMusicId then
         exports.xsound:Destroy(currentMusicId)
         currentMusicId = nil
@@ -76,7 +90,7 @@ RegisterNUICallback('wais:stopMusic', function(data, cb)
 end)
 
 -- Müziği duraklat
-RegisterNUICallback('wais:pauseMusic', function(data, cb)
+RegisterNUICallback('pauseMusic', function(data, cb)
     if currentMusicId then
         exports.xsound:Pause(currentMusicId)
         print('[WAIS-HUD xsound] Müzik duraklatıldı')
@@ -85,7 +99,7 @@ RegisterNUICallback('wais:pauseMusic', function(data, cb)
 end)
 
 -- Müziği devam ettir
-RegisterNUICallback('wais:resumeMusic', function(data, cb)
+RegisterNUICallback('resumeMusic', function(data, cb)
     if currentMusicId then
         exports.xsound:Resume(currentMusicId)
         print('[WAIS-HUD xsound] Müzik devam ediyor')
@@ -94,7 +108,7 @@ RegisterNUICallback('wais:resumeMusic', function(data, cb)
 end)
 
 -- Ses seviyesi ayarla
-RegisterNUICallback('wais:setVolume', function(data, cb)
+RegisterNUICallback('setVolume', function(data, cb)
     currentVolume = data.volume or 0.5
     if currentMusicId then
         exports.xsound:setVolume(currentMusicId, currentVolume)
@@ -103,8 +117,8 @@ RegisterNUICallback('wais:setVolume', function(data, cb)
     cb({ success = true })
 end)
 
--- Bass ayarla
-RegisterNUICallback('wais:setBass', function(data, cb)
+-- Bass ayarla (custom callback)
+RegisterNUICallback('setBass', function(data, cb)
     currentBass = data.bass or 0
     if currentMusicId then
         exports.xsound:setBassGain(currentMusicId, currentBass / 10)
@@ -114,25 +128,36 @@ RegisterNUICallback('wais:setBass', function(data, cb)
 end)
 
 -- Şarkı atlama (sonraki)
-RegisterNUICallback('wais:nextSong', function(data, cb)
-    -- Playlist'ten sonraki şarkıyı çal
+RegisterNUICallback('nextSong', function(data, cb)
     cb({ success = true })
 end)
 
 -- Şarkı atlama (önceki)
-RegisterNUICallback('wais:prevSong', function(data, cb)
-    -- Playlist'ten önceki şarkıyı çal
+RegisterNUICallback('prevSong', function(data, cb)
     cb({ success = true })
 end)
 
 -- Müzik durumu sorgula
-RegisterNUICallback('wais:getMusicStatus', function(data, cb)
+RegisterNUICallback('getMusicStatus', function(data, cb)
     cb({ 
         success = true,
         isPlaying = isPlaying,
         currentUrl = currentMusicUrl,
         volume = currentVolume,
         bass = currentBass
+    })
+end)
+
+-- YouTube video bilgisi (fake response - xsound kullanıyoruz)
+RegisterNUICallback('getVideoData', function(data, cb)
+    cb({ 
+        success = true,
+        videoData = {
+            title = "xsound Music Player",
+            duration = 0,
+            thumbnail = "",
+            author = "Nexora RP"
+        }
     })
 end)
 
@@ -168,5 +193,6 @@ CreateThread(function()
     end
 end)
 
-print('[WAIS-HUD] xsound entegrasyonu yüklendi (geliştirilmiş)')
+print('[WAIS-HUD] xsound entegrasyonu yüklendi (YouTube API bypass)')
+
 
