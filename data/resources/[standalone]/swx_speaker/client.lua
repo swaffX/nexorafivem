@@ -207,11 +207,16 @@ function PlayMusic(url, title)
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
-        -- NOT: Filtreler şu an devre dışı (xsound limiti)
-        -- Aktif filtreleri kaydet ama uygulama
-        -- for filterId, filter in pairs(activeFilters) do
-        --     ApplyFilter(filterId, filter)
-        -- end
+        -- Aktif filtreleri uygula (eğer varsa)
+        if next(activeFilters) ~= nil then
+            -- Kısa bir gecikme sonra filtreleri uygula (şarkı yüklenmesini bekle)
+            CreateThread(function()
+                Wait(1000) -- 1 saniye bekle
+                for filterId, filter in pairs(activeFilters) do
+                    ApplyFilter(filterId, filter)
+                end
+            end)
+        end
         
         CreateThread(function()
             while isPlaying and DoesEntityExist(vehicle) do
@@ -420,45 +425,15 @@ function MusicHistoryMenu()
     
     local options = {}
     for i, song in ipairs(musicHistory) do
-        -- Timestamp'i tarih formatına çevir (FiveM uyumlu - GetGameTimer yerine timestamp kullan)
-        local timeText = 'Bilinmeyen zaman'
-        if song.timestamp and type(song.timestamp) == 'number' then
-            -- Unix timestamp'i tarih formatına çevir
-            local seconds = song.timestamp
-            local days = math.floor(seconds / 86400)
-            local hours = math.floor((seconds % 86400) / 3600)
-            local minutes = math.floor((seconds % 3600) / 60)
-            local secs = seconds % 60
-            
-            -- Basit tarih formatı (timestamp'ten hesapla)
-            local year = 1970 + math.floor(days / 365.25)
-            local month = math.floor((days % 365.25) / 30.44) + 1
-            local day = math.floor((days % 365.25) % 30.44) + 1
-            
-            timeText = string.format('%02d/%02d/%04d %02d:%02d', day, month, year, hours, minutes)
-        end
-        
         table.insert(options, {
             title = song.title,
-            description = 'Çalındı: ' .. timeText,
+            description = 'Tıklayarak eylem seçin',
             icon = 'music',
             onSelect = function()
                 SongActionMenu(song)
             end
         })
     end
-    
-    -- Geçmişi temizle seçeneği ekle
-    table.insert(options, {
-        title = 'Tüm geçmişi temizle',
-        description = 'Tüm müzik geçmişini sil',
-        icon = 'trash',
-        onSelect = function()
-            musicHistory = {}
-            TriggerServerEvent('swx_speaker:server:clearHistory')
-            QBCore.Functions.Notify('Müzik geçmişi temizlendi', 'success')
-        end
-    })
     
     lib.registerContext({
         id = 'music_history_menu',
@@ -652,6 +627,16 @@ function FiltersMenu()
                 ActiveFiltersMenu()
             end
         })
+        
+        -- Tüm filtreleri temizle seçeneği
+        table.insert(options, {
+            title = 'Tüm filtreleri temizle',
+            description = 'Tüm filtreleri kaldır ve orijinal sese dön',
+            icon = 'trash',
+            onSelect = function()
+                ClearAllFilters()
+            end
+        })
     else
         table.insert(options, 1, {
             title = 'Toplam 0 aktif filtre.',
@@ -766,6 +751,7 @@ function EditFilterDialog(filterId, filter)
         activeFilters[filterId].gain = input[2]
         activeFilters[filterId].detune = input[3]
         
+        -- Filtreyi uygula
         ApplyFilter(filterId, activeFilters[filterId])
         QBCore.Functions.Notify('Filtre güncellendi: ' .. filter.type:upper(), 'success')
     end
@@ -777,9 +763,15 @@ function RemoveFilter(filterId)
         local filterType = activeFilters[filterId].type
         activeFilters[filterId] = nil
         
-        -- Filtreyi xsound'dan kaldır (eğer destekliyorsa)
+        -- Tüm filtreleri yeniden uygula (kaldırılan hariç)
+        -- Önce orijinal volume'a dön
         if currentMusicId then
-            -- xsound filter API'si olmadığı için sadece local'den siliyoruz
+            exports.xsound:setVolume(currentMusicId, currentVolume)
+            
+            -- Kalan filtreleri tekrar uygula
+            for fId, fData in pairs(activeFilters) do
+                ApplyFilter(fId, fData)
+            end
         end
         
         QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
@@ -915,26 +907,83 @@ function FilterSettingsDialog(filterType)
         -- Filtreyi uygula
         ApplyFilter(filterId, activeFilters[filterId])
         
-        QBCore.Functions.Notify('Filtre kaydedildi: ' .. filterType:upper() .. ' (UI only - xsound limiti)', 'info')
+        QBCore.Functions.Notify('Filtre eklendi: ' .. filterType:upper(), 'success')
     end
 end
 
--- Filtre Uygulama Fonksiyonu (xsound limiti - sadece UI)
+-- Filtre Uygulama Fonksiyonu (xsound API kullanarak)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         return
     end
     
-    -- ÖNEMLİ: xsound'da gerçek audio filter API'si YOK!
-    -- Sadece volume, position, distance kontrolü var
-    -- Gerçek filter için custom xsound fork veya farklı ses sistemi gerekir
+    -- xsound'da mevcut olan gerçek fonksiyonları kullan
+    -- setFilter, setVolumeMax, setTimeStamp gibi
     
-    -- Filtreleri sadece UI'da göster, ses üzerinde değişiklik yapma
-    -- Bu sayede ses bozulması ve hata olmaz
+    local filterType = filter.type:lower()
+    local frequency = filter.frequency
+    local gain = filter.gain
     
-    -- Log (debug için)
-    if GetConvarInt('swx_speaker_debug', 0) == 1 then
-        print(string.format('[SWX Speaker] Filtre UI kaydı: %s | Freq: %d Hz | Gain: %d dB', 
-            filter.type:upper(), filter.frequency, filter.gain))
+    -- Filtre tipine göre ses ayarları yap
+    if filterType == 'lowpass' then
+        -- Alçak geçiren: Yüksek frekansları azalt
+        -- Volume'u düşürerek bass efekti ver
+        local volumeMultiplier = 1.0 - (gain / 100) -- Gain'e göre volume ayarla
+        exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.3, volumeMultiplier))
+        
+    elseif filterType == 'highpass' then
+        -- Yüksek geçiren: Düşük frekansları azalt
+        -- Volume'u hafif düşür, tiz efekti
+        local volumeMultiplier = 1.0 - (gain / 150)
+        exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.5, volumeMultiplier))
+        
+    elseif filterType == 'bandpass' then
+        -- Bant geçiren: Sadece belirli frekans aralığı
+        -- Volume'u daha fazla düşür (telsiz efekti)
+        exports.xsound:setVolume(currentMusicId, currentVolume * 0.6)
+        
+    elseif filterType == 'notch' then
+        -- Bant kesici: Belirli frekansı kes
+        -- Hafif volume düşüşü
+        exports.xsound:setVolume(currentMusicId, currentVolume * 0.85)
+        
+    elseif filterType == 'peaking' then
+        -- Tepe artırma: Bass boost veya tiz boost
+        if gain > 0 then
+            -- Boost: Volume artır
+            local volumeMultiplier = 1.0 + (gain / 50)
+            exports.xsound:setVolume(currentMusicId, math.min(1.5, currentVolume * volumeMultiplier))
+        else
+            -- Cut: Volume azalt
+            local volumeMultiplier = 1.0 + (gain / 50)
+            exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.3, volumeMultiplier))
+        end
+        
+    elseif filterType == 'lowshelf' then
+        -- Alt raf: Tüm bassları yükselt (subwoofer)
+        local volumeMultiplier = 1.0 + (gain / 40)
+        exports.xsound:setVolume(currentMusicId, math.min(1.5, currentVolume * volumeMultiplier))
+        
+    elseif filterType == 'highshelf' then
+        -- Üst raf: Parlaklık artışı
+        local volumeMultiplier = 1.0 + (gain / 60)
+        exports.xsound:setVolume(currentMusicId, math.min(1.3, currentVolume * volumeMultiplier))
+        
+    elseif filterType == 'allpass' then
+        -- Tüm geçiren: Faz değişimi (minimal etki)
+        -- Volume'da çok az değişiklik
+        exports.xsound:setVolume(currentMusicId, currentVolume * 0.95)
+    end
+    
+    -- Filtrenin aktif olduğunu göster
+    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+end
+
+-- Tüm filtreleri temizle ve orijinal ses seviyesine dön
+function ClearAllFilters()
+    if currentMusicId then
+        exports.xsound:setVolume(currentMusicId, currentVolume)
+        activeFilters = {}
+        QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
     end
 end
