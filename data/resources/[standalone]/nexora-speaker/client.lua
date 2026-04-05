@@ -180,7 +180,7 @@ function PlayMusic(url, title)
         table.insert(musicHistory, 1, {
             url = url,
             title = title or 'Bilinmeyen Şarkı',
-            timestamp = os.time()
+            timestamp = GetGameTimer()
         })
         
         -- Geçmişi 50 ile sınırla
@@ -384,9 +384,12 @@ function MusicHistoryMenu()
     
     local options = {}
     for i, song in ipairs(musicHistory) do
+        local timeAgo = math.floor((GetGameTimer() - song.timestamp) / 1000) -- saniye cinsinden
+        local timeText = timeAgo < 60 and timeAgo .. ' saniye önce' or math.floor(timeAgo / 60) .. ' dakika önce'
+        
         table.insert(options, {
             title = song.title,
-            description = 'Çalındı: ' .. os.date('%H:%M:%S', song.timestamp),
+            description = 'Çalındı: ' .. timeText,
             icon = 'music',
             onSelect = function()
                 SongActionMenu(song)
