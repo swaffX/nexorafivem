@@ -198,6 +198,11 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     end
 end)
 
+RegisterNetEvent('swx_speaker:client:extractFailed', function(requestId)
+    if requestId and requestId < currentExtractRequest then return end
+    isExtracting = false
+end)
+
 -- DİALOGLAR VE MENÜLER
 function PlayMusicDialog()
     local input = lib.inputDialog('Müzik Çal', {

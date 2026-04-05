@@ -61,6 +61,7 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
     
     if not videoId then
         TriggerClientEvent('QBCore:Notify', src, 'Geçersiz YouTube URL!', 'error')
+        TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
         return
     end
     
@@ -100,8 +101,10 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
             end
         elseif statusCode == 0 then
             TriggerClientEvent('QBCore:Notify', src, 'Extractor servisi çalışmıyor!', 'error')
+            TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
         else
             TriggerClientEvent('QBCore:Notify', src, 'Extractor hatası!', 'error')
+            TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
         end
     end, 'GET')
 end)
