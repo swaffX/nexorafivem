@@ -37,6 +37,7 @@ client_scripts {
     'bridge/editable/client.lua',
     'bridge/esx/client.lua',
     'bridge/qb/client.lua',
+    'client/entity_fix.lua', -- Entity hata düzeltmesi
     'client/client.lua',
     'client/xsound_integration.lua', -- xsound entegrasyonu
 }

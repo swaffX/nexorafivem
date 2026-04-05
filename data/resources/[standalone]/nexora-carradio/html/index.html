@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora Car Radio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container" style="display: none;">
+        <div class="radio-panel">
+            <div class="header">
+                <h1>🎵 Araç Hoparlör Sistemi</h1>
+                <button class="close-btn" onclick="closeMenu()">✕</button>
+            </div>
+
+            <div class="content">
+                <!-- URL Girişi -->
+                <div class="section">
+                    <label>YouTube URL</label>
+                    <div class="input-group">
+                        <input type="text" id="musicUrl" placeholder="https://youtube.com/watch?v=..." />
+                        <button onclick="playMusic()">▶ Çal</button>
+                    </div>
+                </div>
+
+                <!-- Kontroller -->
+                <div class="section controls">
+                    <button onclick="pauseMusic()" class="control-btn">⏸ Duraklat</button>
+                    <button onclick="resumeMusic()" class="control-btn">▶ Devam</button>
+                    <button onclick="stopMusic()" class="control-btn stop">⏹ Durdur</button>
+                </div>
+
+                <!-- Ses Seviyesi -->
+                <div class="section">
+                    <label>Ses Seviyesi: <span id="volumeValue">50</span>%</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)" />
+                </div>
+
+                <!-- Bass -->
+                <div class="section">
+                    <label>Bass: <span id="bassValue">0</span></label>
+                    <input type="range" id="bassSlider" min="-10" max="10" value="0" oninput="changeBass(this.value)" />
+                </div>
+
+                <!-- Tiz (Treble) -->
+                <div class="section">
+                    <label>Tiz: <span id="trebleValue">0</span></label>
+                    <input type="range" id="trebleSlider" min="-10" max="10" value="0" oninput="changeTreble(this.value)" />
+                </div>
+
+                <!-- Playlist -->
+                <div class="section">
+                    <div class="playlist-header">
+                        <label>Geçmiş Şarkılar</label>
+                        <button onclick="clearPlaylist()" class="clear-btn">Temizle</button>
+                    </div>
+                    <div id="playlist" class="playlist">
+                        <p class="empty-playlist">Henüz şarkı çalmadınız</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

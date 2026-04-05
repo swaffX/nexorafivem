@@ -5,9 +5,12 @@ local currentMusicUrl = nil
 local currentMusicId = nil
 local isPlaying = false
 
--- WAIS-HUD'dan müzik çalma eventi
-RegisterNetEvent('wais-hud:client:playMusic', function(url)
+-- WAIS-HUD'dan müzik çalma eventi (NUI'den gelecek)
+RegisterNUICallback('playMusic', function(data, cb)
+    local url = data.url
+    
     if not url or url == "" then
+        cb({ success = false, message = "URL boş" })
         return
     end
     
@@ -24,13 +27,14 @@ RegisterNetEvent('wais-hud:client:playMusic', function(url)
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
-    if vehicle ~= 0 then
+    if vehicle ~= 0 and DoesEntityExist(vehicle) then
         -- Araç içindeyse, aracın konumunda çal
         local coords = GetEntityCoords(vehicle)
         
         -- xsound ile müzik çal
-        exports.xsound:PlayUrlPos(currentMusicId, url, Config.MusicSystem.distance or 10.0, coords, false)
-        exports.xsound:Distance(currentMusicId, Config.MusicSystem.distance or 10.0)
+        exports.xsound:PlayUrlPos(currentMusicId, url, 15.0, coords, false)
+        exports.xsound:Distance(currentMusicId, 15.0)
+        exports.xsound:setVolume(currentMusicId, data.volume or 0.5)
         
         isPlaying = true
         
@@ -47,16 +51,19 @@ RegisterNetEvent('wais-hud:client:playMusic', function(url)
     else
         -- Araç dışındaysa, oyuncunun konumunda çal
         local coords = GetEntityCoords(ped)
-        exports.xsound:PlayUrlPos(currentMusicId, url, Config.MusicSystem.distance or 10.0, coords, false)
-        exports.xsound:Distance(currentMusicId, Config.MusicSystem.distance or 10.0)
+        exports.xsound:PlayUrlPos(currentMusicId, url, 10.0, coords, false)
+        exports.xsound:Distance(currentMusicId, 10.0)
+        exports.xsound:setVolume(currentMusicId, data.volume or 0.5)
         
         isPlaying = true
         print('[WAIS-HUD xsound] Müzik çalıyor (yaya): ' .. currentMusicId)
     end
+    
+    cb({ success = true, musicId = currentMusicId })
 end)
 
 -- Müziği durdur
-RegisterNetEvent('wais-hud:client:stopMusic', function()
+RegisterNUICallback('stopMusic', function(data, cb)
     if currentMusicId then
         exports.xsound:Destroy(currentMusicId)
         currentMusicId = nil
@@ -64,6 +71,33 @@ RegisterNetEvent('wais-hud:client:stopMusic', function()
         isPlaying = false
         print('[WAIS-HUD xsound] Müzik durduruldu')
     end
+    cb({ success = true })
+end)
+
+-- Müziği duraklat/devam ettir
+RegisterNUICallback('pauseMusic', function(data, cb)
+    if currentMusicId then
+        exports.xsound:Pause(currentMusicId)
+        print('[WAIS-HUD xsound] Müzik duraklatıldı')
+    end
+    cb({ success = true })
+end)
+
+RegisterNUICallback('resumeMusic', function(data, cb)
+    if currentMusicId then
+        exports.xsound:Resume(currentMusicId)
+        print('[WAIS-HUD xsound] Müzik devam ediyor')
+    end
+    cb({ success = true })
+end)
+
+-- Ses seviyesi ayarla
+RegisterNUICallback('setVolume', function(data, cb)
+    if currentMusicId and data.volume then
+        exports.xsound:setVolume(currentMusicId, data.volume)
+        print('[WAIS-HUD xsound] Ses seviyesi: ' .. data.volume)
+    end
+    cb({ success = true })
 end)
 
 -- Araçtan indiğinde müziği durdur
@@ -76,7 +110,12 @@ CreateThread(function()
         
         if wasInVehicle and not inVehicle and isPlaying then
             -- Araçtan indi, müziği durdur
-            TriggerEvent('wais-hud:client:stopMusic')
+            if currentMusicId then
+                exports.xsound:Destroy(currentMusicId)
+                currentMusicId = nil
+                currentMusicUrl = nil
+                isPlaying = false
+            end
         end
         
         wasInVehicle = inVehicle
