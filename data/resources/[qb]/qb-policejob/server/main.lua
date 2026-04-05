@@ -14,7 +14,7 @@ local function UpdateBlips()
             local heading = GetEntityHeading(GetPlayerPed(v.PlayerData.source))
             dutyPlayers[#dutyPlayers + 1] = {
                 source = v.PlayerData.source,
-                label = v.PlayerData.metadata['callsign'],
+                label = v.PlayerData.metadata['callsign'] or "NO CALLSIGN",
                 job = v.PlayerData.job.name,
                 location = {
                     x = coords.x,
@@ -48,7 +48,7 @@ QBCore.Functions.CreateCallback('police:GetDutyPlayers', function(_, cb)
         if v and v.PlayerData.job.type == 'leo' and v.PlayerData.job.onduty then
             dutyPlayers[#dutyPlayers + 1] = {
                 source = v.PlayerData.source,
-                label = v.PlayerData.metadata['callsign'],
+                label = v.PlayerData.metadata['callsign'] or "NO CALLSIGN",
                 job = v.PlayerData.job.name
             }
         end
