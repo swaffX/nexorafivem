@@ -45,6 +45,20 @@ function disableControls()
     EnableControlAction(0, 2, true)   -- Mouse Up/Down
     EnableControlAction(0, 4, true)
     EnableControlAction(0, 5, true)
+    
+    -- ANIMPOSE CONTROLS - Yukarı/Aşağı hareket için gerekli
+    EnableControlAction(0, 172, true) -- Arrow Up (Yukarı)
+    EnableControlAction(0, 173, true) -- Arrow Down (Aşağı)
+    EnableControlAction(0, 174, true) -- Arrow Left (Hız azalt)
+    EnableControlAction(0, 175, true) -- Arrow Right (Hız arttır)
+    EnableControlAction(0, 32, true)  -- W (İleri)
+    EnableControlAction(0, 33, true)  -- S (Geri)
+    EnableControlAction(0, 34, true)  -- A (Sol)
+    EnableControlAction(0, 35, true)  -- D (Sağ)
+    EnableControlAction(0, 38, true)  -- E (Sola dön)
+    EnableControlAction(0, 205, true) -- → (Sağa dön)
+    EnableControlAction(0, 191, true) -- Enter (Onayla)
+    EnableControlAction(0, 73, true)  -- X (İptal)
 end
 
 RegisterNetEvent("gct-animpos:AnimPosition", function()
@@ -88,7 +102,14 @@ function animPosition()
         175
     )
 
-    FreezeEntityPosition(ped, true)
+    -- Emote'u iptal edilemez yap (animpose sırasında korunsun)
+    if exports['rpemotes'] then
+        pcall(function()
+            exports['rpemotes']:CanCancelEmote(false)
+        end)
+    end
+
+    -- FreezeEntityPosition kaldırıldı - emote animasyonunu bozmamak için
     local posChanged = false
 
     while true do
@@ -228,7 +249,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 172) then
                 local newPos = vector3(coords.x, coords.y, coords.z + moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, true, true)
+                    -- Z koordinatını değiştir ama animasyonu koru
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
                     SendNUIMessage({ type = "keyActive", key = "move_up" })
 
                     TriggerServerEvent(
@@ -243,7 +265,8 @@ function animPosition()
             if IsDisabledControlJustReleased(0, 173) then
                 local newPos = vector3(coords.x, coords.y, coords.z - moveSpeed)
                 if #(newPos - OriginalPos.coords) <= Config.AnimPose["MaxDist"] then
-                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, true, true)
+                    -- Z koordinatını değiştir ama animasyonu koru
+                    SetEntityCoordsNoOffset(ped, newPos.x, newPos.y, newPos.z, false, false, false)
                     SendNUIMessage({ type = "keyActive", key = "move_down" })
 
                     TriggerServerEvent(
@@ -265,6 +288,13 @@ function animPosition()
                     type = "hideUI"
                 })
                 ResetEntityAlpha(ped)
+                
+                -- Emote'u tekrar iptal edilebilir yap
+                if exports['rpemotes'] then
+                    pcall(function()
+                        exports['rpemotes']:CanCancelEmote(true)
+                    end)
+                end
 
                 TriggerServerEvent(
                     "gct-animpos:server:syncPed",
@@ -283,13 +313,21 @@ function animPosition()
                 )
                 SetEntityHeading(ped, OriginalPos.heading)
                 ResetEntityAlpha(ped)
+                
+                -- Emote'u tekrar iptal edilebilir yap
+                if exports['rpemotes'] then
+                    pcall(function()
+                        exports['rpemotes']:CanCancelEmote(true)
+                    end)
+                end
+                
                 TriggerServerEvent(
                     "gct-animpos:server:syncPed",
                     OriginalPos.coords,
                     OriginalPos.heading,
                     0
                 )
-                FreezeEntityPosition(ped, false)
+                -- FreezeEntityPosition kaldırıldı
                 QBCore.Functions.Notify(Config.Language["resetposition"], "error")
                 posChanged = false
                 animPos = false
@@ -314,6 +352,14 @@ function animPosition()
             )
             SetEntityHeading(ped, OriginalPos.heading)
             ResetEntityAlpha(ped)
+            
+            -- Emote'u tekrar iptal edilebilir yap
+            if exports['rpemotes'] then
+                pcall(function()
+                    exports['rpemotes']:CanCancelEmote(true)
+                end)
+            end
+            
             TriggerServerEvent(
                 "gct-animpos:server:syncPed",
                 OriginalPos.coords,
@@ -323,7 +369,7 @@ function animPosition()
             QBCore.Functions.Notify(Config.Language["resetposition"], "error")
             posChanged = false
             animPos = false
-            FreezeEntityPosition(ped, false)
+            -- FreezeEntityPosition kaldırıldı
             break
         end
         Wait(1)
@@ -332,6 +378,14 @@ function animPosition()
     if not posChanged then
         animPos = false
         ResetEntityAlpha(ped)
+        
+        -- Emote'u tekrar iptal edilebilir yap
+        if exports['rpemotes'] then
+            pcall(function()
+                exports['rpemotes']:CanCancelEmote(true)
+            end)
+        end
+        
         TriggerServerEvent(
             "gct-animpos:server:syncPed",
             OriginalPos.coords,
