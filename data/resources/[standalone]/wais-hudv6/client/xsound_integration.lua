@@ -5,7 +5,7 @@ local currentMusicUrl = nil
 local currentMusicId = nil
 local isPlaying = false
 local currentVolume = 0.5
-local currentBass = 0
+-- Bass desteği xsound'da yok, kaldırıldı
 
 -- WAIS-HUD'ın kendi müzik sistemini override et
 AddEventHandler('wais:hudv6:client:playMusic', function(url)
@@ -41,9 +41,7 @@ RegisterNUICallback('playMusic', function(data, cb)
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
         exports.xsound:Distance(currentMusicId, 30.0)
         
-        if currentBass ~= 0 then
-            exports.xsound:setBassGain(currentMusicId, currentBass / 10)
-        end
+        -- Bass kontrolü xsound'da desteklenmiyor, kaldırıldı
         
         isPlaying = true
         
@@ -117,15 +115,10 @@ RegisterNUICallback('setVolume', function(data, cb)
     cb({ success = true })
 end)
 
--- Bass ayarla (custom callback)
-RegisterNUICallback('setBass', function(data, cb)
-    currentBass = data.bass or 0
-    if currentMusicId then
-        exports.xsound:setBassGain(currentMusicId, currentBass / 10)
-        print('[WAIS-HUD xsound] Bass: ' .. currentBass)
-    end
-    cb({ success = true })
-end)
+-- Bass ayarla (xsound desteklemiyor, callback kaldırıldı)
+-- RegisterNUICallback('setBass', function(data, cb)
+--     cb({ success = true })
+-- end)
 
 -- Şarkı atlama (sonraki)
 RegisterNUICallback('nextSong', function(data, cb)
@@ -143,8 +136,7 @@ RegisterNUICallback('getMusicStatus', function(data, cb)
         success = true,
         isPlaying = isPlaying,
         currentUrl = currentMusicUrl,
-        volume = currentVolume,
-        bass = currentBass
+        volume = currentVolume
     })
 end)
 
