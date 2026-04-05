@@ -246,8 +246,6 @@ function PlayMusic(url, title)
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
         exports.xsound:Distance(currentMusicId, currentDistance)
         
-        -- Bass kontrolü xsound'da desteklenmiyor, kaldırıldı
-        
         isPlaying = true
         isPaused = false -- Yeni müzik başladı, pause durumunu sıfırla
         
@@ -266,18 +264,6 @@ function PlayMusic(url, title)
         
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
-        
-        -- Base volume'u güncelle
-        baseVolume = currentVolume
-        currentFilteredVolume = currentVolume
-        
-        -- Aktif filtreleri uygula (eğer varsa) - Smooth transition ile
-        if filterChain and next(filterChain) ~= nil then
-            CreateThread(function()
-                Wait(1500) -- Şarkı yüklenmesini bekle
-                RecalculateFilterChain()
-            end)
-        end
         
         CreateThread(function()
             while isPlaying and DoesEntityExist(vehicle) do
@@ -349,18 +335,9 @@ function VolumeRangeDialog()
         currentVolume = input[1] / 100
         currentDistance = input[2] / 10
         
-        -- Base volume'u güncelle
-        baseVolume = currentVolume
-        
         if currentMusicId then
             exports.xsound:Distance(currentMusicId, currentDistance)
-            
-            -- Filtreler varsa yeniden hesapla, yoksa direkt ayarla
-            if filterChain and next(filterChain) ~= nil then
-                RecalculateFilterChain()
-            else
-                exports.xsound:setVolume(currentMusicId, currentVolume)
-            end
+            exports.xsound:setVolume(currentMusicId, currentVolume)
         end
         
         QBCore.Functions.Notify('Ses: ' .. string.format("%.2f", currentVolume) .. ' | Mesafe: ' .. string.format("%.1f", currentDistance) .. 'm', 'success')
@@ -735,8 +712,16 @@ function FiltersMenu()
     
     local options = {
         {
-            title = 'Yeni filtre',
-            description = 'Ses çıkışını değiştir.',
+            title = 'Preset filtreler',
+            description = 'Hazır ses efektleri',
+            icon = 'star',
+            onSelect = function()
+                FilterPresetsMenu()
+            end
+        },
+        {
+            title = 'Özel filtre oluştur',
+            description = 'Manuel ayarlarla filtre ekle',
             icon = 'sliders',
             onSelect = function()
                 FilterTypeMenu()
@@ -781,6 +766,175 @@ function FiltersMenu()
     })
     
     lib.showContext('filters_menu')
+end
+
+-- Preset Filtreler Menüsü
+function FilterPresetsMenu()
+    lib.registerContext({
+        id = 'filter_presets_menu',
+        title = 'Preset Filtreler',
+        menu = 'filters_menu',
+        options = {
+            {
+                title = '🔊 Güçlü Bass Boost',
+                description = 'Subwoofer efekti - Güçlü bas sesi',
+                icon = 'volume-up',
+                onSelect = function()
+                    ApplyPreset('bass_boost')
+                end
+            },
+            {
+                title = '🎵 Parlak Tiz',
+                description = 'Kristal netlik - Parlak ses',
+                icon = 'music',
+                onSelect = function()
+                    ApplyPreset('bright')
+                end
+            },
+            {
+                title = '📻 Radyo Efekti',
+                description = 'Eski radyo sesi - Nostaljik',
+                icon = 'radio',
+                onSelect = function()
+                    ApplyPreset('radio')
+                end
+            },
+            {
+                title = '🚗 Araba Camı Kapalı',
+                description = 'Boğuk ses - Dışarıdan dinleme',
+                icon = 'car',
+                onSelect = function()
+                    ApplyPreset('muffled')
+                end
+            },
+            {
+                title = '📞 Telefon Sesi',
+                description = 'İnce, filtrelenmiş ses',
+                icon = 'phone',
+                onSelect = function()
+                    ApplyPreset('phone')
+                end
+            },
+            {
+                title = '🎧 Konser Salonu',
+                description = 'Geniş, yankılı ses',
+                icon = 'headphones',
+                onSelect = function()
+                    ApplyPreset('concert')
+                end
+            }
+        }
+    })
+    
+    lib.showContext('filter_presets_menu')
+end
+
+-- Preset Uygula
+function ApplyPreset(presetName)
+    if not currentMusicId then
+        QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
+        return
+    end
+    
+    -- Önce tüm filtreleri temizle
+    ClearAllFilters()
+    
+    Wait(100)
+    
+    if presetName == 'bass_boost' then
+        -- Güçlü Bass Boost: Lowshelf +12dB @ 200Hz
+        local filterId = 'preset_bass_' .. math.random(1000, 9999)
+        activeFilters[filterId] = {
+            type = 'lowshelf',
+            frequency = 150,
+            gain = 15,
+            detune = 0
+        }
+        ApplyFilter(filterId, activeFilters[filterId])
+        QBCore.Functions.Notify('Preset uygulandı: Güçlü Bass Boost 🔊', 'success')
+        
+    elseif presetName == 'bright' then
+        -- Parlak Tiz: Highshelf +8dB @ 8000Hz
+        local filterId = 'preset_bright_' .. math.random(1000, 9999)
+        activeFilters[filterId] = {
+            type = 'highshelf',
+            frequency = 8000,
+            gain = 10,
+            detune = 0
+        }
+        ApplyFilter(filterId, activeFilters[filterId])
+        QBCore.Functions.Notify('Preset uygulandı: Parlak Tiz 🎵', 'success')
+        
+    elseif presetName == 'radio' then
+        -- Radyo: Bandpass 1000-3000Hz
+        local filterId = 'preset_radio_' .. math.random(1000, 9999)
+        activeFilters[filterId] = {
+            type = 'bandpass',
+            frequency = 2000,
+            gain = 5,
+            detune = 3000
+        }
+        ApplyFilter(filterId, activeFilters[filterId])
+        QBCore.Functions.Notify('Preset uygulandı: Radyo Efekti 📻', 'success')
+        
+    elseif presetName == 'muffled' then
+        -- Boğuk: Lowpass 800Hz
+        local filterId = 'preset_muffled_' .. math.random(1000, 9999)
+        activeFilters[filterId] = {
+            type = 'lowpass',
+            frequency = 800,
+            gain = 0,
+            detune = 1200
+        }
+        ApplyFilter(filterId, activeFilters[filterId])
+        QBCore.Functions.Notify('Preset uygulandı: Araba Camı Kapalı 🚗', 'success')
+        
+    elseif presetName == 'phone' then
+        -- Telefon: Highpass 300Hz + Lowpass 3000Hz
+        local filterId1 = 'preset_phone_hp_' .. math.random(1000, 9999)
+        activeFilters[filterId1] = {
+            type = 'highpass',
+            frequency = 300,
+            gain = 0,
+            detune = 0
+        }
+        ApplyFilter(filterId1, activeFilters[filterId1])
+        
+        Wait(50)
+        
+        local filterId2 = 'preset_phone_lp_' .. math.random(1000, 9999)
+        activeFilters[filterId2] = {
+            type = 'lowpass',
+            frequency = 3000,
+            gain = 0,
+            detune = 0
+        }
+        ApplyFilter(filterId2, activeFilters[filterId2])
+        QBCore.Functions.Notify('Preset uygulandı: Telefon Sesi 📞', 'success')
+        
+    elseif presetName == 'concert' then
+        -- Konser: Bass boost + Tiz boost
+        local filterId1 = 'preset_concert_bass_' .. math.random(1000, 9999)
+        activeFilters[filterId1] = {
+            type = 'lowshelf',
+            frequency = 200,
+            gain = 8,
+            detune = 0
+        }
+        ApplyFilter(filterId1, activeFilters[filterId1])
+        
+        Wait(50)
+        
+        local filterId2 = 'preset_concert_treble_' .. math.random(1000, 9999)
+        activeFilters[filterId2] = {
+            type = 'highshelf',
+            frequency = 8000,
+            gain = 6,
+            detune = 0
+        }
+        ApplyFilter(filterId2, activeFilters[filterId2])
+        QBCore.Functions.Notify('Preset uygulandı: Konser Salonu 🎧', 'success')
+    end
 end
 
 -- Aktif Filtreler Menüsü
@@ -843,17 +997,17 @@ function EditFilterDialog(filterId, filter)
     local input = lib.inputDialog('Filtre Düzenle: ' .. filter.type:upper(), {
         {
             type = 'number',
-            label = 'Frequency',
-            description = '10 ile 10000 arasında Hz',
+            label = 'Frequency (Hz)',
+            description = '10 ile 22000 arasında Hz',
             min = 10,
-            max = 10000,
+            max = 22000,
             default = filter.frequency,
             required = true,
             icon = 'signal'
         },
         {
             type = 'number',
-            label = 'Gain',
+            label = 'Gain (dB)',
             description = '-40 ile 40 arasında dB',
             min = -40,
             max = 40,
@@ -863,8 +1017,8 @@ function EditFilterDialog(filterId, filter)
         },
         {
             type = 'number',
-            label = 'Detune',
-            description = '-4800 ile 4800 arasında cents',
+            label = 'Detune (cents)',
+            description = 'Q değeri (keskinlik)',
             min = -4800,
             max = 4800,
             default = filter.detune,
@@ -878,9 +1032,8 @@ function EditFilterDialog(filterId, filter)
         activeFilters[filterId].gain = input[2]
         activeFilters[filterId].detune = input[3]
         
-        -- Filtreyi uygula
+        -- Filtreyi yeniden uygula
         ApplyFilter(filterId, activeFilters[filterId])
-        QBCore.Functions.Notify('Filtre güncellendi: ' .. filter.type:upper(), 'success')
     end
 end
 
@@ -979,34 +1132,94 @@ end
 
 -- Filtre Ayarları Dialog
 function FilterSettingsDialog(filterType)
-    local input = lib.inputDialog('Filtre değerleri', {
+    -- Her filtre tipi için optimize edilmiş varsayılan değerler
+    local defaultFreq, defaultGain, defaultDetune, freqDesc, gainDesc
+    
+    if filterType == 'lowpass' then
+        defaultFreq = 800
+        defaultGain = 0
+        defaultDetune = 0
+        freqDesc = 'Kesim frekansı (düşük = daha boğuk)'
+        gainDesc = 'Resonance (0 = doğal, pozitif = vurgulu)'
+        
+    elseif filterType == 'highpass' then
+        defaultFreq = 200
+        defaultGain = 0
+        defaultDetune = 0
+        freqDesc = 'Kesim frekansı (yüksek = daha ince)'
+        gainDesc = 'Resonance (0 = doğal)'
+        
+    elseif filterType == 'bandpass' then
+        defaultFreq = 1000
+        defaultGain = 0
+        defaultDetune = 2400
+        freqDesc = 'Merkez frekans (telsiz: 1000-2000 Hz)'
+        gainDesc = 'Resonance (yüksek = daha dar bant)'
+        
+    elseif filterType == 'notch' then
+        defaultFreq = 1000
+        defaultGain = -20
+        defaultDetune = 2400
+        freqDesc = 'Kesilecek frekans (cızırtı temizleme)'
+        gainDesc = 'Kesim derinliği (negatif = daha fazla)'
+        
+    elseif filterType == 'peaking' then
+        defaultFreq = 100
+        defaultGain = 10
+        defaultDetune = 0
+        freqDesc = 'Hedef frekans (bass: 60-250 Hz, tiz: 8000+ Hz)'
+        gainDesc = 'Boost/Cut (pozitif = artır, negatif = azalt)'
+        
+    elseif filterType == 'lowshelf' then
+        defaultFreq = 200
+        defaultGain = 8
+        defaultDetune = 0
+        freqDesc = 'Geçiş frekansı (bass kontrolü)'
+        gainDesc = 'Bass boost/cut (pozitif = güçlü bass)'
+        
+    elseif filterType == 'highshelf' then
+        defaultFreq = 8000
+        defaultGain = 5
+        defaultDetune = 0
+        freqDesc = 'Geçiş frekansı (parlaklık kontrolü)'
+        gainDesc = 'Tiz boost/cut (pozitif = daha parlak)'
+        
+    elseif filterType == 'allpass' then
+        defaultFreq = 1000
+        defaultGain = 0
+        defaultDetune = 0
+        freqDesc = 'Frekans (faz kayması)'
+        gainDesc = 'Etki (genelde 0 bırakın)'
+    end
+    
+    local input = lib.inputDialog('Filtre: ' .. filterType:upper(), {
         {
             type = 'number',
-            label = 'Frequency',
-            description = '10 ile 10000 arasında Hz',
+            label = 'Frequency (Hz)',
+            description = freqDesc,
             min = 10,
-            max = 10000,
-            default = 350,
+            max = 22000,
+            default = defaultFreq,
             required = true,
             icon = 'signal'
         },
         {
             type = 'number',
-            label = 'Gain',
-            description = '-40 ile 40 arasında dB',
+            label = 'Gain (dB)',
+            description = gainDesc,
             min = -40,
             max = 40,
-            default = 0,
+            default = defaultGain,
             required = true,
             icon = 'volume-up'
         },
         {
             type = 'number',
-            label = 'Detune',
-            description = '-4800 ile 4800 arasında cents',
+            label = 'Detune (cents)',
+            description = 'Q değeri (keskinlik): 0 = yumuşak, yüksek = keskin',
             min = -4800,
             max = 4800,
-            default = 0,
+            default = defaultDetune,
             required = true,
             icon = 'music'
         }
@@ -1028,228 +1241,105 @@ function FilterSettingsDialog(filterType)
         
         -- Filtreyi uygula
         ApplyFilter(filterId, activeFilters[filterId])
-        
-        QBCore.Functions.Notify('Filtre eklendi: ' .. filterType:upper(), 'success')
     end
 end
 
 -- ============================================
--- PROFESYONEL FİLTRE SİSTEMİ v2.0
+-- PROFESYONEL FİLTRE SİSTEMİ v3.0 - GERÇEK AUDIO FİLTRELER
 -- ============================================
--- Chain mantığı: Birden fazla filtre aynı anda aktif
--- Smooth transitions: Fade in/out efektleri
--- Safe gain values: Distortion önleme
+-- xSound Web Audio API kullanarak gerçek filtre efektleri
+-- Şarkıyı bozmadan profesyonel efektler
 -- ============================================
 
-local filterChain = {} -- Aktif filtre zinciri
-local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
-local currentFilteredVolume = Config.DefaultVolume -- Filtreli ses seviyesi
-local isTransitioning = false -- Geçiş animasyonu aktif mi?
-
--- Filtre Uygulama Fonksiyonu (Chain + Smooth Transition)
+-- Filtre Uygulama Fonksiyonu (xSound API ile gerçek filtre)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
+        QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
         return
     end
     
     -- Filtreyi chain'e ekle
     filterChain[filterId] = filter
+    activeFilters[filterId] = filter
+    
+    -- xSound'a gerçek filtre uygula
+    local filterType = filter.type:lower()
+    local frequency = math.max(10, math.min(22000, filter.frequency)) -- 10Hz - 22kHz
+    local gain = math.max(-40, math.min(40, filter.gain)) -- -40dB ile +40dB
+    local Q = CalculateQValue(filterType, filter.detune) -- Q değeri (keskinlik)
     
     -- Debug log
-    print(string.format('[SWX Speaker] Filtre eklendi: %s | Gain: %d dB | Freq: %d Hz', 
-        filter.type:upper(), filter.gain, filter.frequency))
+    print(string.format('[SWX Speaker] Gerçek filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
+        filterType:upper(), frequency, gain, Q))
     
-    -- Tüm filtreleri hesapla ve uygula
-    RecalculateFilterChain()
+    -- xSound setFilter fonksiyonu (Web Audio API)
+    -- Format: exports.xsound:setFilter(soundId, filterType, frequency, Q, gain)
+    exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+    
+    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
 end
 
--- Tüm Filtre Zincirini Yeniden Hesapla
-function RecalculateFilterChain()
-    if not currentMusicId or isTransitioning then
-        return
-    end
+-- Q Değeri Hesapla (Filtre keskinliği)
+function CalculateQValue(filterType, detune)
+    -- Detune'u Q değerine çevir (-4800 ile +4800 cents -> 0.1 ile 10 Q)
+    local normalizedDetune = detune / 4800 -- -1 ile +1 arası
+    local Q = 1.0 -- Varsayılan Q değeri
     
-    -- filterChain nil kontrolü
-    if not filterChain then
-        filterChain = {}
-        return
-    end
-    
-    -- Başlangıç: Orijinal volume
-    local targetVolume = baseVolume
-    local volumeMultiplier = 1.0
-    
-    -- Tüm aktif filtreleri chain olarak uygula
-    for filterId, filter in pairs(filterChain) do
-        if filter and filter.type then
-            local filterType = filter.type:lower()
-            local gain = filter.gain or 0
-            local frequency = filter.frequency or 350
-            
-            -- Her filtre tipine göre volume çarpanı hesapla
-            local filterMultiplier = CalculateFilterMultiplier(filterType, gain, frequency)
-            volumeMultiplier = volumeMultiplier * filterMultiplier
-        end
-    end
-    
-    -- Hedef volume'u hesapla (safe limits)
-    targetVolume = baseVolume * volumeMultiplier
-    targetVolume = math.max(0.1, math.min(1.5, targetVolume)) -- 0.1 - 1.5 arası sınırla
-    
-    -- Debug log
-    print(string.format('[SWX Speaker] Filtre hesaplama: Base: %.2f | Multiplier: %.2f | Target: %.2f', 
-        baseVolume, volumeMultiplier, targetVolume))
-    
-    -- Smooth transition ile uygula
-    SmoothVolumeTransition(currentFilteredVolume, targetVolume, 500) -- 500ms geçiş
-    
-    currentFilteredVolume = targetVolume
-end
-
--- Filtre Çarpanı Hesapla (Safe Gain Values)
-function CalculateFilterMultiplier(filterType, gain, frequency)
-    -- Gain'i safe aralığa normalize et (-20 ile +20 arası)
-    local safeGain = math.max(-20, math.min(20, gain))
-    
-    if filterType == 'lowpass' then
-        -- Alçak geçiren: Yüksek frekansları azalt (boğuk ses)
-        -- Gain negatifse daha fazla kesim, pozitifse daha az kesim
-        local cutAmount = 0.3 - (safeGain / 100) -- Gain +20 ise 0.1, -20 ise 0.5
-        local freqFactor = 1.0 - (frequency / 10000) * cutAmount
-        return math.max(0.5, freqFactor)
+    if filterType == 'lowpass' or filterType == 'highpass' then
+        -- Lowpass/Highpass: Q değeri keskinliği belirler
+        Q = 0.7 + (math.abs(normalizedDetune) * 5) -- 0.7 ile 5.7 arası
         
-    elseif filterType == 'highpass' then
-        -- Yüksek geçiren: Düşük frekansları azalt (ince ses)
-        local cutAmount = 0.3 - (safeGain / 100)
-        local freqFactor = 0.7 + (frequency / 10000) * cutAmount
-        return math.max(0.6, math.min(1.0, freqFactor))
+    elseif filterType == 'bandpass' or filterType == 'notch' then
+        -- Bandpass/Notch: Yüksek Q = dar bant
+        Q = 1.0 + (math.abs(normalizedDetune) * 15) -- 1.0 ile 16.0 arası (dar bant)
         
-    elseif filterType == 'bandpass' then
-        -- Bant geçiren: Dar frekans aralığı (telsiz efekti)
-        -- Gain ile keskinlik ayarlanır
-        local narrowness = 0.7 - (math.abs(safeGain) / 100)
-        return math.max(0.5, narrowness)
-        
-    elseif filterType == 'notch' then
-        -- Bant kesici: Belirli frekansı kes
-        local cutDepth = 0.9 - (math.abs(safeGain) / 100)
-        return math.max(0.7, cutDepth)
-        
-    elseif filterType == 'peaking' then
-        -- Tepe artırma: Bass/tiz boost veya cut
-        -- Gain pozitifse boost, negatifse cut
-        if safeGain > 0 then
-            -- Boost: Volume artır (bass boost için)
-            return 1.0 + (safeGain / 40) -- +20 gain = 1.5x volume
-        else
-            -- Cut: Volume azalt
-            return 1.0 + (safeGain / 50) -- -20 gain = 0.6x volume
-        end
-        
-    elseif filterType == 'lowshelf' then
-        -- Alt raf: Tüm bassları yükselt/azalt (subwoofer)
-        -- Gain pozitifse bass boost, negatifse bass cut
-        if safeGain > 0 then
-            -- Bass boost: Volume artır
-            return 1.0 + (safeGain / 30) -- +20 gain = 1.67x volume (güçlü bass)
-        else
-            -- Bass cut: Volume azalt
-            return 1.0 + (safeGain / 40) -- -20 gain = 0.5x volume
-        end
-        
-    elseif filterType == 'highshelf' then
-        -- Üst raf: Parlaklık artır/azalt (clarity)
-        -- Gain pozitifse tiz boost, negatifse tiz cut
-        if safeGain > 0 then
-            -- Tiz boost: Volume artır
-            return 1.0 + (safeGain / 50) -- +20 gain = 1.4x volume
-        else
-            -- Tiz cut: Volume azalt
-            return 1.0 + (safeGain / 60) -- -20 gain = 0.67x volume
-        end
+    elseif filterType == 'peaking' or filterType == 'lowshelf' or filterType == 'highshelf' then
+        -- Peaking/Shelf: Q değeri etki alanını belirler
+        Q = 0.5 + (math.abs(normalizedDetune) * 3) -- 0.5 ile 3.5 arası
         
     elseif filterType == 'allpass' then
-        -- Tüm geçiren: Faz değişimi (minimal etki)
-        return 0.98
+        -- Allpass: Q değeri faz kaymasını etkiler
+        Q = 0.1 + (math.abs(normalizedDetune) * 2) -- 0.1 ile 2.1 arası
     end
     
-    return 1.0 -- Varsayılan: Değişiklik yok
+    return math.max(0.1, math.min(20, Q)) -- 0.1 ile 20 arası sınırla
 end
 
--- Smooth Volume Transition (Fade Effect)
-function SmoothVolumeTransition(fromVolume, toVolume, durationMs)
+-- Tüm Filtreleri Temizle
+function ClearAllFilters()
     if not currentMusicId then
         return
     end
     
-    isTransitioning = true
+    -- xSound'dan tüm filtreleri kaldır
+    for filterId, filter in pairs(filterChain) do
+        exports.xsound:clearFilter(currentMusicId, filter.type:lower())
+    end
     
-    local steps = 20 -- 20 adımda geçiş
-    local stepDelay = durationMs / steps
-    local volumeStep = (toVolume - fromVolume) / steps
+    filterChain = {}
+    activeFilters = {}
     
-    CreateThread(function()
-        for i = 1, steps do
-            if not currentMusicId then
-                break
-            end
-            
-            local currentStep = fromVolume + (volumeStep * i)
-            exports.xsound:setVolume(currentMusicId, currentStep)
-            
-            Wait(stepDelay)
-        end
-        
-        -- Son adımda kesin değeri ayarla
-        if currentMusicId then
-            exports.xsound:setVolume(currentMusicId, toVolume)
-        end
-        
-        isTransitioning = false
-    end)
+    QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
+    print('[SWX Speaker] Tüm filtreler kaldırıldı')
 end
 
--- Tüm Filtreleri Temizle ve Orijinal Sese Dön
-function ClearAllFilters()
+-- Filtre Kaldırma (Tek filtre)
+function RemoveFilter(filterId)
+    if not activeFilters[filterId] then
+        return
+    end
+    
+    local filterType = activeFilters[filterId].type:lower()
+    
+    -- xSound'dan filtreyi kaldır
     if currentMusicId then
-        filterChain = {}
-        SmoothVolumeTransition(currentFilteredVolume, baseVolume, 500)
-        currentFilteredVolume = baseVolume
-        activeFilters = {}
-        QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
+        exports.xsound:clearFilter(currentMusicId, filterType)
     end
-end
-
--- Filtre Kaldırma (Chain'den çıkar ve yeniden hesapla)
-function RemoveFilter(filterId)
-    if activeFilters[filterId] then
-        local filterType = activeFilters[filterId].type
-        
-        -- Chain'den kaldır
-        if filterChain then
-            filterChain[filterId] = nil
-        end
-        activeFilters[filterId] = nil
-        
-        -- Kalan filtreleri yeniden hesapla
-        RecalculateFilterChain()
-        
-        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
-    end
-end
-
--- Filtre Kaldırma (Chain'den çıkar ve yeniden hesapla)
-function RemoveFilter(filterId)
-    if activeFilters[filterId] then
-        local filterType = activeFilters[filterId].type
-        
-        -- Chain'den kaldır
-        filterChain[filterId] = nil
-        activeFilters[filterId] = nil
-        
-        -- Kalan filtreleri yeniden hesapla
-        RecalculateFilterChain()
-        
-        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
-    end
+    
+    -- Chain'den kaldır
+    filterChain[filterId] = nil
+    activeFilters[filterId] = nil
+    
+    QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
+    print('[SWX Speaker] Filtre kaldırıldı: ' .. filterType:upper())
 end

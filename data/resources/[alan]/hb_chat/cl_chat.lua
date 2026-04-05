@@ -326,7 +326,7 @@ function DrawText3D(x, y, z, text)
         SetTextScale(0.85, 0.85)
         SetTextFont(4)
         SetTextProportional(1)
-        SetTextColour(250, 229, 0, 215)
+        SetTextColour(255, 255, 255, 215) -- Beyaz renk
         SetTextEntry("STRING")
         SetTextCentre(true)
         AddTextComponentString(text)
@@ -355,23 +355,19 @@ Citizen.CreateThread(function()
         
         -- Typing yapan oyuncuları göster
         for playerId, timestamp in pairs(nearbyTypingPlayers) do
-            -- 5 saniyeden eski kayıtları temizle
-            if currentTime - timestamp > 5000 then
-                nearbyTypingPlayers[playerId] = nil
-            else
-                local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
-                if ped ~= -1 and DoesEntityExist(ped) then
-                    local coords = GetPedBoneCoords(ped, 0x796e, 0.0, 0.0, 0.0) -- Head bone
-                    local x, y, z = coords.x, coords.y, coords.z + 0.5
-                    
-                    -- Animasyonlu noktalar oluştur
-                    local dots = ""
-                    for i = 1, dotCount do
-                        dots = dots .. "."
-                    end
-                    
-                    DrawText3D(x, y, z, dots)
+            -- Chat kapatılana kadar göster (timeout kaldırıldı)
+            local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
+            if ped ~= -1 and DoesEntityExist(ped) then
+                local coords = GetPedBoneCoords(ped, 0x796e, 0.0, 0.0, 0.0) -- Head bone
+                local x, y, z = coords.x, coords.y, coords.z + 0.5
+                
+                -- Animasyonlu noktalar oluştur
+                local dots = ""
+                for i = 1, dotCount do
+                    dots = dots .. "."
                 end
+                
+                DrawText3D(x, y, z, dots)
             end
         end
     end
