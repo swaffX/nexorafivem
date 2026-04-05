@@ -5,24 +5,35 @@ window.addEventListener('message', function(event) {
     
     if (data.action === 'toggle') {
         const container = document.getElementById('container');
-        container.style.display = data.show ? 'flex' : 'none';
         
-        if (data.show && data.data) {
+        if (data.show) {
+            container.style.display = 'block';
+            setTimeout(() => {
+                container.classList.add('active');
+            }, 10);
+            
             // Ayarları yükle
-            document.getElementById('volumeSlider').value = data.data.volume * 100;
-            document.getElementById('volumeValue').textContent = Math.round(data.data.volume * 100);
-            
-            document.getElementById('bassSlider').value = data.data.bass;
-            document.getElementById('bassValue').textContent = data.data.bass;
-            
-            document.getElementById('trebleSlider').value = data.data.treble;
-            document.getElementById('trebleValue').textContent = data.data.treble;
-            
-            // Playlist'i yükle
-            if (data.data.playlist) {
-                playlist = data.data.playlist;
-                updatePlaylist();
+            if (data.data) {
+                document.getElementById('volumeSlider').value = data.data.volume * 100;
+                document.getElementById('volumeValue').textContent = Math.round(data.data.volume * 100);
+                
+                document.getElementById('bassSlider').value = data.data.bass;
+                document.getElementById('bassValue').textContent = data.data.bass;
+                
+                document.getElementById('trebleSlider').value = data.data.treble;
+                document.getElementById('trebleValue').textContent = data.data.treble;
+                
+                // Playlist'i yükle
+                if (data.data.playlist) {
+                    playlist = data.data.playlist;
+                    updatePlaylist();
+                }
             }
+        } else {
+            container.classList.remove('active');
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 400);
         }
     }
 });
@@ -148,7 +159,7 @@ function updatePlaylist() {
     recentSongs.forEach(song => {
         const item = document.createElement('div');
         item.className = 'playlist-item';
-        item.innerHTML = `<i class="fas fa-music"></i>${song.title}`;
+        item.innerHTML = `<i class="fas fa-music"></i><span>${song.title}</span>`;
         item.onclick = () => {
             document.getElementById('musicUrl').value = song.url;
         };

@@ -4,124 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Car Radio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="container">
+        <!-- Header -->
         <div class="menu-header">
-            <div class="header-title">🎵 Araç Hoparlör</div>
+            <div class="header-title">Araç Hoparlör Sistemi</div>
             <div class="header-controls">
-                <div class="header-icon" onclick="closeMenu()">
+                <div class="header-btn minimize">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="header-btn close" onclick="closeMenu()">
                     <i class="fas fa-times"></i>
                 </div>
             </div>
         </div>
 
+        <!-- Content -->
         <div id="buttons">
             <!-- URL Girişi -->
             <div class="menu-item">
-                <div class="button-icon">
-                    <i class="fas fa-link"></i>
-                </div>
-                <div class="text-content">
-                    <input type="text" id="musicUrl" placeholder="YouTube URL girin..." class="url-input" />
+                <div class="item-content">
+                    <div class="item-header">YouTube URL</div>
+                    <div class="item-desc">
+                        <input type="text" id="musicUrl" placeholder="https://youtube.com/watch?v=..." class="url-input" />
+                    </div>
                 </div>
             </div>
 
-            <div class="menu-item button" onclick="playMusic()">
-                <div class="button-icon">
-                    <i class="fas fa-play"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Müzik Çal</div>
-                    <div class="text">YouTube linkini çal</div>
+            <div class="menu-item clickable" onclick="playMusic()">
+                <div class="item-content">
+                    <div class="item-header">Müzik Çal</div>
+                    <div class="item-desc">YouTube linkini çal</div>
                 </div>
             </div>
 
             <!-- Kontroller -->
-            <div class="menu-item button" onclick="pauseMusic()">
-                <div class="button-icon">
-                    <i class="fas fa-pause"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Duraklat</div>
-                    <div class="text">Müziği duraklat</div>
+            <div class="menu-item clickable" onclick="pauseMusic()">
+                <div class="item-content">
+                    <div class="item-header">Duraklat</div>
+                    <div class="item-desc">Müziği duraklat</div>
                 </div>
             </div>
 
-            <div class="menu-item button" onclick="resumeMusic()">
-                <div class="button-icon">
-                    <i class="fas fa-play-circle"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Devam Ettir</div>
-                    <div class="text">Müziği devam ettir</div>
+            <div class="menu-item clickable" onclick="resumeMusic()">
+                <div class="item-content">
+                    <div class="item-header">Devam Ettir</div>
+                    <div class="item-desc">Müziği devam ettir</div>
                 </div>
             </div>
 
-            <div class="menu-item button" onclick="stopMusic()">
-                <div class="button-icon stop-icon">
-                    <i class="fas fa-stop"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Durdur</div>
-                    <div class="text">Müziği tamamen durdur</div>
+            <div class="menu-item clickable danger" onclick="stopMusic()">
+                <div class="item-content">
+                    <div class="item-header">Durdur</div>
+                    <div class="item-desc">Müziği tamamen durdur</div>
                 </div>
             </div>
 
             <!-- Ses Seviyesi -->
             <div class="menu-item">
-                <div class="button-icon">
-                    <i class="fas fa-volume-up"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Ses: <span id="volumeValue">50</span>%</div>
+                <div class="item-content">
+                    <div class="item-header">Ses Seviyesi: <span id="volumeValue">50</span>%</div>
                     <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)" />
                 </div>
             </div>
 
             <!-- Bass -->
             <div class="menu-item">
-                <div class="button-icon">
-                    <i class="fas fa-drum"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Bass: <span id="bassValue">0</span></div>
+                <div class="item-content">
+                    <div class="item-header">Bass: <span id="bassValue">0</span></div>
                     <input type="range" id="bassSlider" min="-10" max="10" value="0" oninput="changeBass(this.value)" />
                 </div>
             </div>
 
             <!-- Tiz -->
             <div class="menu-item">
-                <div class="button-icon">
-                    <i class="fas fa-music"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Tiz: <span id="trebleValue">0</span></div>
+                <div class="item-content">
+                    <div class="item-header">Tiz: <span id="trebleValue">0</span></div>
                     <input type="range" id="trebleSlider" min="-10" max="10" value="0" oninput="changeTreble(this.value)" />
                 </div>
             </div>
 
             <!-- Playlist Başlık -->
             <div class="menu-item title">
-                <div class="text-content">
-                    <div class="header" style="text-align: center;">Geçmiş Şarkılar</div>
+                <div class="item-content">
+                    <div class="item-header">Geçmiş Şarkılar</div>
                 </div>
             </div>
 
             <!-- Playlist -->
             <div id="playlist"></div>
 
-            <!-- Temizle Butonu -->
-            <div class="menu-item button" onclick="clearPlaylist()">
-                <div class="button-icon stop-icon">
-                    <i class="fas fa-trash"></i>
-                </div>
-                <div class="text-content">
-                    <div class="header">Playlist Temizle</div>
-                    <div class="text">Tüm geçmişi sil</div>
+            <!-- Temizle -->
+            <div class="menu-item clickable danger" onclick="clearPlaylist()">
+                <div class="item-content">
+                    <div class="item-header">Playlist Temizle</div>
+                    <div class="item-desc">Tüm geçmişi sil</div>
                 </div>
             </div>
         </div>
