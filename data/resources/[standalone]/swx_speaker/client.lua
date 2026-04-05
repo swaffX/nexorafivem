@@ -266,6 +266,7 @@ function PlayMusic(url, title)
         if isYouTube then
             -- YouTube URL'si ise server'a gönder (request ID ile)
             QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
+            print('[SWX Speaker] Sending extract request with coords:', coords.x, coords.y, coords.z)
             TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
         else
             -- Direkt ses dosyası
@@ -330,6 +331,7 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         print('[SWX Speaker] Calling xsound:PlayUrlPos...')
         print('[SWX Speaker] Music ID:', musicId)
         print('[SWX Speaker] Volume:', volume, 'Distance:', distance)
+        print('[SWX Speaker] Coords:', coords.x, coords.y, coords.z)
         
         -- Yeni müziği çal
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
