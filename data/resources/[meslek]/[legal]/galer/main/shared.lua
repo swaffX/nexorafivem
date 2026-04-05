@@ -264,7 +264,7 @@ Config.Locations = {
         marker = "VEHICLESHOP",
         blip = {
             ["active"] = true,
-            ["name"] = "Vehicle Shop",
+            ["name"] = "Galeri",
             ["colour"] = 3,
             ["id"] = 326
         },
@@ -364,7 +364,7 @@ EYES.Functions = {
             local blip = AddBlipForCoord(v.coords)
             SetBlipSprite(blip, v.blip["id"])
             SetBlipScale(blip, 0.5)
-            SetBlipAsShortRange(blip, false)
+            SetBlipAsShortRange(blip, true)
             SetBlipColour(blip, v.blip["colour"])
             BeginTextCommandSetBlipName("STRING")
             AddTextComponentString(v.blip["name"])

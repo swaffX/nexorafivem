@@ -216,7 +216,7 @@ Citizen.CreateThread(function()
         SetBlipDisplay(gblip, 4)
         SetBlipScale(gblip, 0.6)
         SetBlipColour(gblip, 0)
-        SetBlipAsShortRange(gblip, false)
+        SetBlipAsShortRange(gblip, true) -- Uzaktan görünmesin
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentString(motelData.label)
         EndTextCommandSetBlipName(gblip)
