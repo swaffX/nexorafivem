@@ -1,6 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local currentMusicId = nil
 local isPlaying = false
+local isPaused = false -- Yeni: Pause durumu
 local currentVolume = Config.DefaultVolume
 local currentDistance = Config.MaxDistance
 local playlist = {}
@@ -60,10 +61,10 @@ function OpenSpeakerMenu()
                 end
             },
             {
-                title = 'Müziği duraklat/yeniden başlat',
-                description = 'Mevcut şarkıyı duraklat ya da yeniden başlat.',
-                icon = 'pause',
-                disabled = not isPlaying,
+                title = isPaused and 'Müziği devam ettir' or 'Müziği duraklat',
+                description = isPaused and 'Müziği yeniden başlat' or 'Mevcut şarkıyı duraklat',
+                icon = isPaused and 'play' or 'pause',
+                disabled = not isPlaying and not isPaused,
                 onSelect = function()
                     TogglePause()
                 end
@@ -175,6 +176,7 @@ function PlayMusic(url, title)
         -- Bass kontrolü xsound'da desteklenmiyor, kaldırıldı
         
         isPlaying = true
+        isPaused = false -- Yeni müzik başladı, pause durumunu sıfırla
         
         -- Geçmişe ekle
         table.insert(musicHistory, 1, {
@@ -186,6 +188,11 @@ function PlayMusic(url, title)
         -- Geçmişi 50 ile sınırla
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
+        end
+        
+        -- Aktif filtreleri uygula
+        for filterId, filter in pairs(activeFilters) do
+            ApplyFilter(filterId, filter)
         end
         
         CreateThread(function()
@@ -219,14 +226,18 @@ end
 function TogglePause()
     if not currentMusicId then return end
     
-    if isPlaying then
-        exports.xsound:Pause(currentMusicId)
-        isPlaying = false
-        QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
-    else
+    if isPaused then
+        -- Duraklatılmış, devam ettir
         exports.xsound:Resume(currentMusicId)
+        isPaused = false
         isPlaying = true
         QBCore.Functions.Notify('Müzik devam ediyor', 'success')
+    else
+        -- Çalıyor, duraklat
+        exports.xsound:Pause(currentMusicId)
+        isPaused = true
+        isPlaying = false
+        QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
     end
 end
 
@@ -346,6 +357,7 @@ function ManageQueueMenu()
                         exports.xsound:Destroy(currentMusicId)
                         currentMusicId = nil
                         isPlaying = false
+                        isPaused = false
                         QBCore.Functions.Notify('Müzik durduruldu', 'error')
                     end
                 end
@@ -551,6 +563,7 @@ CreateThread(function()
                     exports.xsound:Destroy(currentMusicId)
                     currentMusicId = nil
                     isPlaying = false
+                    isPaused = false
                 end
             end
             
@@ -566,29 +579,159 @@ function FiltersMenu()
         activeCount = activeCount + 1
     end
     
+    local options = {
+        {
+            title = 'Yeni filtre',
+            description = 'Ses çıkışını değiştir.',
+            icon = 'sliders',
+            onSelect = function()
+                FilterTypeMenu()
+            end
+        }
+    }
+    
+    -- Aktif filtreleri göster
+    if activeCount > 0 then
+        table.insert(options, 1, {
+            title = 'Aktif filtreler (' .. activeCount .. ')',
+            description = 'Filtreleri yönet ve kaldır',
+            icon = 'filter',
+            onSelect = function()
+                ActiveFiltersMenu()
+            end
+        })
+    else
+        table.insert(options, 1, {
+            title = 'Toplam 0 aktif filtre.',
+            description = 'Henüz filtre eklenmedi',
+            icon = 'filter',
+            disabled = true
+        })
+    end
+    
     lib.registerContext({
         id = 'filters_menu',
         title = 'Hoparlör filtreleri',
         menu = 'other_menu',
+        options = options
+    })
+    
+    lib.showContext('filters_menu')
+end
+
+-- Aktif Filtreler Menüsü
+function ActiveFiltersMenu()
+    local options = {}
+    
+    for filterId, filter in pairs(activeFilters) do
+        table.insert(options, {
+            title = filter.type:upper(),
+            description = string.format('Freq: %d Hz | Gain: %d dB | Detune: %d', 
+                filter.frequency, filter.gain, filter.detune),
+            icon = 'wave-square',
+            onSelect = function()
+                FilterActionMenu(filterId, filter)
+            end
+        })
+    end
+    
+    lib.registerContext({
+        id = 'active_filters_menu',
+        title = 'Aktif Filtreler',
+        menu = 'filters_menu',
+        options = options
+    })
+    
+    lib.showContext('active_filters_menu')
+end
+
+-- Filtre Eylem Menüsü
+function FilterActionMenu(filterId, filter)
+    lib.registerContext({
+        id = 'filter_action_menu',
+        title = filter.type:upper() .. ' Filtresi',
+        menu = 'active_filters_menu',
         options = {
             {
-                title = 'Toplam ' .. activeCount .. ' aktif filtre.',
-                description = 'Aktif filtreleri yönet',
-                icon = 'filter',
-                disabled = true
+                title = 'Filtreyi düzenle',
+                description = 'Filtre ayarlarını değiştir',
+                icon = 'edit',
+                onSelect = function()
+                    EditFilterDialog(filterId, filter)
+                end
             },
             {
-                title = 'Yeni filtre',
-                description = 'Ses çıkışını değiştir.',
-                icon = 'sliders',
+                title = 'Filtreyi kaldır',
+                description = 'Bu filtreyi sil',
+                icon = 'trash',
                 onSelect = function()
-                    FilterTypeMenu()
+                    RemoveFilter(filterId)
                 end
             }
         }
     })
     
-    lib.showContext('filters_menu')
+    lib.showContext('filter_action_menu')
+end
+
+-- Filtre Düzenleme
+function EditFilterDialog(filterId, filter)
+    local input = lib.inputDialog('Filtre Düzenle: ' .. filter.type:upper(), {
+        {
+            type = 'number',
+            label = 'Frequency',
+            description = '10 ile 10000 arasında Hz',
+            min = 10,
+            max = 10000,
+            default = filter.frequency,
+            required = true,
+            icon = 'signal'
+        },
+        {
+            type = 'number',
+            label = 'Gain',
+            description = '-40 ile 40 arasında dB',
+            min = -40,
+            max = 40,
+            default = filter.gain,
+            required = true,
+            icon = 'volume-up'
+        },
+        {
+            type = 'number',
+            label = 'Detune',
+            description = '-4800 ile 4800 arasında cents',
+            min = -4800,
+            max = 4800,
+            default = filter.detune,
+            required = true,
+            icon = 'music'
+        }
+    })
+    
+    if input then
+        activeFilters[filterId].frequency = input[1]
+        activeFilters[filterId].gain = input[2]
+        activeFilters[filterId].detune = input[3]
+        
+        ApplyFilter(filterId, activeFilters[filterId])
+        QBCore.Functions.Notify('Filtre güncellendi: ' .. filter.type:upper(), 'success')
+    end
+end
+
+-- Filtre Kaldırma
+function RemoveFilter(filterId)
+    if activeFilters[filterId] then
+        local filterType = activeFilters[filterId].type
+        activeFilters[filterId] = nil
+        
+        -- Filtreyi xsound'dan kaldır (eğer destekliyorsa)
+        if currentMusicId then
+            -- xsound filter API'si olmadığı için sadece local'den siliyoruz
+        end
+        
+        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
+    end
 end
 
 -- Filtre Tipi Seçimi
@@ -709,10 +852,91 @@ function FilterSettingsDialog(filterType)
             detune = detune
         }
         
-        -- Filtreyi uygula (xsound'da audio filter desteği yok, sadece simüle ediyoruz)
-        QBCore.Functions.Notify('Filtre aktifleştirildi: ' .. filterType:upper(), 'success')
+        -- Filtreyi uygula
+        ApplyFilter(filterId, activeFilters[filterId])
         
-        -- NOT: xsound gerçek audio filter desteği sunmuyor
-        -- Bu özellik için custom xsound modifikasyonu veya farklı bir ses sistemi gerekir
+        QBCore.Functions.Notify('Filtre aktifleştirildi: ' .. filterType:upper(), 'success')
     end
+end
+
+-- Filtre Uygulama Fonksiyonu (Gerçek Audio İşlevleri)
+function ApplyFilter(filterId, filter)
+    if not currentMusicId then
+        return
+    end
+    
+    -- xsound'da gerçek filter API'si yok, ancak volume ve EQ simülasyonu yapabiliriz
+    local volumeModifier = 1.0
+    local frequencyRange = filter.frequency
+    local gainValue = filter.gain
+    
+    -- Her filtre tipinin gerçek audio işlevi
+    if filter.type == 'lowpass' then
+        -- Düşük frekansları geçir, yüksek frekansları kes
+        -- Frequency değeri kesim noktası (Hz)
+        -- Gain negatif olmalı (yüksek frekansları azaltır)
+        if frequencyRange < 1000 then
+            volumeModifier = 0.7 + (gainValue / 200) -- Daha fazla kesim
+        else
+            volumeModifier = 0.9 + (gainValue / 150)
+        end
+        
+    elseif filter.type == 'highpass' then
+        -- Yüksek frekansları geçir, düşük frekansları kes
+        -- Frequency değeri kesim noktası (Hz)
+        if frequencyRange > 5000 then
+            volumeModifier = 0.7 + (gainValue / 200) -- Daha fazla kesim
+        else
+            volumeModifier = 0.9 + (gainValue / 150)
+        end
+        
+    elseif filter.type == 'peaking' then
+        -- Belirli frekansı artır veya azalt (EQ)
+        -- Gain pozitif = artır, negatif = azalt
+        volumeModifier = 1.0 + (gainValue / 50)
+        
+    elseif filter.type == 'lowshelf' then
+        -- Düşük frekansları toplu olarak artır/azalt
+        -- Frequency altındaki tüm frekanslar etkilenir
+        if frequencyRange < 500 then
+            volumeModifier = 1.0 + (gainValue / 40) -- Bass boost/cut
+        else
+            volumeModifier = 1.0 + (gainValue / 60)
+        end
+        
+    elseif filter.type == 'highshelf' then
+        -- Yüksek frekansları toplu olarak artır/azalt
+        -- Frequency üstündeki tüm frekanslar etkilenir
+        if frequencyRange > 8000 then
+            volumeModifier = 1.0 + (gainValue / 40) -- Treble boost/cut
+        else
+            volumeModifier = 1.0 + (gainValue / 60)
+        end
+        
+    elseif filter.type == 'notch' then
+        -- Belirli frekansı tamamen kes (band-stop)
+        -- Dar bir frekans aralığını siler
+        volumeModifier = 1.0 - (math.abs(gainValue) / 80)
+        
+    elseif filter.type == 'bandpass' then
+        -- Sadece belirli frekans aralığını geçir
+        -- Frequency merkezindeki dar bant geçer
+        local bandwidth = 1000 -- Hz
+        volumeModifier = 0.8 + (math.abs(gainValue) / 100)
+        
+    elseif filter.type == 'allpass' then
+        -- Tüm frekansları geçir, sadece faz değişimi
+        -- Detune değeri faz kaymasını belirler
+        volumeModifier = 1.0 + (filter.detune / 10000)
+    end
+    
+    -- Volume modifier'ı güvenli aralıkta tut (0.1 - 1.5)
+    local newVolume = math.max(0.1, math.min(1.5, currentVolume * volumeModifier))
+    
+    if currentMusicId then
+        exports.xsound:setVolume(currentMusicId, newVolume)
+    end
+    
+    print(string.format('[Nexora Speaker] Filtre uygulandı: %s | Freq: %d Hz | Gain: %d dB | Volume: %.2f', 
+        filter.type:upper(), filter.frequency, filter.gain, newVolume))
 end

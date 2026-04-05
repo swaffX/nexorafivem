@@ -334,4 +334,47 @@ function DrawText3D(x, y, z, text)
     end
 end
 
+-- Animasyonlu typing göstergesi
+Citizen.CreateThread(function()
+    local dotCount = 1
+    local lastUpdate = 0
+    
+    while true do
+        Citizen.Wait(0)
+        
+        local currentTime = GetGameTimer()
+        
+        -- Her 500ms'de bir nokta sayısını değiştir
+        if currentTime - lastUpdate > 500 then
+            dotCount = dotCount + 1
+            if dotCount > 3 then
+                dotCount = 1
+            end
+            lastUpdate = currentTime
+        end
+        
+        -- Typing yapan oyuncuları göster
+        for playerId, timestamp in pairs(nearbyTypingPlayers) do
+            -- 5 saniyeden eski kayıtları temizle
+            if currentTime - timestamp > 5000 then
+                nearbyTypingPlayers[playerId] = nil
+            else
+                local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
+                if ped ~= -1 and DoesEntityExist(ped) then
+                    local coords = GetPedBoneCoords(ped, 0x796e, 0.0, 0.0, 0.0) -- Head bone
+                    local x, y, z = coords.x, coords.y, coords.z + 0.5
+                    
+                    -- Animasyonlu noktalar oluştur
+                    local dots = ""
+                    for i = 1, dotCount do
+                        dots = dots .. "."
+                    end
+                    
+                    DrawText3D(x, y, z, dots)
+                end
+            end
+        end
+    end
+end)
+
 
