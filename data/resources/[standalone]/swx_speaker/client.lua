@@ -471,8 +471,8 @@ function MusicHistoryMenu()
         
         table.insert(options, {
             title = songTitle,
-            description = '', -- Boş bırak, sadece title göster
             icon = 'music',
+            arrow = true, -- Ok işareti ekle
             onSelect = function()
                 SongActionMenu(song)
             end
