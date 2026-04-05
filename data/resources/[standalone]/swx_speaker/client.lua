@@ -236,132 +236,86 @@ end
 
 function PlayMusic(url, title)
     if isExtracting then
-        QBCore.Functions.Notify('Şarkı zaten yükleniyor, lütfen bekleyin...', 'error')
+        QBCore.Functions.Notify('İşlem devam ediyor, lütfen bekleyin...', 'error')
         return
     end
 
     print('[SWX Speaker] PlayMusic called with URL:', url:sub(1, 50) .. '...')
     
-    -- Önceki müziği tamamen durdur
-    if currentMusicId then
-        exports.xsound:Destroy(currentMusicId)
-        currentMusicId = nil
-    end
-    
-    -- State'leri sıfırla
-    isPlaying = false
-    isPaused = false
-    isExtracting = true -- Kilidi aktif et
-    
-    -- Request ID artır (stale response'ları engelle)
+    -- Request ID ve Yeni Music ID hazırla
     currentExtractRequest = currentExtractRequest + 1
     local requestId = currentExtractRequest
-    
     local newMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
+    
+    -- Önceki müziği temizle
+    if currentMusicId then
+        exports.xsound:Destroy(currentMusicId)
+    end
+    
+    currentMusicId = newMusicId -- ID'yi hemen ata
+    isPlaying = false
+    isPaused = false
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
-        
-        -- YouTube URL'si kontrolü
         local isYouTube = string.find(url, 'youtube.com') or string.find(url, 'youtu.be')
         
         if isYouTube then
-            -- YouTube URL'si ise server'a gönder (request ID ile)
+            isExtracting = true -- Sadece YouTube için kilitle
             QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
-            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, newMusicId, currentVolume, currentDistance, coords, requestId)
+            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
         else
-            isExtracting = false -- Kilidi kaldır
-            currentMusicId = newMusicId
-            -- Direkt ses dosyası
+            isExtracting = false
             exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
             exports.xsound:Distance(currentMusicId, currentDistance)
             exports.xsound:destroyOnFinish(currentMusicId, false)
             
             isPlaying = true
-            
-            -- Geçmişe ekle
-            local timestamp = GetGameTimer()
-            table.insert(musicHistory, 1, {
-                url = url,
-                proxyUrl = nil,
-                title = title or 'Bilinmeyen Şarkı',
-                timestamp = timestamp
-            })
-            
-            if #musicHistory > 50 then
-                table.remove(musicHistory, #musicHistory)
-            end
-            
             TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
-            
             QBCore.Functions.Notify('🎵 Müzik çalıyor!', 'success')
         end
     else
-        isExtracting = false -- Kilidi kaldır
+        isExtracting = false
         QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
     end
 end
 
 -- Server'dan gelen extracted audio URL'sini çal
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
-    isExtracting = false -- İstek bitti, kilidi kaldır
-    
-    print('[SWX Speaker] playExtractedAudio event received!')
-    print('[SWX Speaker] musicId:', musicId)
-    print('[SWX Speaker] requestId:', requestId, 'currentExtractRequest:', currentExtractRequest)
-    
-    -- STALE RESPONSE KONTROLÜ: Eğer bu eski bir request ise görmezden gel
+    -- STALE RESPONSE KONTROLÜ
     if requestId and requestId < currentExtractRequest then
         print('[SWX Speaker] STALE RESPONSE - ignoring')
-        return -- Bu eski bir response, yok say
+        return
+    end
+
+    isExtracting = false -- Kilidi burada kaldır
+    
+    -- Eğer bu arada müzik ID'si değiştiyse (yeni şarkı başlatıldıysa) iptal et
+    if currentMusicId ~= musicId then
+        print('[SWX Speaker] MusicId mismatch, ignoring old result')
+        return
     end
     
     -- localhost URL'sini sunucu IP'sine çevir
-    local targetIp = serverIp or '194.105.5.37' -- Fallback: Eski IP veya localhost
+    local targetIp = serverIp or '194.105.5.37'
     audioUrl = audioUrl:gsub('localhost', targetIp)
-    print('[SWX Speaker] Audio URL:', audioUrl:sub(1, 80) .. '...')
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- Önceki müziği tamamen durdur
-        if currentMusicId and currentMusicId ~= musicId then
-            print('[SWX Speaker] Destroying old musicId:', currentMusicId)
-            exports.xsound:Destroy(currentMusicId)
-        end
-        
-        -- State'leri sıfırla
-        isPlaying = false
+        isPlaying = true
         isPaused = false
         
-        print('[SWX Speaker] Calling xsound:PlayUrlPos...')
-        
-        -- Yeni müziği çal
+        print('[SWX Speaker] Calling xsound:PlayUrlPos with ID:', musicId)
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
         exports.xsound:Distance(musicId, distance)
         exports.xsound:destroyOnFinish(musicId, false)
         
-        -- State'leri güncelle
-        isPlaying = true
-        currentMusicId = musicId
-        
-        -- Geçmişe ekle (orijinal YouTube URL'si)
-        local timestamp = GetGameTimer()
-        table.insert(musicHistory, 1, {
-            url = originalUrl or audioUrl,
-            proxyUrl = audioUrl,
-            title = title or 'YouTube Şarkı',
-            timestamp = timestamp
-        })
-        
-        if #musicHistory > 50 then
-            table.remove(musicHistory, #musicHistory)
-        end
-        
+        TriggerServerEvent('swx_speaker:server:addToHistory', originalUrl or audioUrl, title or 'YouTube Şarkı')
         QBCore.Functions.Notify('🎵 ' .. (title or 'YouTube Şarkı'), 'success')
     else
         QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
