@@ -168,28 +168,26 @@ function PlayMusicDialog()
             description = 'YouTube video veya playlist URL\'si girin',
             required = true,
             icon = 'link'
-        },
-        {
-            type = 'input',
-            label = 'Şarkı Adı',
-            description = 'Şarkı adını girin (önemli!)',
-            required = true, -- Artık zorunlu
-            icon = 'music',
-            placeholder = 'Örn: Samet Yıldırm - Turkish Airlines'
         }
     })
     
     if input then
         local url = input[1]
-        local title = input[2]
         
-        -- Title boş olamaz
-        if not title or title == '' then
-            QBCore.Functions.Notify('Şarkı adı boş olamaz!', 'error')
-            return
-        end
+        -- Loading notification
+        QBCore.Functions.Notify('Şarkı bilgisi alınıyor...', 'info', 2000)
         
-        PlayMusic(url, title)
+        -- Server'dan YouTube title'ı çek
+        QBCore.Functions.TriggerCallback('swx_speaker:getYouTubeTitle', function(title)
+            if title then
+                PlayMusic(url, title)
+            else
+                -- Fallback: Video ID'den title oluştur
+                local videoId = string.match(url, '[?&]v=([^&]+)') or string.match(url, 'youtu%.be/([^?]+)')
+                local fallbackTitle = videoId and ('YouTube: ' .. videoId) or 'Bilinmeyen Şarkı'
+                PlayMusic(url, fallbackTitle)
+            end
+        end, url)
     end
 end
 
@@ -201,32 +199,34 @@ function AddToQueueDialog()
             description = 'Sıraya eklenecek şarkı URL\'si',
             required = true,
             icon = 'link'
-        },
-        {
-            type = 'input',
-            label = 'Şarkı Adı',
-            description = 'Şarkı adını girin (önemli!)',
-            required = true, -- Artık zorunlu
-            icon = 'music',
-            placeholder = 'Örn: Samet Yıldırm - Turkish Airlines'
         }
     })
     
     if input then
         local url = input[1]
-        local title = input[2]
         
-        -- Title boş olamaz
-        if not title or title == '' then
-            QBCore.Functions.Notify('Şarkı adı boş olamaz!', 'error')
-            return
-        end
+        -- Loading notification
+        QBCore.Functions.Notify('Şarkı bilgisi alınıyor...', 'info', 2000)
         
-        table.insert(playlist, {
-            url = url,
-            title = title
-        })
-        QBCore.Functions.Notify('Şarkı sıraya eklendi! (' .. #playlist .. ' şarkı)', 'success')
+        -- Server'dan YouTube title'ı çek
+        QBCore.Functions.TriggerCallback('swx_speaker:getYouTubeTitle', function(title)
+            if title then
+                table.insert(playlist, {
+                    url = url,
+                    title = title
+                })
+                QBCore.Functions.Notify('Şarkı sıraya eklendi! (' .. #playlist .. ' şarkı)', 'success')
+            else
+                -- Fallback
+                local videoId = string.match(url, '[?&]v=([^&]+)') or string.match(url, 'youtu%.be/([^?]+)')
+                local fallbackTitle = videoId and ('YouTube: ' .. videoId) or 'Bilinmeyen Şarkı'
+                table.insert(playlist, {
+                    url = url,
+                    title = fallbackTitle
+                })
+                QBCore.Functions.Notify('Şarkı sıraya eklendi!', 'success')
+            end
+        end, url)
     end
 end
 

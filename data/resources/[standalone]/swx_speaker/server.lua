@@ -3,6 +3,38 @@
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- YouTube Title Çekme (oEmbed API kullanarak)
+QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, cb, url)
+    -- Video ID'yi çıkar
+    local videoId = string.match(url, '[?&]v=([^&]+)') or string.match(url, 'youtu%.be/([^?]+)')
+    
+    if not videoId then
+        print('[SWX Speaker] Geçersiz YouTube URL: ' .. url)
+        cb(nil)
+        return
+    end
+    
+    -- YouTube oEmbed API kullan (API key gerektirmez)
+    local apiUrl = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' .. videoId .. '&format=json'
+    
+    PerformHttpRequest(apiUrl, function(statusCode, response, headers)
+        if statusCode == 200 and response then
+            local success, data = pcall(function() return json.decode(response) end)
+            
+            if success and data and data.title then
+                print('[SWX Speaker] YouTube title alındı: ' .. data.title)
+                cb(data.title)
+            else
+                print('[SWX Speaker] JSON parse hatası')
+                cb(nil)
+            end
+        else
+            print('[SWX Speaker] HTTP hatası: ' .. statusCode)
+            cb(nil)
+        end
+    end, 'GET')
+end)
+
 -- Müzik geçmişini yükle
 RegisterNetEvent('swx_speaker:server:loadHistory', function()
     local src = source
