@@ -52,17 +52,6 @@ RegisterNetEvent("gct-animpos:AnimPosition", function()
         QBCore.Functions.Notify(Config.Language["notworking"], "error")
         return
     end
-    
-    -- Emote aktifse iptal et
-    if exports['rpemotes'] then
-        local success, result = pcall(function()
-            exports['rpemotes']:EmoteCancel()
-        end)
-        if success then
-            Wait(100) -- Emote'un tamamen iptal olması için kısa bir bekleme
-        end
-    end
-    
     animPosition()
 end)
 
@@ -99,7 +88,7 @@ function animPosition()
         175
     )
 
-    FreezeEntityPosition(ped, true)
+    -- FreezeEntityPosition kaldırıldı - emote animasyonunu bozmamak için
     local posChanged = false
 
     while true do
@@ -300,7 +289,7 @@ function animPosition()
                     OriginalPos.heading,
                     0
                 )
-                FreezeEntityPosition(ped, false)
+                -- FreezeEntityPosition kaldırıldı
                 QBCore.Functions.Notify(Config.Language["resetposition"], "error")
                 posChanged = false
                 animPos = false
@@ -334,7 +323,7 @@ function animPosition()
             QBCore.Functions.Notify(Config.Language["resetposition"], "error")
             posChanged = false
             animPos = false
-            FreezeEntityPosition(ped, false)
+            -- FreezeEntityPosition kaldırıldı
             break
         end
         Wait(1)
