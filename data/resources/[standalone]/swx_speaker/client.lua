@@ -234,6 +234,21 @@ function AddToQueueDialog()
     end
 end
 
+-- Konum güncelleme thread'i (Sesin aracı takip etmesi için)
+CreateThread(function()
+    while true do
+        Wait(500)
+        if isPlaying and currentMusicId then
+            local ped = PlayerPedId()
+            local vehicle = GetVehiclePedIsIn(ped, false)
+            if vehicle ~= 0 then
+                local coords = GetEntityCoords(vehicle)
+                exports.xsound:Position(currentMusicId, coords)
+            end
+        end
+    end
+end)
+
 function PlayMusic(url, title)
     if isExtracting then
         QBCore.Functions.Notify('İşlem devam ediyor, lütfen bekleyin...', 'error')
@@ -266,6 +281,15 @@ function PlayMusic(url, title)
         if isYouTube then
             isExtracting = true -- Sadece YouTube için kilitle
             QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
+            
+            -- Zaman aşımı koruması: Eğer 15 saniye içinde cevap gelmezse kilidi kaldır
+            SetTimeout(15000, function()
+                if isExtracting and currentExtractRequest == requestId then
+                    isExtracting = false
+                    QBCore.Functions.Notify('YouTube işlemi zaman aşımına uğradı!', 'error')
+                end
+            end)
+            
             TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
         else
             isExtracting = false
