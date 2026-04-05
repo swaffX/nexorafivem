@@ -79,18 +79,19 @@ Config.Classes = {
 }
 
 -- The left part is at percentage RPM, and the right is how much fuel (divided by 10) you want to remove from the tank every second
+-- DÜZELTME: Benzin tüketimi %50 azaltıldı (daha gerçekçi)
 Config.FuelUsage = {
-	[1.0] = 1.4,
-	[0.9] = 1.2,
-	[0.8] = 1.0,
-	[0.7] = 0.9,
-	[0.6] = 0.8,
-	[0.5] = 0.7,
-	[0.4] = 0.5,
-	[0.3] = 0.4,
-	[0.2] = 0.2,
-	[0.1] = 0.1,
-	[0.0] = 0.0,
+	[1.0] = 0.7,  -- Önceden 1.4 (Tam gaz)
+	[0.9] = 0.6,  -- Önceden 1.2
+	[0.8] = 0.5,  -- Önceden 1.0
+	[0.7] = 0.45, -- Önceden 0.9
+	[0.6] = 0.4,  -- Önceden 0.8
+	[0.5] = 0.35, -- Önceden 0.7
+	[0.4] = 0.25, -- Önceden 0.5
+	[0.3] = 0.2,  -- Önceden 0.4
+	[0.2] = 0.1,  -- Önceden 0.2
+	[0.1] = 0.05, -- Önceden 0.1
+	[0.0] = 0.0,  -- Rölanti (değişmedi)
 }
 
 Config.GasStations = {

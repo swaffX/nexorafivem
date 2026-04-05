@@ -207,14 +207,15 @@ function PlayMusic(url, title)
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
-        -- Aktif filtreleri uygula (eğer varsa)
+        -- Base volume'u güncelle
+        baseVolume = currentVolume
+        currentFilteredVolume = currentVolume
+        
+        -- Aktif filtreleri uygula (eğer varsa) - Smooth transition ile
         if next(activeFilters) ~= nil then
-            -- Kısa bir gecikme sonra filtreleri uygula (şarkı yüklenmesini bekle)
             CreateThread(function()
-                Wait(1000) -- 1 saniye bekle
-                for filterId, filter in pairs(activeFilters) do
-                    ApplyFilter(filterId, filter)
-                end
+                Wait(1500) -- Şarkı yüklenmesini bekle
+                RecalculateFilterChain()
             end)
         end
         
@@ -288,9 +289,18 @@ function VolumeRangeDialog()
         currentVolume = input[1] / 100
         currentDistance = input[2] / 10
         
+        -- Base volume'u güncelle
+        baseVolume = currentVolume
+        
         if currentMusicId then
-            exports.xsound:setVolume(currentMusicId, currentVolume)
             exports.xsound:Distance(currentMusicId, currentDistance)
+            
+            -- Filtreler varsa yeniden hesapla, yoksa direkt ayarla
+            if next(filterChain) ~= nil then
+                RecalculateFilterChain()
+            else
+                exports.xsound:setVolume(currentMusicId, currentVolume)
+            end
         end
         
         QBCore.Functions.Notify('Ses: ' .. string.format("%.2f", currentVolume) .. ' | Mesafe: ' .. string.format("%.1f", currentDistance) .. 'm', 'success')
@@ -423,11 +433,28 @@ function MusicHistoryMenu()
         return
     end
     
-    local options = {}
+    -- Duplicate kontrolü: Aynı URL'den sadece 1 tane göster
+    local uniqueSongs = {}
+    local seenUrls = {}
+    
     for i, song in ipairs(musicHistory) do
+        if not seenUrls[song.url] then
+            table.insert(uniqueSongs, song)
+            seenUrls[song.url] = true
+        end
+    end
+    
+    -- Eğer tüm şarkılar duplicate ise
+    if #uniqueSongs == 0 then
+        QBCore.Functions.Notify('Müzik geçmişi boş!', 'error')
+        return
+    end
+    
+    local options = {}
+    for i, song in ipairs(uniqueSongs) do
         table.insert(options, {
-            title = song.title,
-            description = 'Tıklayarak eylem seçin',
+            title = song.title, -- Şarkı adı title'da
+            description = song.title, -- Şarkı adı description'da da (kısa versiyon)
             icon = 'music',
             onSelect = function()
                 SongActionMenu(song)
@@ -761,18 +788,13 @@ end
 function RemoveFilter(filterId)
     if activeFilters[filterId] then
         local filterType = activeFilters[filterId].type
+        
+        -- Chain'den kaldır
+        filterChain[filterId] = nil
         activeFilters[filterId] = nil
         
-        -- Tüm filtreleri yeniden uygula (kaldırılan hariç)
-        -- Önce orijinal volume'a dön
-        if currentMusicId then
-            exports.xsound:setVolume(currentMusicId, currentVolume)
-            
-            -- Kalan filtreleri tekrar uygula
-            for fId, fData in pairs(activeFilters) do
-                ApplyFilter(fId, fData)
-            end
-        end
+        -- Kalan filtreleri yeniden hesapla
+        RecalculateFilterChain()
         
         QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
     end
@@ -911,79 +933,169 @@ function FilterSettingsDialog(filterType)
     end
 end
 
--- Filtre Uygulama Fonksiyonu (xsound API kullanarak)
+-- ============================================
+-- PROFESYONEL FİLTRE SİSTEMİ v2.0
+-- ============================================
+-- Chain mantığı: Birden fazla filtre aynı anda aktif
+-- Smooth transitions: Fade in/out efektleri
+-- Safe gain values: Distortion önleme
+-- ============================================
+
+local filterChain = {} -- Aktif filtre zinciri
+local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
+local currentFilteredVolume = Config.DefaultVolume -- Filtreli ses seviyesi
+local isTransitioning = false -- Geçiş animasyonu aktif mi?
+
+-- Filtre Uygulama Fonksiyonu (Chain + Smooth Transition)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         return
     end
     
-    -- xsound'da mevcut olan gerçek fonksiyonları kullan
-    -- setFilter, setVolumeMax, setTimeStamp gibi
+    -- Filtreyi chain'e ekle
+    filterChain[filterId] = filter
     
-    local filterType = filter.type:lower()
-    local frequency = filter.frequency
-    local gain = filter.gain
+    -- Tüm filtreleri hesapla ve uygula
+    RecalculateFilterChain()
+end
+
+-- Tüm Filtre Zincirini Yeniden Hesapla
+function RecalculateFilterChain()
+    if not currentMusicId or isTransitioning then
+        return
+    end
     
-    -- Filtre tipine göre ses ayarları yap
+    -- Başlangıç: Orijinal volume
+    local targetVolume = baseVolume
+    local volumeMultiplier = 1.0
+    
+    -- Tüm aktif filtreleri chain olarak uygula
+    for filterId, filter in pairs(filterChain) do
+        local filterType = filter.type:lower()
+        local gain = filter.gain
+        local frequency = filter.frequency
+        
+        -- Her filtre tipine göre volume çarpanı hesapla
+        local filterMultiplier = CalculateFilterMultiplier(filterType, gain, frequency)
+        volumeMultiplier = volumeMultiplier * filterMultiplier
+    end
+    
+    -- Hedef volume'u hesapla (safe limits)
+    targetVolume = baseVolume * volumeMultiplier
+    targetVolume = math.max(0.1, math.min(1.5, targetVolume)) -- 0.1 - 1.5 arası sınırla
+    
+    -- Smooth transition ile uygula
+    SmoothVolumeTransition(currentFilteredVolume, targetVolume, 500) -- 500ms geçiş
+    
+    currentFilteredVolume = targetVolume
+end
+
+-- Filtre Çarpanı Hesapla (Safe Gain Values)
+function CalculateFilterMultiplier(filterType, gain, frequency)
+    -- Gain'i safe aralığa normalize et (-20 ile +20 arası)
+    local safeGain = math.max(-20, math.min(20, gain))
+    
     if filterType == 'lowpass' then
         -- Alçak geçiren: Yüksek frekansları azalt
-        -- Volume'u düşürerek bass efekti ver
-        local volumeMultiplier = 1.0 - (gain / 100) -- Gain'e göre volume ayarla
-        exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.3, volumeMultiplier))
+        -- Frequency düşükse daha fazla etki
+        local freqFactor = 1.0 - (frequency / 10000) * 0.3
+        return freqFactor * (1.0 - safeGain / 100)
         
     elseif filterType == 'highpass' then
         -- Yüksek geçiren: Düşük frekansları azalt
-        -- Volume'u hafif düşür, tiz efekti
-        local volumeMultiplier = 1.0 - (gain / 150)
-        exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.5, volumeMultiplier))
+        local freqFactor = 0.7 + (frequency / 10000) * 0.3
+        return freqFactor * (1.0 - safeGain / 150)
         
     elseif filterType == 'bandpass' then
-        -- Bant geçiren: Sadece belirli frekans aralığı
-        -- Volume'u daha fazla düşür (telsiz efekti)
-        exports.xsound:setVolume(currentMusicId, currentVolume * 0.6)
+        -- Bant geçiren: Dar frekans aralığı (telsiz efekti)
+        return 0.7 * (1.0 - math.abs(safeGain) / 200)
         
     elseif filterType == 'notch' then
         -- Bant kesici: Belirli frekansı kes
-        -- Hafif volume düşüşü
-        exports.xsound:setVolume(currentMusicId, currentVolume * 0.85)
+        return 0.9 * (1.0 - math.abs(safeGain) / 150)
         
     elseif filterType == 'peaking' then
-        -- Tepe artırma: Bass boost veya tiz boost
-        if gain > 0 then
-            -- Boost: Volume artır
-            local volumeMultiplier = 1.0 + (gain / 50)
-            exports.xsound:setVolume(currentMusicId, math.min(1.5, currentVolume * volumeMultiplier))
+        -- Tepe artırma: Bass/tiz boost
+        if safeGain > 0 then
+            -- Boost: Volume artır (subtle)
+            return 1.0 + (safeGain / 80)
         else
             -- Cut: Volume azalt
-            local volumeMultiplier = 1.0 + (gain / 50)
-            exports.xsound:setVolume(currentMusicId, currentVolume * math.max(0.3, volumeMultiplier))
+            return 1.0 + (safeGain / 60)
         end
         
     elseif filterType == 'lowshelf' then
-        -- Alt raf: Tüm bassları yükselt (subwoofer)
-        local volumeMultiplier = 1.0 + (gain / 40)
-        exports.xsound:setVolume(currentMusicId, math.min(1.5, currentVolume * volumeMultiplier))
+        -- Alt raf: Bass boost (subwoofer)
+        return 1.0 + (safeGain / 50)
         
     elseif filterType == 'highshelf' then
-        -- Üst raf: Parlaklık artışı
-        local volumeMultiplier = 1.0 + (gain / 60)
-        exports.xsound:setVolume(currentMusicId, math.min(1.3, currentVolume * volumeMultiplier))
+        -- Üst raf: Parlaklık (clarity)
+        return 1.0 + (safeGain / 70)
         
     elseif filterType == 'allpass' then
-        -- Tüm geçiren: Faz değişimi (minimal etki)
-        -- Volume'da çok az değişiklik
-        exports.xsound:setVolume(currentMusicId, currentVolume * 0.95)
+        -- Tüm geçiren: Minimal etki
+        return 0.98
     end
     
-    -- Filtrenin aktif olduğunu göster
-    QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
+    return 1.0 -- Varsayılan: Değişiklik yok
 end
 
--- Tüm filtreleri temizle ve orijinal ses seviyesine dön
+-- Smooth Volume Transition (Fade Effect)
+function SmoothVolumeTransition(fromVolume, toVolume, durationMs)
+    if not currentMusicId then
+        return
+    end
+    
+    isTransitioning = true
+    
+    local steps = 20 -- 20 adımda geçiş
+    local stepDelay = durationMs / steps
+    local volumeStep = (toVolume - fromVolume) / steps
+    
+    CreateThread(function()
+        for i = 1, steps do
+            if not currentMusicId then
+                break
+            end
+            
+            local currentStep = fromVolume + (volumeStep * i)
+            exports.xsound:setVolume(currentMusicId, currentStep)
+            
+            Wait(stepDelay)
+        end
+        
+        -- Son adımda kesin değeri ayarla
+        if currentMusicId then
+            exports.xsound:setVolume(currentMusicId, toVolume)
+        end
+        
+        isTransitioning = false
+    end)
+end
+
+-- Tüm Filtreleri Temizle ve Orijinal Sese Dön
 function ClearAllFilters()
     if currentMusicId then
-        exports.xsound:setVolume(currentMusicId, currentVolume)
+        filterChain = {}
+        SmoothVolumeTransition(currentFilteredVolume, baseVolume, 500)
+        currentFilteredVolume = baseVolume
         activeFilters = {}
         QBCore.Functions.Notify('Tüm filtreler temizlendi', 'info')
+    end
+end
+
+-- Filtre Kaldırma (Chain'den çıkar ve yeniden hesapla)
+function RemoveFilter(filterId)
+    if activeFilters[filterId] then
+        local filterType = activeFilters[filterId].type
+        
+        -- Chain'den kaldır
+        filterChain[filterId] = nil
+        activeFilters[filterId] = nil
+        
+        -- Kalan filtreleri yeniden hesapla
+        RecalculateFilterChain()
+        
+        QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
     end
 end
