@@ -1,0 +1,1 @@
+-- Server-side (gelecekte database entegrasyonu için)
