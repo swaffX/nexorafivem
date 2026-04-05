@@ -107,19 +107,39 @@ CREATE TABLE IF NOT EXISTS `speaker_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-## 🎧 Audio Filtreler
+## 🎧 Audio Filtreler (v1.2.1 - Bass Boost Desteği)
 
-### Mevcut Filtreler
+### ✅ Düzeltilmiş Filtreler
 1. **Lowpass**: Boğuk, kapalı ses
 2. **Highpass**: İnce, telefon sesi
 3. **Bandpass**: Telsiz efekti
 4. **Notch**: Cızırtı temizleme
-5. **Peaking**: Bass/tiz boost
-6. **Lowshelf**: Subwoofer efekti
+5. **Peaking**: Bass/tiz boost ⭐ **OPTİMİZE EDİLDİ**
+6. **Lowshelf**: Subwoofer efekti ⭐ **OPTİMİZE EDİLDİ**
 7. **Highshelf**: Parlaklık artışı
 8. **Allpass**: Faz değişimi
 
-**Not**: Filtreler şu an sadece UI gösterimi için. Gerçek audio filter için custom xsound fork gerekir.
+### 🎵 Bass Boost Kombinasyonları
+
+#### Güçlü Bass (Hip-Hop/EDM)
+```
+1. Lowshelf: 150 Hz, +15 dB
+2. Peaking: 80 Hz, +12 dB
+→ Arabada hissedilen güçlü bass 💥
+```
+
+#### Kaliteli Ses (Lüks Araba)
+```
+1. Lowshelf: 150 Hz, +8 dB
+2. Highshelf: 8000 Hz, +6 dB
+→ Premium ses sistemi ✨
+```
+
+### ⚠️ Önemli Notlar
+- Filtreler xsound Web Audio API ile **gerçek ses** üzerinde çalışır
+- YouTube URL'lerinde filtreler desteklenmez (iframe limitation)
+- Sadece yerel ses dosyalarında aktif
+- xsound otomatik retry mekanizması içerir
 
 ## 🐛 Sorun Giderme
 
@@ -140,6 +160,16 @@ CREATE TABLE IF NOT EXISTS `speaker_history` (
 3. K tuşu başka bir script ile çakışıyor mu?
 
 ## 📝 Changelog
+
+### v1.2.1 (2026-04-05) - Bass Boost Fix
+- ✅ **Bass boost filtreleri düzeltildi** (Lowshelf & Peaking)
+- ✅ Optimize edilmiş Q değeri hesaplama
+- ✅ Gain'e göre otomatik Q ayarlama
+- ✅ Daha doğal ve güçlü bass sesi
+- ✅ xsound Web Audio API entegrasyonu güçlendirildi
+- ✅ Filtre retry mekanizması iyileştirildi
+- ✅ Detaylı console logging eklendi
+- ✅ README güncellendi
 
 ### v1.2.0 (2026-04-05)
 - ✅ Kalıcı müzik geçmişi (database)

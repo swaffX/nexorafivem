@@ -3,8 +3,8 @@ game 'gta5'
 lua54 'yes'
 
 author 'SWX Scripts'
-description 'Araç Hoparlör Sistemi - ox_lib Context Menu'
-version '1.2.0'
+description 'Araç Hoparlör Sistemi - ox_lib Context Menu - Bass Boost Fix v1.2.1'
+version '1.2.1'
 
 shared_scripts {
     '@ox_lib/init.lua',

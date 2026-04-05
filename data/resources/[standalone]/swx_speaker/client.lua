@@ -10,6 +10,9 @@ local musicHistory = {} -- Müzik geçmişi
 local activeFilters = {} -- Aktif filtreler
 local historyLoaded = false -- Geçmiş yüklendi mi?
 
+-- Request tracking - hızlı değişimlerde stale response'ları engelle
+local currentExtractRequest = 0
+
 -- Filtre sistemi değişkenleri
 local filterChain = {} -- Aktif filtre zinciri
 local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
@@ -231,9 +234,19 @@ function AddToQueueDialog()
 end
 
 function PlayMusic(url, title)
+    -- Önceki müziği tamamen durdur
     if currentMusicId then
         exports.xsound:Destroy(currentMusicId)
+        currentMusicId = nil
     end
+    
+    -- State'leri sıfırla
+    isPlaying = false
+    isPaused = false
+    
+    -- Request ID artır (stale response'ları engelle)
+    currentExtractRequest = currentExtractRequest + 1
+    local requestId = currentExtractRequest
     
     currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
     
@@ -243,43 +256,94 @@ function PlayMusic(url, title)
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
         
-        exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
-        exports.xsound:Distance(currentMusicId, currentDistance)
+        -- YouTube URL'si kontrolü
+        local isYouTube = string.find(url, 'youtube.com') or string.find(url, 'youtu.be')
         
-        -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
-        exports.xsound:destroyOnFinish(currentMusicId, false)
+        if isYouTube then
+            -- YouTube URL'si ise server'a gönder (request ID ile)
+            QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
+            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
+        else
+            -- Direkt ses dosyası
+            exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
+            exports.xsound:Distance(currentMusicId, currentDistance)
+            exports.xsound:destroyOnFinish(currentMusicId, false)
+            
+            isPlaying = true
+            
+            -- Geçmişe ekle
+            local timestamp = GetGameTimer()
+            table.insert(musicHistory, 1, {
+                url = url,
+                proxyUrl = nil,
+                title = title or 'Bilinmeyen Şarkı',
+                timestamp = timestamp
+            })
+            
+            if #musicHistory > 50 then
+                table.remove(musicHistory, #musicHistory)
+            end
+            
+            TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
+            
+            QBCore.Functions.Notify('🎵 Müzik çalıyor!', 'success')
+        end
+    else
+        QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
+    end
+end
+
+-- Server'dan gelen extracted audio URL'sini çal
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId)
+    -- STALE RESPONSE KONTROLÜ: Eğer bu eski bir request ise görmezden gel
+    if requestId and requestId < currentExtractRequest then
+        return -- Bu eski bir response, yok say
+    end
+    
+    -- localhost URL'sini VPS IP'sine çevir
+    audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
+    
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    
+    if vehicle ~= 0 and DoesEntityExist(vehicle) then
+        -- Önceki müziği tamamen durdur
+        if currentMusicId and currentMusicId ~= musicId then
+            exports.xsound:Destroy(currentMusicId)
+        end
         
-        isPlaying = true
+        -- State'leri sıfırla
+        isPlaying = false
         isPaused = false
         
-        -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+        -- Yeni müziği çal
+        exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
+        exports.xsound:Distance(musicId, distance)
+        exports.xsound:destroyOnFinish(musicId, false)
+        
+        -- State'leri güncelle
+        isPlaying = true
+        currentMusicId = musicId
+        
+        -- Geçmişe ekle (orijinal YouTube URL'si)
         local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
-            url = url,
-            title = title or 'Bilinmeyen Şarkı',
+            url = originalUrl or audioUrl,
+            proxyUrl = audioUrl,
+            title = title or 'YouTube Şarkı',
             timestamp = timestamp
         })
         
-        -- Geçmişi 50 ile sınırla (local)
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
         end
         
-        -- Server'a kaydet (kalıcı)
-        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
-        
-        CreateThread(function()
-            while isPlaying and DoesEntityExist(vehicle) do
-                local newCoords = GetEntityCoords(vehicle)
-                exports.xsound:Position(currentMusicId, newCoords)
-                Wait(500)
-            end
-        end)
-        
-        QBCore.Functions.Notify('Müzik çalıyor!', 'success')
-        print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+        QBCore.Functions.Notify('🎵 ' .. (title or 'YouTube Şarkı'), 'success')
+    else
+        QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
     end
-end
+end)
+
 
 function PlayNextSong()
     if #playlist == 0 then
@@ -1006,18 +1070,18 @@ function FilterSettingsDialog(filterType)
         gainDesc = 'Kesim derinliği (negatif = daha fazla)'
         
     elseif filterType == 'peaking' then
-        defaultFreq = 100
-        defaultGain = 10
+        defaultFreq = 80
+        defaultGain = 12
         defaultDetune = 0
-        freqDesc = 'Hedef frekans (bass: 60-250 Hz, tiz: 8000+ Hz)'
-        gainDesc = 'Boost/Cut (pozitif = artır, negatif = azalt)'
+        freqDesc = 'Hedef frekans (bass: 60-250 Hz, tiz: 3000-8000 Hz)'
+        gainDesc = 'Boost/Cut (pozitif = güçlendir, negatif = zayıflat)'
         
     elseif filterType == 'lowshelf' then
-        defaultFreq = 200
-        defaultGain = 8
+        defaultFreq = 150
+        defaultGain = 15
         defaultDetune = 0
-        freqDesc = 'Geçiş frekansı (bass kontrolü)'
-        gainDesc = 'Bass boost/cut (pozitif = güçlü bass)'
+        freqDesc = 'Geçiş frekansı (bass kontrolü: 100-300 Hz)'
+        gainDesc = 'Bass boost/cut (pozitif = güçlü bass 💥)'
         
     elseif filterType == 'highshelf' then
         defaultFreq = 8000
@@ -1092,58 +1156,82 @@ end
 -- xSound Web Audio API ile gerçek filtreler
 -- ============================================
 
--- Filtre Uygulama Fonksiyonu
+-- Filtre Uygulama Fonksiyonu (Düzeltilmiş - Bass Boost için optimize)
 function ApplyFilter(filterId, filter)
     if not currentMusicId then
         QBCore.Functions.Notify('Önce bir şarkı çalmalısınız!', 'error')
         return
     end
     
-    -- Filtreyi chain'e ekle
+    if not isPlaying then
+        QBCore.Functions.Notify('Müzik çalınırken filtre uygulayın!', 'error')
+        return
+    end
+    
+    -- Filtreyi kaydet (sonra uygula)
+    local filterType = filter.type:lower()
     filterChain[filterId] = filter
     activeFilters[filterId] = filter
     
-    -- xSound'a gerçek filtre uygula
-    local filterType = filter.type:lower()
+    -- xSound'a gerçek filtre uygula (hata yakalama ile)
     local frequency = math.max(10, math.min(22000, filter.frequency))
     local gain = math.max(-40, math.min(40, filter.gain))
-    local Q = CalculateQValue(filterType, filter.detune)
+    local Q = CalculateQValue(filterType, filter.detune, gain)
     
-    -- Debug log
-    print(string.format('[SWX Speaker] Filtre uygulanıyor: %s | Freq: %d Hz | Gain: %d dB | Q: %.2f', 
-        filterType:upper(), frequency, gain, Q))
-    
-    -- Şarkı yüklenmesini bekle (2 saniye)
-    CreateThread(function()
-        Wait(2000)
-        
-        -- xSound setFilter export'u
-        local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
-        
-        if success then
-            QBCore.Functions.Notify('Filtre uygulandı: ' .. filterType:upper(), 'success')
-        else
-            QBCore.Functions.Notify('Filtre uygulanamadı, tekrar deneyin', 'error')
-            -- Başarısız olursa chain'den kaldır
-            filterChain[filterId] = nil
-            activeFilters[filterId] = nil
-        end
+    -- xSound setFilter export'u çağır (try-catch)
+    local success = pcall(function()
+        return exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
     end)
+    
+    if success then
+        QBCore.Functions.Notify('🎵 Filtre uygulandı: ' .. filterType:upper(), 'success')
+    else
+        QBCore.Functions.Notify('Filtre uygulanamadı! Müziğin yüklenmesini bekleyin.', 'error')
+        activeFilters[filterId] = nil
+        filterChain[filterId] = nil
+    end
 end
 
--- Q Değeri Hesapla
-function CalculateQValue(filterType, detune)
+-- Q Değeri Hesapla (Düzeltilmiş - Bass Boost için optimize)
+function CalculateQValue(filterType, detune, gain)
     local normalizedDetune = detune / 4800
     local Q = 1.0
     
-    if filterType == 'lowpass' or filterType == 'highpass' then
+    -- Bass boost için özel Q değerleri
+    if filterType == 'lowshelf' then
+        -- Lowshelf: Gain'e göre Q ayarla (düşük gain = geniş bant, yüksek gain = dar bant)
+        local gainFactor = math.abs(gain) / 20
+        Q = 0.5 + (gainFactor * 2) + (math.abs(normalizedDetune) * 2)
+        Q = math.max(0.3, math.min(5, Q))
+        
+    elseif filterType == 'peaking' then
+        -- Peaking: Bass boost için optimize edilmiş Q
+        -- Pozitif gain (boost) için daha düşük Q (daha geniş bant)
+        -- Negatif gain (cut) için daha yüksek Q (daha dar bant)
+        if gain > 0 then
+            -- Bass boost: Geniş bant, doğal ses
+            Q = 0.7 + (math.abs(normalizedDetune) * 2.5)
+        else
+            -- Bass cut: Dar bant, hedef frekans
+            Q = 1.0 + (math.abs(normalizedDetune) * 4)
+        end
+        Q = math.max(0.5, math.min(10, Q))
+        
+    elseif filterType == 'lowpass' or filterType == 'highpass' then
         Q = 0.7 + (math.abs(normalizedDetune) * 5)
+        Q = math.max(0.1, math.min(15, Q))
+        
     elseif filterType == 'bandpass' or filterType == 'notch' then
         Q = 1.0 + (math.abs(normalizedDetune) * 15)
-    elseif filterType == 'peaking' or filterType == 'lowshelf' or filterType == 'highshelf' then
+        Q = math.max(0.5, math.min(20, Q))
+        
+    elseif filterType == 'highshelf' then
         Q = 0.5 + (math.abs(normalizedDetune) * 3)
+        Q = math.max(0.3, math.min(5, Q))
+        
     elseif filterType == 'allpass' then
         Q = 0.1 + (math.abs(normalizedDetune) * 2)
+        Q = math.max(0.1, math.min(10, Q))
     end
     
     return math.max(0.1, math.min(20, Q))

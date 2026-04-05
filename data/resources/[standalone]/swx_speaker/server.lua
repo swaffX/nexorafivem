@@ -3,6 +3,10 @@
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- YouTube Audio Extract Cache (sunucu belleğinde sakla)
+local audioCache = {} -- { [videoId] = { url, title, duration, timestamp } }
+local CACHE_EXPIRY = 3600 -- 1 saat (saniye)
+
 -- YouTube Title Çekme (oEmbed API kullanarak)
 QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, cb, url)
     -- Video ID'yi çıkar
@@ -31,6 +35,59 @@ QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, 
         else
             print('[SWX Speaker] HTTP hatası: ' .. statusCode)
             cb(nil)
+        end
+    end, 'GET')
+end)
+
+-- YouTube Audio Extract (Kendi VPS extractor servisini kullan + Cache)
+RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, musicId, volume, distance, coords, requestId)
+    local src = source
+    
+    -- Video ID'yi çıkar
+    local videoId = string.match(videoUrl, '[?&]v=([^&]+)') or string.match(videoUrl, 'youtu%.be/([^?]+)')
+    
+    if not videoId then
+        TriggerClientEvent('QBCore:Notify', src, 'Geçersiz YouTube URL!', 'error')
+        return
+    end
+    
+    -- CACHE KONTROLÜ: Daha önce extract edilmiş mi?
+    local cached = audioCache[videoId]
+    if cached and (os.time() - cached.timestamp) < CACHE_EXPIRY then
+        print('[SWX Speaker Server] Cache hit: ' .. videoId)
+        
+        -- Client'a cache'den gönder
+        TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, cached.url, musicId, volume, distance, coords, cached.title, videoUrl, requestId)
+        return
+    end
+    
+    print('[SWX Speaker Server] YouTube audio extract: ' .. videoId)
+    
+    -- Kendi localhost extractor servisimiz
+    local extractorUrl = 'http://localhost:3000/extract?url=' .. videoUrl
+    
+    PerformHttpRequest(extractorUrl, function(statusCode, response, headers)
+        if statusCode == 200 and response then
+            local success, data = pcall(function() return json.decode(response) end)
+            
+            if success and data and data.success and data.url then
+                -- CACHE'E KAYDET
+                audioCache[videoId] = {
+                    url = data.url,
+                    title = data.title or 'YouTube Şarkı',
+                    duration = data.duration or 0,
+                    timestamp = os.time()
+                }
+                
+                -- Client'a gönder
+                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId)
+            else
+                TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
+            end
+        elseif statusCode == 0 then
+            TriggerClientEvent('QBCore:Notify', src, 'Extractor servisi çalışmıyor!', 'error')
+        else
+            TriggerClientEvent('QBCore:Notify', src, 'Extractor hatası!', 'error')
         end
     end, 'GET')
 end)
