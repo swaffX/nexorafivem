@@ -299,7 +299,7 @@ function PlayMusic(url, title)
 end
 
 -- Server'dan gelen extracted audio URL'sini çal
-RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId)
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
     print('[SWX Speaker] playExtractedAudio event received!')
     print('[SWX Speaker] musicId:', musicId)
     print('[SWX Speaker] requestId:', requestId, 'currentExtractRequest:', currentExtractRequest)
@@ -310,8 +310,9 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         return -- Bu eski bir response, yok say
     end
     
-    -- localhost URL'sini VPS IP'sine çevir
-    audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
+    -- localhost URL'sini sunucu IP'sine çevir
+    local targetIp = serverIp or '194.105.5.37' -- Fallback: Eski IP veya localhost
+    audioUrl = audioUrl:gsub('localhost', targetIp)
     print('[SWX Speaker] Audio URL:', audioUrl:sub(1, 80) .. '...')
     
     local ped = PlayerPedId()

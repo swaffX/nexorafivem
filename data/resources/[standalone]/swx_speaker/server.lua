@@ -3,6 +3,17 @@
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- Sunucu IP tespiti
+local serverPublicIp = "localhost"
+PerformHttpRequest('https://api.ipify.org', function(errorCode, resultData, resultHeaders)
+    if errorCode == 200 and resultData then
+        serverPublicIp = resultData
+        print('[SWX Speaker] Sunucu Public IP Tespit Edildi: ' .. serverPublicIp)
+    else
+        print('[SWX Speaker] Sunucu IP tespit edilemedi, localhost kullanılacak.')
+    end
+end)
+
 -- YouTube Audio Extract Cache (sunucu belleğinde sakla)
 local audioCache = {} -- { [videoId] = { title, duration, timestamp, extractNeeded } }
 local CACHE_EXPIRY = 3600 -- 1 saat (saniye)
@@ -83,7 +94,7 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
                 print('[SWX Speaker Server] Sending fresh URL to client with requestId:', requestId)
                 
                 -- Client'a gönder (her zaman fresh URL)
-                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId)
+                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId, serverPublicIp)
             else
                 TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
             end
