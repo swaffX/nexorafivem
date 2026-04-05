@@ -5,14 +5,24 @@ function sanitizeURL(url) {
 
 function getYoutubeUrlId(url) {
     let videoId = "";
+    
+    // Proxy URL kontrolü - eğer URL çok uzunsa veya localhost içeriyorsa YouTube değil
+    if (url.length > 500 || url.indexOf('localhost') !== -1 || url.indexOf('proxy') !== -1) {
+        return ""; // Bu bir proxy URL'si, YouTube değil
+    }
+    
     if (url.indexOf("youtube") !== -1) {
         let urlParts = url.split("?v=");
-        videoId = urlParts[1].substring(0, 11);
+        if (urlParts[1]) {
+            videoId = urlParts[1].substring(0, 11);
+        }
     }
 
     if (url.indexOf("youtu.be") !== -1) {
         let urlParts = url.replace("//", "").split("/");
-        videoId = urlParts[1].substring(0, 11);
+        if (urlParts[1]) {
+            videoId = urlParts[1].substring(0, 11);
+        }
     }
     return videoId;
 }

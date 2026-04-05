@@ -299,11 +299,25 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     print('[SWX Speaker] Extracted audio URL alındı: ' .. audioUrl)
     print('[SWX Speaker] Başlık: ' .. (title or 'Bilinmiyor'))
     
+    -- localhost URL'sini VPS IP'sine çevir
+    audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
+    
+    print('[SWX Speaker] Client URL (düzeltilmiş): ' .. audioUrl)
+    
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- Extracted audio URL'sini çal (direkt ses dosyası olduğu için filtre çalışır!)
+        -- xsound'un YouTube detection'ını bypass etmek için URL'yi kısaltalım
+        -- Proxy URL'sini kullan ama xsound'a direkt ses dosyası gibi göster
+        
+        -- Önce eski müziği temizle
+        if currentMusicId and currentMusicId ~= musicId then
+            exports.xsound:Destroy(currentMusicId)
+        end
+        
+        -- Extracted audio URL'sini çal
+        -- ÖNEMLİ: xsound:PlayUrlPos kullanıyoruz (YouTube değil, direkt URL)
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
         exports.xsound:Distance(musicId, distance)
         
@@ -312,12 +326,13 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         
         isPlaying = true
         isPaused = false
+        currentMusicId = musicId
         
         -- Geçmişe ekle
         local timestamp = GetGameTimer()
         table.insert(musicHistory, 1, {
-            url = audioUrl,  -- Audio URL'sini kaydet
-            originalUrl = nil,  -- Orijinal YouTube URL'si (opsiyonel)
+            url = audioUrl,
+            originalUrl = nil,
             title = title or 'YouTube Şarkı',
             timestamp = timestamp
         })
@@ -326,9 +341,6 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         if #musicHistory > 50 then
             table.remove(musicHistory, #musicHistory)
         end
-        
-        -- Server'a kaydet
-        TriggerServerEvent('swx_speaker:server:addToHistory', audioUrl, title or 'YouTube Şarkı')
         
         -- Aracın konumu değişirse güncelle
         CreateThread(function()
