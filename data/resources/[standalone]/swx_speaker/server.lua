@@ -4,8 +4,10 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 -- YouTube Audio Extract Cache (sunucu belleğinde sakla)
-local audioCache = {} -- { [videoId] = { url, title, duration, timestamp } }
+local audioCache = {} -- { [videoId] = { title, duration, timestamp, extractNeeded } }
 local CACHE_EXPIRY = 3600 -- 1 saat (saniye)
+-- NOT: Google Video URL'leri expire oluyor, bu yüzden sadece metadata cache'liyoruz
+-- Her playback'te yeni URL extract edilecek
 
 -- YouTube Title Çekme (oEmbed API kullanarak)
 QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, cb, url)
@@ -51,18 +53,17 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
         return
     end
     
-    -- CACHE KONTROLÜ: Daha önce extract edilmiş mi?
+    -- CACHE KONTROLÜ: Metadata cache var mı? (title, duration)
     local cached = audioCache[videoId]
-    if cached and (os.time() - cached.timestamp) < CACHE_EXPIRY then
-        print('[SWX Speaker Server] Cache hit: ' .. videoId)
-        print('[SWX Speaker Server] Sending to client with requestId:', requestId)
-        
-        -- Client'a cache'den gönder
-        TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, cached.url, musicId, volume, distance, coords, cached.title, videoUrl, requestId)
-        return
+    local useCache = cached and (os.time() - cached.timestamp) < CACHE_EXPIRY
+    
+    if useCache then
+        print('[SWX Speaker Server] Metadata cache hit: ' .. videoId)
+        print('[SWX Speaker Server] Title:', cached.title)
+        -- URL her zaman fresh extract edilir (expire olmaması için)
     end
     
-    print('[SWX Speaker Server] YouTube audio extract: ' .. videoId)
+    print('[SWX Speaker Server] Extracting fresh audio URL: ' .. videoId)
     
     -- Kendi localhost extractor servisimiz
     local extractorUrl = 'http://localhost:3000/extract?url=' .. videoUrl
@@ -72,17 +73,16 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
             local success, data = pcall(function() return json.decode(response) end)
             
             if success and data and data.success and data.url then
-                -- CACHE'E KAYDET
+                -- CACHE'E METADATA KAYDET (sadece title, duration - URL expire oluyor)
                 audioCache[videoId] = {
-                    url = data.url,
                     title = data.title or 'YouTube Şarkı',
                     duration = data.duration or 0,
                     timestamp = os.time()
                 }
                 
-                print('[SWX Speaker Server] Sending to client with requestId:', requestId)
+                print('[SWX Speaker Server] Sending fresh URL to client with requestId:', requestId)
                 
-                -- Client'a gönder
+                -- Client'a gönder (her zaman fresh URL)
                 TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId)
             else
                 TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
