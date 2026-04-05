@@ -49,60 +49,79 @@ RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, mu
     
     print('[SWX Speaker Server] YouTube audio extract başlatılıyor: ' .. videoId)
     
-    -- Piped API kullanarak ses dosyası URL'si al (ücretsiz, rate-limited değil)
-    local pipedApiUrl = 'https://pipedapi.kavin.rocks/streams/' .. videoId
+    -- Alternatif Piped API'leri (biri çalışmazsa diğerini dene)
+    local pipedInstances = {
+        'https://pipedapi.r4fo.com/streams/',
+        'https://pipedapi.adminforge.de/streams/',
+        'https://pipedapi.in.projectsegfau.lt/streams/',
+        'https://api.piped.yt/streams/'
+    }
     
-    PerformHttpRequest(pipedApiUrl, function(statusCode, response, headers)
-        if statusCode == 200 and response then
-            local success, data = pcall(function() return json.decode(response) end)
-            
-            if success and data and data.audioStreams and #data.audioStreams > 0 then
-                -- En yüksek kaliteli ses formatını bul (M4A veya WebM)
-                local bestAudio = nil
-                local bestBitrate = 0
+    local function tryNextAPI(index)
+        if index > #pipedInstances then
+            print('[SWX Speaker Server] HATA: Tüm Piped API\'leri başarısız oldu!')
+            TriggerClientEvent('QBCore:Notify', src, 'YouTube API\'leri şu an erişilemez. Lütfen tekrar deneyin!', 'error')
+            return
+        end
+        
+        local pipedApiUrl = pipedInstances[index] .. videoId
+        print('[SWX Speaker Server] Deniyor: ' .. pipedInstances[index])
+        
+        PerformHttpRequest(pipedApiUrl, function(statusCode, response, headers)
+            if statusCode == 200 and response then
+                local success, data = pcall(function() return json.decode(response) end)
                 
-                for _, stream in ipairs(data.audioStreams) do
-                    -- M4A formatı tercih et (daha uyumlu)
-                    if stream.mimeType and (string.find(stream.mimeType, 'audio/mp4') or string.find(stream.mimeType, 'audio/m4a')) then
-                        if stream.bitrate and stream.bitrate > bestBitrate then
-                            bestAudio = stream
-                            bestBitrate = stream.bitrate
-                        end
-                    end
-                end
-                
-                -- M4A bulunamadıysa WebM kullan
-                if not bestAudio then
+                if success and data and data.audioStreams and #data.audioStreams > 0 then
+                    -- En yüksek kaliteli ses formatını bul (M4A veya WebM)
+                    local bestAudio = nil
+                    local bestBitrate = 0
+                    
                     for _, stream in ipairs(data.audioStreams) do
-                        if stream.mimeType and string.find(stream.mimeType, 'audio/webm') then
+                        -- M4A formatı tercih et (daha uyumlu)
+                        if stream.mimeType and (string.find(stream.mimeType, 'audio/mp4') or string.find(stream.mimeType, 'audio/m4a')) then
                             if stream.bitrate and stream.bitrate > bestBitrate then
                                 bestAudio = stream
                                 bestBitrate = stream.bitrate
                             end
                         end
                     end
-                end
-                
-                if bestAudio and bestAudio.url then
-                    local audioUrl = bestAudio.url
-                    print('[SWX Speaker Server] Audio URL bulundu: ' .. audioUrl)
-                    print('[SWX Speaker Server] Format: ' .. (bestAudio.mimeType or 'unknown') .. ' | Bitrate: ' .. (bestAudio.bitrate or 'unknown'))
                     
-                    -- Client'a audio URL'sini gönder
-                    TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, audioUrl, musicId, volume, distance, coords, data.title)
+                    -- M4A bulunamadıysa WebM kullan
+                    if not bestAudio then
+                        for _, stream in ipairs(data.audioStreams) do
+                            if stream.mimeType and string.find(stream.mimeType, 'audio/webm') then
+                                if stream.bitrate and stream.bitrate > bestBitrate then
+                                    bestAudio = stream
+                                    bestBitrate = stream.bitrate
+                                end
+                            end
+                        end
+                    end
+                    
+                    if bestAudio and bestAudio.url then
+                        local audioUrl = bestAudio.url
+                        print('[SWX Speaker Server] Audio URL bulundu: ' .. audioUrl)
+                        print('[SWX Speaker Server] Format: ' .. (bestAudio.mimeType or 'unknown') .. ' | Bitrate: ' .. (bestAudio.bitrate or 'unknown'))
+                        
+                        -- Client'a audio URL'sini gönder
+                        TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, audioUrl, musicId, volume, distance, coords, data.title)
+                    else
+                        print('[SWX Speaker Server] HATA: Audio stream bulunamadı!')
+                        TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
+                    end
                 else
-                    print('[SWX Speaker Server] HATA: Audio stream bulunamadı!')
-                    TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
+                    print('[SWX Speaker Server] HATA: Audio streams array boş!')
+                    TriggerClientEvent('QBCore:Notify', src, 'YouTube format desteklenmiyor!', 'error')
                 end
             else
-                print('[SWX Speaker Server] HATA: Audio streams array boş!')
-                TriggerClientEvent('QBCore:Notify', src, 'YouTube format desteklenmiyor!', 'error')
+                print('[SWX Speaker Server] HTTP hatası: ' .. statusCode .. ' - Bir sonraki API deneniyor...')
+                tryNextAPI(index + 1)
             end
-        else
-            print('[SWX Speaker Server] HTTP hatası: ' .. statusCode)
-            TriggerClientEvent('QBCore:Notify', src, 'YouTube API hatası! (' .. statusCode .. ')', 'error')
-        end
-    end, 'GET')
+        end, 'GET')
+    end
+    
+    -- İlk API'yi dene
+    tryNextAPI(1)
 end)
 
 -- Müzik geçmişini yükle
