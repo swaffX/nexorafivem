@@ -320,6 +320,8 @@ end
 
 -- GARANTİLİ BAŞLATMA - Smooth fade-in, no kickback
 function StartAudio(musicId, url, volume, coords, distance, title)
+    print('[SWX Speaker] StartAudio çağrıldı:', musicId, url:sub(1, 50))
+    
     -- URL kontrolü
     if not url or url == '' then
         QBCore.Functions.Notify('Geçersiz ses URL\'si', 'error')
@@ -329,7 +331,7 @@ function StartAudio(musicId, url, volume, coords, distance, title)
     
     -- Yeni sesi başlat
     local success, err = pcall(function()
-        exports.xsound:PlayUrlPos(musicId, url, 0.01, coords, false) -- Sessiz başlat
+        exports.xsound:PlayUrlPos(musicId, url, 0.01, coords, false)
         exports.xsound:Distance(musicId, distance)
         exports.xsound:destroyOnFinish(musicId, false)
     end)
@@ -341,6 +343,20 @@ function StartAudio(musicId, url, volume, coords, distance, title)
         return
     end
     
+    -- Sesin varlığını kontrol et
+    SetTimeout(200, function()
+        local exists = exports.xsound:soundExists(musicId)
+        print('[SWX Speaker] Ses var mı:', exists)
+        if not exists then
+            print('[SWX Speaker] SES BAŞLATILAMADI - URL:', url:sub(1, 50))
+            QBCore.Functions.Notify('❌ Ses başlatılamadı! URL\'yi kontrol edin.', 'error')
+            isPlaying = false
+            return
+        end
+        
+        print('[SWX Speaker] Ses başarıyla başlatıldı, fade-in başlıyor')
+    end)
+    
     isPlaying = true
     isPaused = false
     isExtracting = false
@@ -351,12 +367,12 @@ function StartAudio(musicId, url, volume, coords, distance, title)
     }
     
     -- Smooth fade-in (500ms)
-    SetTimeout(100, function()
+    SetTimeout(300, function()
         if exports.xsound:soundExists(musicId) then
             for i = 1, 10 do
                 SetTimeout(i * 50, function()
                     if exports.xsound:soundExists(musicId) then
-                        local targetVol = math.min(volume, 2.0) -- Max 2.0 (200%)
+                        local targetVol = math.min(volume, 2.0)
                         exports.xsound:setVolume(musicId, 0.01 + (targetVol - 0.01) * (i / 10))
                     end
                 end)
@@ -364,13 +380,14 @@ function StartAudio(musicId, url, volume, coords, distance, title)
         end
     end)
     
-    -- Başarı bildirimi
     if title then
         QBCore.Functions.Notify('▶️ ' .. title, 'success')
     end
 end
 
 RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
+    print('[SWX Speaker Client] EVENT GELDİ! requestId:', requestId)
+    
     -- Eski request'leri ignore et
     if requestId and requestId < currentExtractRequest then
         print('[SWX Speaker] Eski request ignore edildi:', requestId)
@@ -389,10 +406,11 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     audioUrl = audioUrl:gsub('localhost', targetIp)
     audioUrl = audioUrl:gsub('127%.0%.0%.1', targetIp)
     
+    print('[SWX Speaker] Audio URL:', audioUrl:sub(1, 60))
+    
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
-    -- Araç kontrolü - farklı araçta mıyız?
     if vehicle == 0 then
         QBCore.Functions.Notify('Araçtan indiniz, ses iptal edildi', 'error')
         return
@@ -400,10 +418,10 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     
     local currentMusicId = GetVehicleMusicId(vehicle)
     if currentMusicId ~= musicId then
-        -- Araç değişmiş, yeni araçta çal
         musicId = currentMusicId
     end
     
+    print('[SWX Speaker] Müzik başlatılıyor:', musicId)
     StartAudio(musicId, audioUrl, volume, coords, distance, title or 'YouTube Şarkı')
     TriggerServerEvent('swx_speaker:server:addToHistory', originalUrl or audioUrl, title or 'YouTube Şarkı')
 end)
@@ -642,15 +660,18 @@ function PlayNextSong()
     end
 end
 
--- Otomatik sonraki şarkıya geç
+-- Otomatik sonraki şarkıya geç - isFinished olmadığı için zaman bazlı kontrol
 CreateThread(function()
     while true do
-        Wait(1000)
+        Wait(2000) -- 2 saniyede bir kontrol et
         for musicId, soundData in pairs(activeSounds) do
             if exports.xsound:soundExists(musicId) then
-                local isFinished = exports.xsound:isFinished(musicId)
-                if isFinished then
-                    print('[SWX Speaker] Şarkı bitti:', soundData.title)
+                -- Ses hala var mı kontrol et (zaman bazlı)
+                local elapsed = GetGameTimer() - soundData.startTime
+                -- Eğer ses 30 saniyeden uzun süredir çalıyorsa ve bitmişse
+                -- (xsound isFinished yok, bu yüzden sadece varlık kontrolü)
+                if elapsed > 30000 and not exports.xsound:isPlaying(musicId) then
+                    print('[SWX Speaker] Şarkı bitti (tahmini):', soundData.title)
                     activeSounds[musicId] = nil
                     isPlaying = false
                     if #playlist > 0 then
@@ -661,6 +682,7 @@ CreateThread(function()
                 end
             else
                 activeSounds[musicId] = nil
+                isPlaying = false
             end
         end
     end
