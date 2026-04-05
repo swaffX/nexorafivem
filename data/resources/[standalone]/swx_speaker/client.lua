@@ -10,6 +10,9 @@ local musicHistory = {} -- Müzik geçmişi
 local activeFilters = {} -- Aktif filtreler
 local historyLoaded = false -- Geçmiş yüklendi mi?
 
+-- Request tracking - hızlı değişimlerde stale response'ları engelle
+local currentExtractRequest = 0
+
 -- Filtre sistemi değişkenleri
 local filterChain = {} -- Aktif filtre zinciri
 local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
@@ -231,15 +234,21 @@ function AddToQueueDialog()
 end
 
 function PlayMusic(url, title)
-    -- ÖNEMLİ: Önce eski müziği tamamen temizle
+    -- Önceki müziği tamamen durdur
     if currentMusicId then
-        print('[SWX Speaker] Eski müzik temizleniyor: ' .. currentMusicId)
         exports.xsound:Destroy(currentMusicId)
-        Wait(100) -- xsound'un temizlenmesi için kısa bekleme
+        currentMusicId = nil
     end
     
+    -- State'leri sıfırla
+    isPlaying = false
+    isPaused = false
+    
+    -- Request ID artır (stale response'ları engelle)
+    currentExtractRequest = currentExtractRequest + 1
+    local requestId = currentExtractRequest
+    
     currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
-    print('[SWX Speaker] Yeni müzik ID: ' .. currentMusicId)
     
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
@@ -251,45 +260,33 @@ function PlayMusic(url, title)
         local isYouTube = string.find(url, 'youtube.com') or string.find(url, 'youtu.be')
         
         if isYouTube then
-            -- YouTube URL'si ise server'a gönder, audio extract yapsın
-            QBCore.Functions.Notify('YouTube sesi işleniyor... (birkaç saniye)', 'info', 3000)
-            print('[SWX Speaker] YouTube URL tespit edildi, audio extract yapılıyor...')
-            
-            -- Server'a YouTube URL'sini gönder
-            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords)
+            -- YouTube URL'si ise server'a gönder (request ID ile)
+            QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
+            TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
         else
-            -- Direkt ses dosyası ise normal çal
+            -- Direkt ses dosyası
             exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
             exports.xsound:Distance(currentMusicId, currentDistance)
-            
-            -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
             exports.xsound:destroyOnFinish(currentMusicId, false)
             
             isPlaying = true
-            isPaused = false
             
-            -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+            -- Geçmişe ekle
             local timestamp = GetGameTimer()
             table.insert(musicHistory, 1, {
                 url = url,
-                proxyUrl = nil,  -- Direkt dosya olduğu için proxy yok
+                proxyUrl = nil,
                 title = title or 'Bilinmeyen Şarkı',
                 timestamp = timestamp
             })
             
-            -- Geçmişi 50 ile sınırla (local)
             if #musicHistory > 50 then
                 table.remove(musicHistory, #musicHistory)
             end
             
-            -- Server'a kaydet (kalıcı)
             TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
             
-            -- NOT: xsound PlayUrlPos ile otomatik position tracking yapıyor
-            -- Gereksiz Position thread'ine gerek yok!
-            
-            QBCore.Functions.Notify('Müzik çalıyor!', 'success')
-            print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+            QBCore.Functions.Notify('🎵 Müzik çalıyor!', 'success')
         end
     else
         QBCore.Functions.Notify('Aracın içinde olmalısın!', 'error')
@@ -297,7 +294,12 @@ function PlayMusic(url, title)
 end
 
 -- Server'dan gelen extracted audio URL'sini çal
-RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl)
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId)
+    -- STALE RESPONSE KONTROLÜ: Eğer bu eski bir request ise görmezden gel
+    if requestId and requestId < currentExtractRequest then
+        return -- Bu eski bir response, yok say
+    end
+    
     -- localhost URL'sini VPS IP'sine çevir
     audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
     
@@ -305,8 +307,8 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
     local vehicle = GetVehiclePedIsIn(ped, false)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        -- Önceki müziği hızlıca temizle
-        if currentMusicId then
+        -- Önceki müziği tamamen durdur
+        if currentMusicId and currentMusicId ~= musicId then
             exports.xsound:Destroy(currentMusicId)
         end
         
@@ -1161,68 +1163,32 @@ function ApplyFilter(filterId, filter)
         return
     end
     
-    -- YouTube URL kontrolü - filtreler YouTube'da çalışmaz
-    -- Not: Şu anda current URL'yi track etmiyoruz, kullanıcıya bilgi verelim
-    local filterType = filter.type:lower()
-    if string.find(filterType, 'shelf') or filterType == 'peaking' then
-        print('[SWX Speaker] ⚠️  BASS BOOST NOTE: Filters work best with direct audio URLs, not YouTube')
-        print('[SWX Speaker] ℹ️  YouTube iframe players cannot be processed by Web Audio API')
+    if not isPlaying then
+        QBCore.Functions.Notify('Müzik çalınırken filtre uygulayın!', 'error')
+        return
     end
     
-    -- Filtreyi chain'e ekle
+    -- Filtreyi kaydet (sonra uygula)
+    local filterType = filter.type:lower()
     filterChain[filterId] = filter
     activeFilters[filterId] = filter
     
-    -- xSound'a gerçek filtre uygula
+    -- xSound'a gerçek filtre uygula (hata yakalama ile)
     local frequency = math.max(10, math.min(22000, filter.frequency))
     local gain = math.max(-40, math.min(40, filter.gain))
     local Q = CalculateQValue(filterType, filter.detune, gain)
     
-    -- Debug log - detaylı bilgi
-    print(string.format('[SWX Speaker] 🎵 Applying filter: %s', filterType:upper()))
-    print(string.format('[SWX Speaker]   ├─ Frequency: %d Hz', frequency))
-    print(string.format('[SWX Speaker]   ├─ Gain: %d dB', gain))
-    print(string.format('[SWX Speaker]   ├─ Q: %.2f', Q))
-    print(string.format('[SWX Speaker]   └─ Music ID: %s', currentMusicId))
-    
-    -- Bass boost için özel uyarılar
-    if filterType == 'lowshelf' and gain > 15 then
-        print('[SWX Speaker] ⚠️  HIGH BASS BOOST: Gain > 15dB may cause distortion')
-        print('[SWX Speaker] 💡 Recommendation: Use +10 to +15 dB for clean bass')
-    elseif filterType == 'peaking' and frequency < 60 then
-        print('[SWX Speaker] ⚠️  VERY LOW FREQUENCY: < 60Hz may not be audible on all speakers')
-    end
-    
-    -- xSound setFilter export'u çağır
-    local success = exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+    -- xSound setFilter export'u çağır (try-catch)
+    local success = pcall(function()
+        return exports.xsound:setFilter(currentMusicId, filterType, frequency, Q, gain)
+    end)
     
     if success then
-        -- Kullanıcıya bildirim
-        local effectText = ''
-        if gain > 0 then
-            effectText = string.format('+%d dB boost', gain)
-        else
-            effectText = string.format('%d dB cut', gain)
-        end
-        
-        QBCore.Functions.Notify(
-            string.format('Filtre uygulandı: %s (%s)', filterType:upper(), effectText), 
-            'success'
-        )
-        print(string.format('[SWX Speaker] ✅ Filter applied successfully: %s', filterType:upper()))
+        QBCore.Functions.Notify('🎵 Filtre uygulandı: ' .. filterType:upper(), 'success')
     else
-        -- Filtre uygulanamadıysa kullanıcıya bilgi ver
-        QBCore.Functions.Notify(
-            'Filtre uygulanamadı. Müziğin yüklenmesini bekleyip tekrar deneyin.', 
-            'error',
-            5000
-        )
-        print(string.format('[SWX Speaker] ❌ Filter application failed: %s', filterType:upper()))
-        print('[SWX Speaker] 💡 Tip: Wait 2-3 seconds after music starts, then apply filter again')
-        
-        -- Başarısız olursa chain'den kaldır
-        filterChain[filterId] = nil
+        QBCore.Functions.Notify('Filtre uygulanamadı! Müziğin yüklenmesini bekleyin.', 'error')
         activeFilters[filterId] = nil
+        filterChain[filterId] = nil
     end
 end
 
