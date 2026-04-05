@@ -465,14 +465,24 @@ function MusicHistoryMenu()
     local options = {}
     for i, song in ipairs(uniqueSongs) do
         local songTitle = song.title or 'Bilinmeyen Şarkı'
+        
+        -- Debug: Her şarkıyı logla
+        print('[SWX Speaker Debug] Menüye ekleniyor: ' .. songTitle)
+        
         table.insert(options, {
-            title = songTitle, -- Şarkı adı title'da
-            description = songTitle, -- Şarkı adı description'da da
+            title = songTitle,
+            description = '', -- Boş bırak, sadece title göster
             icon = 'music',
             onSelect = function()
                 SongActionMenu(song)
             end
         })
+    end
+    
+    -- Eğer hiç option yoksa
+    if #options == 0 then
+        QBCore.Functions.Notify('Şarkı listesi oluşturulamadı!', 'error')
+        return
     end
     
     lib.registerContext({
@@ -968,6 +978,10 @@ function ApplyFilter(filterId, filter)
     -- Filtreyi chain'e ekle
     filterChain[filterId] = filter
     
+    -- Debug log
+    print(string.format('[SWX Speaker] Filtre eklendi: %s | Gain: %d dB | Freq: %d Hz', 
+        filter.type:upper(), filter.gain, filter.frequency))
+    
     -- Tüm filtreleri hesapla ve uygula
     RecalculateFilterChain()
 end
@@ -1005,6 +1019,10 @@ function RecalculateFilterChain()
     targetVolume = baseVolume * volumeMultiplier
     targetVolume = math.max(0.1, math.min(1.5, targetVolume)) -- 0.1 - 1.5 arası sınırla
     
+    -- Debug log
+    print(string.format('[SWX Speaker] Filtre hesaplama: Base: %.2f | Multiplier: %.2f | Target: %.2f', 
+        baseVolume, volumeMultiplier, targetVolume))
+    
     -- Smooth transition ile uygula
     SmoothVolumeTransition(currentFilteredVolume, targetVolume, 500) -- 500ms geçiş
     
@@ -1017,44 +1035,64 @@ function CalculateFilterMultiplier(filterType, gain, frequency)
     local safeGain = math.max(-20, math.min(20, gain))
     
     if filterType == 'lowpass' then
-        -- Alçak geçiren: Yüksek frekansları azalt
-        -- Frequency düşükse daha fazla etki
-        local freqFactor = 1.0 - (frequency / 10000) * 0.3
-        return freqFactor * (1.0 - safeGain / 100)
+        -- Alçak geçiren: Yüksek frekansları azalt (boğuk ses)
+        -- Gain negatifse daha fazla kesim, pozitifse daha az kesim
+        local cutAmount = 0.3 - (safeGain / 100) -- Gain +20 ise 0.1, -20 ise 0.5
+        local freqFactor = 1.0 - (frequency / 10000) * cutAmount
+        return math.max(0.5, freqFactor)
         
     elseif filterType == 'highpass' then
-        -- Yüksek geçiren: Düşük frekansları azalt
-        local freqFactor = 0.7 + (frequency / 10000) * 0.3
-        return freqFactor * (1.0 - safeGain / 150)
+        -- Yüksek geçiren: Düşük frekansları azalt (ince ses)
+        local cutAmount = 0.3 - (safeGain / 100)
+        local freqFactor = 0.7 + (frequency / 10000) * cutAmount
+        return math.max(0.6, math.min(1.0, freqFactor))
         
     elseif filterType == 'bandpass' then
         -- Bant geçiren: Dar frekans aralığı (telsiz efekti)
-        return 0.7 * (1.0 - math.abs(safeGain) / 200)
+        -- Gain ile keskinlik ayarlanır
+        local narrowness = 0.7 - (math.abs(safeGain) / 100)
+        return math.max(0.5, narrowness)
         
     elseif filterType == 'notch' then
         -- Bant kesici: Belirli frekansı kes
-        return 0.9 * (1.0 - math.abs(safeGain) / 150)
+        local cutDepth = 0.9 - (math.abs(safeGain) / 100)
+        return math.max(0.7, cutDepth)
         
     elseif filterType == 'peaking' then
-        -- Tepe artırma: Bass/tiz boost
+        -- Tepe artırma: Bass/tiz boost veya cut
+        -- Gain pozitifse boost, negatifse cut
         if safeGain > 0 then
-            -- Boost: Volume artır (subtle)
-            return 1.0 + (safeGain / 80)
+            -- Boost: Volume artır (bass boost için)
+            return 1.0 + (safeGain / 40) -- +20 gain = 1.5x volume
         else
             -- Cut: Volume azalt
-            return 1.0 + (safeGain / 60)
+            return 1.0 + (safeGain / 50) -- -20 gain = 0.6x volume
         end
         
     elseif filterType == 'lowshelf' then
-        -- Alt raf: Bass boost (subwoofer)
-        return 1.0 + (safeGain / 50)
+        -- Alt raf: Tüm bassları yükselt/azalt (subwoofer)
+        -- Gain pozitifse bass boost, negatifse bass cut
+        if safeGain > 0 then
+            -- Bass boost: Volume artır
+            return 1.0 + (safeGain / 30) -- +20 gain = 1.67x volume (güçlü bass)
+        else
+            -- Bass cut: Volume azalt
+            return 1.0 + (safeGain / 40) -- -20 gain = 0.5x volume
+        end
         
     elseif filterType == 'highshelf' then
-        -- Üst raf: Parlaklık (clarity)
-        return 1.0 + (safeGain / 70)
+        -- Üst raf: Parlaklık artır/azalt (clarity)
+        -- Gain pozitifse tiz boost, negatifse tiz cut
+        if safeGain > 0 then
+            -- Tiz boost: Volume artır
+            return 1.0 + (safeGain / 50) -- +20 gain = 1.4x volume
+        else
+            -- Tiz cut: Volume azalt
+            return 1.0 + (safeGain / 60) -- -20 gain = 0.67x volume
+        end
         
     elseif filterType == 'allpass' then
-        -- Tüm geçiren: Minimal etki
+        -- Tüm geçiren: Faz değişimi (minimal etki)
         return 0.98
     end
     
