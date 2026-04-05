@@ -266,6 +266,7 @@ function PlayMusic(url, title)
         if isYouTube then
             -- YouTube URL'si ise server'a gönder (request ID ile)
             QBCore.Functions.Notify('YouTube sesi işleniyor...', 'info', 2000)
+            print('[SWX Speaker] Sending extract request with coords:', coords.x, coords.y, coords.z)
             TriggerServerEvent('swx_speaker:server:extractYouTubeAudio', url, currentMusicId, currentVolume, currentDistance, coords, requestId)
         else
             -- Direkt ses dosyası
@@ -298,7 +299,7 @@ function PlayMusic(url, title)
 end
 
 -- Server'dan gelen extracted audio URL'sini çal
-RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId)
+RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, musicId, volume, distance, coords, title, originalUrl, requestId, serverIp)
     print('[SWX Speaker] playExtractedAudio event received!')
     print('[SWX Speaker] musicId:', musicId)
     print('[SWX Speaker] requestId:', requestId, 'currentExtractRequest:', currentExtractRequest)
@@ -309,8 +310,9 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         return -- Bu eski bir response, yok say
     end
     
-    -- localhost URL'sini VPS IP'sine çevir
-    audioUrl = audioUrl:gsub('localhost', '194.105.5.37')
+    -- localhost URL'sini sunucu IP'sine çevir
+    local targetIp = serverIp or '194.105.5.37' -- Fallback: Eski IP veya localhost
+    audioUrl = audioUrl:gsub('localhost', targetIp)
     print('[SWX Speaker] Audio URL:', audioUrl:sub(1, 80) .. '...')
     
     local ped = PlayerPedId()
@@ -330,6 +332,7 @@ RegisterNetEvent('swx_speaker:client:playExtractedAudio', function(audioUrl, mus
         print('[SWX Speaker] Calling xsound:PlayUrlPos...')
         print('[SWX Speaker] Music ID:', musicId)
         print('[SWX Speaker] Volume:', volume, 'Distance:', distance)
+        print('[SWX Speaker] Coords:', coords.x, coords.y, coords.z)
         
         -- Yeni müziği çal
         exports.xsound:PlayUrlPos(musicId, audioUrl, volume, coords, false)
@@ -1203,6 +1206,14 @@ function ApplyFilter(filterId, filter)
     end)
     
     if success then
+        -- Filtre uygulandıktan sonra müziği resume et (xsound bug workaround)
+        Citizen.CreateThread(function()
+            Wait(100) -- Kısa bekleme
+            if currentMusicId and isPlaying then
+                exports.xsound:Resume(currentMusicId)
+            end
+        end)
+        
         QBCore.Functions.Notify('🎵 Filtre uygulandı: ' .. filterType:upper(), 'success')
     else
         QBCore.Functions.Notify('Filtre uygulanamadı! Müziğin yüklenmesini bekleyin.', 'error')
