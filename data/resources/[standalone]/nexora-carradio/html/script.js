@@ -53,13 +53,18 @@ function playMusic() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url, title: extractTitle(url) })
-    }).then(resp => resp.json()).then(data => {
+    }).then(resp => {
+        if (resp.ok) {
+            return resp.json();
+        }
+        return { success: false };
+    }).then(data => {
         if (data.success) {
             playlist.push({ url: url, title: extractTitle(url) });
             updatePlaylist();
             document.getElementById('musicUrl').value = '';
         }
-    });
+    }).catch(err => console.log('Error:', err));
 }
 
 function stopMusic() {
@@ -67,7 +72,7 @@ function stopMusic() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-    });
+    }).catch(err => console.log('Error:', err));
 }
 
 function pauseMusic() {
@@ -75,7 +80,7 @@ function pauseMusic() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-    });
+    }).catch(err => console.log('Error:', err));
 }
 
 function resumeMusic() {
@@ -83,7 +88,7 @@ function resumeMusic() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-    });
+    }).catch(err => console.log('Error:', err));
 }
 
 function changeVolume(value) {
@@ -131,7 +136,7 @@ function updatePlaylist() {
     const playlistDiv = document.getElementById('playlist');
     
     if (playlist.length === 0) {
-        playlistDiv.innerHTML = '<p class="empty-playlist">Henüz şarkı çalmadınız</p>';
+        playlistDiv.innerHTML = '<div class="empty-playlist">Henüz şarkı çalmadınız</div>';
         return;
     }
     
@@ -143,7 +148,7 @@ function updatePlaylist() {
     recentSongs.forEach(song => {
         const item = document.createElement('div');
         item.className = 'playlist-item';
-        item.textContent = song.title;
+        item.innerHTML = `<i class="fas fa-music"></i>${song.title}`;
         item.onclick = () => {
             document.getElementById('musicUrl').value = song.url;
         };
