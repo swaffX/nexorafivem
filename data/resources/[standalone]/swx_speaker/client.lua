@@ -588,6 +588,187 @@ function MusicHistoryMenu()
     lib.showContext('history_menu')
 end
 
+-- SES FİLTRELERİ MENÜSÜ
+function FiltersMenu()
+    local musicId = GetVehicleMusicId(GetVehiclePedIsIn(PlayerPedId(), false))
+    if not musicId or not exports.xsound:soundExists(musicId) then
+        QBCore.Functions.Notify('Aktif müzik bulunamadı!', 'error')
+        return
+    end
+    
+    lib.registerContext({
+        id = 'filters_menu',
+        title = '🎚️ Ses Filtreleri',
+        menu = 'speaker_menu',
+        options = {
+            {
+                title = '🔊 Bass Boost +15dB',
+                description = 'Düşük frekansları güçlendirir (hip-hop, trap için ideal)',
+                icon = 'wave-square',
+                iconColor = 'red',
+                onSelect = function()
+                    ApplyFilter(musicId, 'bass', 15)
+                    QBCore.Functions.Notify('🔊 Bass Boost +15dB uygulandı', 'success')
+                end
+            },
+            {
+                title = '🔊 Bass Boost +25dB',
+                description = 'Maksimum bass (ağır bass müzikler için)',
+                icon = 'wave-square',
+                iconColor = 'darkred',
+                onSelect = function()
+                    ApplyFilter(musicId, 'bass', 25)
+                    QBCore.Functions.Notify('🔊 Bass Boost +25dB uygulandı', 'success')
+                end
+            },
+            {
+                title = '🎼 Lowpass Filter',
+                description = 'Yüksek frekansları kes, sadece bas kalır',
+                icon = 'filter',
+                iconColor = 'blue',
+                onSelect = function()
+                    ApplyFilter(musicId, 'lowpass', 0)
+                    QBCore.Functions.Notify('🎼 Lowpass uygulandı', 'success')
+                end
+            },
+            {
+                title = '📢 Bandpass Filter',
+                description = 'Sadece orta frekansları bırakır (telefon/radyo efekti)',
+                icon = 'broadcast-tower',
+                iconColor = 'purple',
+                onSelect = function()
+                    ApplyFilter(musicId, 'bandpass', 0)
+                    QBCore.Functions.Notify('📢 Bandpass uygulandı', 'success')
+                end
+            },
+            {
+                title = '🎸 Treble Boost',
+                description = 'Yüksek frekansları güçlendirir (vokal, gitar için)',
+                icon = 'guitar',
+                iconColor = 'yellow',
+                onSelect = function()
+                    ApplyFilter(musicId, 'treble', 10)
+                    QBCore.Functions.Notify('🎸 Treble Boost uygulandı', 'success')
+                end
+            },
+            {
+                title = '⚡ Özel EQ',
+                description = 'Kendi EQ ayarlarını yap',
+                icon = 'sliders-h',
+                iconColor = 'pink',
+                onSelect = function() CustomEQDialog(musicId) end
+            },
+            {
+                title = '──────────────',
+                disabled = true
+            },
+            {
+                title = '🔄 Filtreleri Sıfırla',
+                description = 'Tüm efektleri kaldır, orijinal sese dön',
+                icon = 'undo',
+                iconColor = 'grey',
+                onSelect = function()
+                    ApplyFilter(musicId, 'reset', 0)
+                    QBCore.Functions.Notify('🔄 Filtreler sıfırlandı', 'info')
+                end
+            }
+        }
+    })
+    lib.showContext('filters_menu')
+end
+
+function ApplyFilter(musicId, filterType, value)
+    if not exports.xsound:soundExists(musicId) then return end
+    
+    local success = pcall(function()
+        if filterType == 'reset' then
+            exports.xsound:setFilter(musicId, false)
+        elseif filterType == 'bass' then
+            exports.xsound:setFilter(musicId, {
+                type = 'highshelf',
+                frequency = 100,
+                gain = value,
+                Q = 1.0
+            })
+        elseif filterType == 'lowpass' then
+            exports.xsound:setFilter(musicId, {
+                type = 'lowpass',
+                frequency = 400,
+                Q = 1.0
+            })
+        elseif filterType == 'bandpass' then
+            exports.xsound:setFilter(musicId, {
+                type = 'bandpass',
+                frequency = 1000,
+                Q = 1.5
+            })
+        elseif filterType == 'treble' then
+            exports.xsound:setFilter(musicId, {
+                type = 'highshelf',
+                frequency = 8000,
+                gain = value,
+                Q = 1.0
+            })
+        end
+    end)
+    
+    if not success then
+        print('[SWX Speaker] Filtre uygulanamadı - xsound setFilter desteği olmayabilir')
+        QBCore.Functions.Notify('⚠️ Filtre desteği bulunamadı', 'error')
+    end
+end
+
+function CustomEQDialog(musicId)
+    if not exports.xsound:soundExists(musicId) then
+        QBCore.Functions.Notify('Aktif müzik bulunamadı!', 'error')
+        return
+    end
+    
+    local input = lib.inputDialog('⚡ Özel EQ Ayarları', {
+        {
+            type = 'slider',
+            label = 'Low (Bass) Gain',
+            description = '100 = Normal, 50 = Azalt, 150 = Artır',
+            default = 100,
+            min = 0,
+            max = 200
+        },
+        {
+            type = 'slider',
+            label = 'Mid Gain',
+            description = '100 = Normal, 50 = Azalt, 150 = Artır',
+            default = 100,
+            min = 0,
+            max = 200
+        },
+        {
+            type = 'slider',
+            label = 'High (Treble) Gain',
+            description = '100 = Normal, 50 = Azalt, 150 = Artır',
+            default = 100,
+            min = 0,
+            max = 200
+        }
+    })
+    
+    if input then
+        local lowGain = (input[1] - 100) / 2
+        local midGain = (input[2] - 100) / 2
+        local highGain = (input[3] - 100) / 2
+        
+        pcall(function()
+            exports.xsound:setFilter(musicId, {
+                type = 'peaking',
+                frequency = 100,
+                gain = lowGain,
+                Q = 1.0
+            })
+        end)
+        
+        QBCore.Functions.Notify(string.format('⚡ EQ: Low %d%%, Mid %d%%, High %d%%', input[1], input[2], input[3]), 'success')
+    end
+end
+
 -- SES AYARLARI - Düzeltilmiş: 0.01 - 2.0 (1% - 200%)
 function VolumeRangeDialog()
     local currentVolPercent = math.floor(currentVolume * 100)
