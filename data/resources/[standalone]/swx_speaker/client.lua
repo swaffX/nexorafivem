@@ -802,13 +802,16 @@ function ApplyFilter(musicId, filterType, value)
     end
     
     if filterData ~= nil then
+        -- Filtre verisini JSON string'e çevir (Lua table → JS object geçişi için)
+        local filterJson = json.encode(filterData)
+        print('[SWX Speaker] Filtre JSON:', filterJson)
+        
         local success, err = pcall(function()
-            exports.xsound:setFilter(musicId, filterData)
+            exports.xsound:setFilter(musicId, filterJson)
         end)
         
         if not success then
             print('[SWX Speaker] XSound setFilter hatası:', err)
-            print('[SWX Speaker] Filtre verisi:', json.encode(filterData))
             QBCore.Functions.Notify('⚠️ Filtre uygulanamadı! XSound versiyonunu kontrol edin.', 'error')
         else
             print('[SWX Speaker] Filtre başarıyla uygulandı:', filterType)
