@@ -91,55 +91,99 @@ end, false)
 
 RegisterKeyMapping('speaker', 'Hoparlör Etkileşimi', 'keyboard', Config.OpenKey)
 
--- ANA MENÜ - Geliştirilmiş UI
+-- ANA MENÜ - Hoparlör Ayarları
 function OpenSpeakerMenu()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     local musicId = GetVehicleMusicId(vehicle)
-    
-    -- Durum bilgisi
-    local statusText = '🔇 Müzik Yok'
-    local statusIcon = 'music'
-    local statusColor = 'grey'
-    
-    if isExtracting then
-        statusText = '⏳ YouTube İşleniyor...'
-        statusIcon = 'spinner'
-        statusColor = 'yellow'
-    elseif isPlaying and not isPaused then
-        statusText = '▶️ Çalıyor'
-        statusIcon = 'play-circle'
-        statusColor = 'green'
-    elseif isPaused then
-        statusText = '⏸️ Duraklatıldı'
-        statusIcon = 'pause-circle'
-        statusColor = 'orange'
-    end
-    
-    -- Ses ve mesafe bilgisi
-    local volPercent = math.floor(currentVolume * 100)
-    local distText = tostring(math.floor(currentDistance)) .. 'm'
-    
+
     lib.registerContext({
         id = 'speaker_menu',
-        title = ' Nexora Premium Speaker 3.0 ',
+        title = 'Hoparlör ayarları',
+        menu = 'speaker_menu',
         options = {
             {
-                title = 'Durum: ' .. statusText,
-                icon = statusIcon,
-                iconColor = statusColor,
+                title = 'Sırayı yönet',
+                description = 'Çalma listesini yönet',
+                icon = 'list',
+                arrow = true,
+                onSelect = function() PlaylistMenu() end
+            },
+            {
+                title = 'Müzik geçmişi',
+                description = 'Daha önce çalınan şarkıları gör',
+                icon = 'history',
+                arrow = true,
+                onSelect = function() MusicHistoryMenu() end
+            },
+            {
+                title = 'Filtreler',
+                description = 'Filtreleri çıkışa uygula',
+                icon = 'sliders',
+                arrow = true,
+                disabled = not isPlaying,
+                onSelect = function() FiltersMenu() end
+            },
+            {
+                title = 'Bağlan',
+                description = 'Bağlantı ayarları',
+                icon = 'link',
+                arrow = true
+            },
+            {
+                title = 'Herkese açık durum',
+                description = 'Herkese açık durum ayarları',
+                icon = 'users',
+                arrow = true
+            },
+            {
+                title = 'Kalıcı durum',
+                description = 'Kalıcı durum ayarları',
+                icon = 'bookmark',
+                arrow = true
+            },
+            {
+                title = 'Hoparlörü yeniden adlandır',
+                description = 'Hoparlör adını değiştir',
+                icon = 'edit',
+                arrow = true
+            },
+            {
+                title = '──────────────',
                 disabled = true
             },
             {
-                title = '▶️ Yeni Müzik Çal',
-                description = isExtracting and '⏳ YouTube sesi işleniyor, lütfen bekleyin...' or 'YouTube URL veya direkt MP3 linki girin',
+                title = 'Diğer',
+                description = 'Diğer ayarlar',
+                icon = 'ellipsis-h',
+                arrow = true,
+                onSelect = function() OtherSettingsMenu() end
+            }
+        }
+    })
+    lib.showContext('speaker_menu')
+end
+
+-- DİĞER AYARLAR MENÜSÜ
+function OtherSettingsMenu()
+    local volPercent = math.floor(currentVolume * 100)
+    local distText = tostring(math.floor(currentDistance)) .. 'm'
+
+    lib.registerContext({
+        id = 'other_settings_menu',
+        title = 'Diğer ayarlar',
+        menu = 'speaker_menu',
+        options = {
+            {
+                title = '🎵 Yeni müzik çal',
+                description = isExtracting and '⏳ YouTube sesi işleniyor...' or 'YouTube URL veya direkt MP3 linki girin',
                 icon = 'play',
                 iconColor = 'green',
                 disabled = isExtracting,
                 onSelect = function() PlayMusicDialog() end
             },
             {
-                title = '📋 Sıraya Ekle (Playlist)',
+                title = '📋 Sıraya ekle',
                 description = 'Sonraki şarkıyı listeye ekle',
                 icon = 'list',
                 iconColor = 'blue',
@@ -147,53 +191,38 @@ function OpenSpeakerMenu()
                 onSelect = function() AddToQueueDialog() end
             },
             {
-                title = '🎵 Playlist Yönetimi (' .. #playlist .. ' şarkı)',
-                description = #playlist > 0 and 'Sıradaki şarkıları görüntüle ve yönet' or 'Playlist boş',
-                icon = 'bars',
-                iconColor = 'purple',
-                disabled = #playlist == 0,
-                onSelect = function() PlaylistMenu() end
-            },
-            {
-                title = isPaused and '▶️ Devam Ettir' or '⏸️ Duraklat',
-                description = isPaused and 'Müziği kaldığı yerden devam ettir' or 'Müziği geçici olarak duraklat',
+                title = isPaused and '▶️ Devam et' or '⏸️ Duraklat',
+                description = isPaused and 'Müziği devam ettir' or 'Müziği duraklat',
                 icon = isPaused and 'play' or 'pause',
                 iconColor = isPaused and 'green' or 'orange',
                 disabled = not isPlaying and not isPaused,
                 onSelect = function() TogglePause() end
             },
             {
-                title = '🔊 Ses & Mesafe Ayarları',
+                title = '⏹️ Müziği durdur',
+                description = 'Müziği tamamen durdur',
+                icon = 'stop',
+                iconColor = 'red',
+                disabled = not isPlaying,
+                onSelect = function()
+                    local musicId = GetVehicleMusicId(GetVehiclePedIsIn(PlayerPedId(), false))
+                    StopAndClearMusic(musicId)
+                end
+            },
+            {
+                title = '──────────────',
+                disabled = true
+            },
+            {
+                title = '🔊 Ses seviyesi ve aralık',
                 description = string.format('Ses: %d%% | Mesafe: %s', volPercent, distText),
                 icon = 'volume-up',
                 iconColor = 'cyan',
                 onSelect = function() VolumeRangeDialog() end
-            },
-            {
-                title = '🎚️ Gelişmiş Ses Filtreleri',
-                description = 'Bass Boost, EQ ve efekt ayarları',
-                icon = 'sliders',
-                iconColor = 'pink',
-                disabled = not isPlaying,
-                onSelect = function() FiltersMenu() end
-            },
-            {
-                title = '⏹️ Müziği Durdur & Temizle',
-                description = 'Müziği tamamen durdur ve kaynakları temizle',
-                icon = 'stop-circle',
-                iconColor = 'red',
-                onSelect = function() StopAndClearMusic(musicId) end
-            },
-            {
-                title = '📜 Müzik Geçmişi (' .. #musicHistory .. ' kayıt)',
-                description = 'Daha önce çalınan şarkıları gör',
-                icon = 'history',
-                iconColor = 'brown',
-                onSelect = function() MusicHistoryMenu() end
             }
         }
     })
-    lib.showContext('speaker_menu')
+    lib.showContext('other_settings_menu')
 end
 
 -- Müziği durdur ve temizle
@@ -530,11 +559,11 @@ function PlaylistMenu()
         })
     end
     
-    lib.registerContext({ 
-        id = 'playlist_menu', 
-        title = '📋 Playlist Yönetimi (' .. #playlist .. ' şarkı)', 
-        menu = 'speaker_menu', 
-        options = options 
+    lib.registerContext({
+        id = 'playlist_menu',
+        title = 'Sırayı yönet',
+        menu = 'speaker_menu',
+        options = options
     })
     lib.showContext('playlist_menu')
 end
@@ -579,26 +608,26 @@ function MusicHistoryMenu()
         end
     end
     
-    lib.registerContext({ 
-        id = 'history_menu', 
-        title = '📜 Müzik Geçmişi (' .. #musicHistory .. ' kayıt)', 
-        menu = 'speaker_menu', 
-        options = options 
+    lib.registerContext({
+        id = 'history_menu',
+        title = 'Müzik geçmişi',
+        menu = 'speaker_menu',
+        options = options
     })
     lib.showContext('history_menu')
 end
 
--- SES FİLTRELERİ MENÜSÜ - Eski Haline Döndürülmüş (lowshelf, highshelf, subwoofer)
+-- SES FİLTRELERİ MENÜSÜ
 function FiltersMenu()
     local musicId = GetVehicleMusicId(GetVehiclePedIsIn(PlayerPedId(), false))
     if not musicId or not exports.xsound:soundExists(musicId) then
         QBCore.Functions.Notify('Aktif müzik bulunamadı!', 'error')
         return
     end
-    
+
     lib.registerContext({
         id = 'filters_menu',
-        title = '🎚️ Ses Filtreleri',
+        title = 'Filtreler',
         menu = 'speaker_menu',
         options = {
             {
@@ -706,8 +735,19 @@ function FiltersMenu()
                 disabled = true
             },
             {
-                title = '🔄 Filtreleri Sıfırla',
-                description = 'Tüm efektleri kaldır, orijinal sese dön',
+                title = '➕ Yeni filtre',
+                description = 'Özel filtre oluştur',
+                icon = 'plus',
+                iconColor = 'green',
+                onSelect = function() CustomFilterDialog(musicId) end
+            },
+            {
+                title = '──────────────',
+                disabled = true
+            },
+            {
+                title = '🔄 Filtreleri sıfırla',
+                description = 'Tüm efektleri kaldır',
                 icon = 'undo',
                 iconColor = 'grey',
                 onSelect = function()
@@ -718,6 +758,60 @@ function FiltersMenu()
         }
     })
     lib.showContext('filters_menu')
+end
+
+-- ÖZEL FİLTRE DIALOG - Frequency, Gain, Detune
+function CustomFilterDialog(musicId)
+    if not exports.xsound:soundExists(musicId) then
+        QBCore.Functions.Notify('Aktif müzik bulunamadı!', 'error')
+        return
+    end
+
+    local input = lib.inputDialog('Filtre değerleri', {
+        {
+            type = 'slider',
+            label = 'Frequency',
+            description = '10 ile 10000 arasında Hz',
+            default = 350,
+            min = 10,
+            max = 10000
+        },
+        {
+            type = 'slider',
+            label = 'Gain',
+            description = '-40 ile 40 arasında dB',
+            default = 0,
+            min = -40,
+            max = 40
+        },
+        {
+            type = 'slider',
+            label = 'Detune',
+            description = '-4800 ile 4800 arasında cents',
+            default = 0,
+            min = -4800,
+            max = 4800
+        }
+    })
+
+    if input then
+        local frequency = input[1]
+        local gain = input[2]
+        local detune = input[3]
+
+        print('[SWX Speaker] Özel filtre uygulanıyor:', frequency, gain, detune)
+
+        local success, err = pcall(function()
+            exports.xsound:setFilter(musicId, 'peaking', frequency, 1.0, gain)
+        end)
+
+        if not success then
+            print('[SWX Speaker] XSound setFilter hatası:', err)
+            QBCore.Functions.Notify('⚠️ Filtre uygulanamadı!', 'error')
+        else
+            QBCore.Functions.Notify(string.format('✅ Filtre uygulandı: %dHz, %ddB, %d cents', frequency, gain, detune), 'success')
+        end
+    end
 end
 
 function ApplyFilter(musicId, filterType, value)
@@ -801,13 +895,17 @@ function ApplyFilter(musicId, filterType, value)
         }
     end
     
+    if filterType == 'reset' then
+        exports.xsound:clearAllFilters(musicId)
+        print('[SWX Speaker] Filtreler sıfırlandı')
+        return
+    end
+    
     if filterData ~= nil then
-        -- Filtre verisini JSON string'e çevir (Lua table → JS object geçişi için)
-        local filterJson = json.encode(filterData)
-        print('[SWX Speaker] Filtre JSON:', filterJson)
+        print('[SWX Speaker] Filtre uygulanıyor:', filterType, 'type:', filterData.type, 'freq:', filterData.frequency, 'gain:', filterData.gain, 'Q:', filterData.Q)
         
         local success, err = pcall(function()
-            exports.xsound:setFilter(musicId, filterJson)
+            exports.xsound:setFilter(musicId, filterData.type, filterData.frequency, filterData.Q, filterData.gain or 0)
         end)
         
         if not success then
