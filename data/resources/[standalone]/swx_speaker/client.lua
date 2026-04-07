@@ -663,73 +663,73 @@ function FiltersMenu()
         options = {
             {
                 title = '🔊 Subwoofer Modu',
-                description = 'Maximum bass - sadece düşük frekanslar (20-80Hz)',
+                description = 'Maximum bass - sadece düşük frekanslar',
                 icon = 'speaker',
                 iconColor = 'darkred',
-                onSelect = function() FilterConfirmMenu(musicId, 'subwoofer', 'Subwoofer Modu', 'Maximum bass - sadece düşük frekanslar (20-80Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'lowshelf', 'Subwoofer Modu', 'Maximum bass - sadece düşük frekanslar') end
             },
             {
                 title = '🎵 Lowshelf Bass Boost',
-                description = 'Düşük frekansları artır (+20dB @ 100Hz)',
+                description = 'Düşük frekansları artır',
                 icon = 'arrow-up',
                 iconColor = 'red',
-                onSelect = function() FilterConfirmMenu(musicId, 'lowshelf_boost', 'Lowshelf Bass Boost', 'Düşük frekansları artır (+20dB @ 100Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'lowshelf', 'Lowshelf Bass Boost', 'Düşük frekansları artır') end
             },
             {
                 title = '📉 Lowshelf Bass Cut',
-                description = 'Düşük frekansları kes (-15dB @ 200Hz)',
+                description = 'Düşük frekansları kes',
                 icon = 'arrow-down',
                 iconColor = 'orange',
-                onSelect = function() FilterConfirmMenu(musicId, 'lowshelf_cut', 'Lowshelf Bass Cut', 'Düşük frekansları kes (-15dB @ 200Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'lowshelf', 'Lowshelf Bass Cut', 'Düşük frekansları kes') end
             },
             {
                 title = '🎸 Highshelf Treble Boost',
-                description = 'Yüksek frekansları artır (+15dB @ 8000Hz)',
+                description = 'Yüksek frekansları artır',
                 icon = 'music',
                 iconColor = 'yellow',
-                onSelect = function() FilterConfirmMenu(musicId, 'highshelf_boost', 'Highshelf Treble Boost', 'Yüksek frekansları artır (+15dB @ 8000Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'highshelf', 'Highshelf Treble Boost', 'Yüksek frekansları artır') end
             },
             {
                 title = '📉 Highshelf Treble Cut',
-                description = 'Yüksek frekansları kes (-15dB @ 6000Hz)',
+                description = 'Yüksek frekansları kes',
                 icon = 'volume-mute',
                 iconColor = 'grey',
-                onSelect = function() FilterConfirmMenu(musicId, 'highshelf_cut', 'Highshelf Treble Cut', 'Yüksek frekansları kes (-15dB @ 6000Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'highshelf', 'Highshelf Treble Cut', 'Yüksek frekansları kes') end
             },
             {
                 title = '🎼 Lowpass Filter',
-                description = 'Sadece bas frekansları bırak (400Hz altı)',
+                description = 'Sadece bas frekansları bırak',
                 icon = 'filter',
                 iconColor = 'blue',
-                onSelect = function() FilterConfirmMenu(musicId, 'lowpass', 'Lowpass Filter', 'Sadece bas frekansları bırak (400Hz altı)') end
+                onSelect = function() FilterInputDialog(musicId, 'lowpass', 'Lowpass Filter', 'Sadece bas frekansları bırak') end
             },
             {
                 title = '📢 Highpass Filter',
-                description = 'Sadece tiz frekansları bırak (1000Hz üstü)',
+                description = 'Sadece tiz frekansları bırak',
                 icon = 'broadcast-tower',
                 iconColor = 'purple',
-                onSelect = function() FilterConfirmMenu(musicId, 'highpass', 'Highpass Filter', 'Sadece tiz frekansları bırak (1000Hz üstü)') end
+                onSelect = function() FilterInputDialog(musicId, 'highpass', 'Highpass Filter', 'Sadece tiz frekansları bırak') end
             },
             {
                 title = '🎯 Peaking EQ',
-                description = 'Orta frekansları ayarla (1000Hz)',
+                description = 'Orta frekansları ayarla',
                 icon = 'adjust',
                 iconColor = 'cyan',
-                onSelect = function() FilterConfirmMenu(musicId, 'peaking', 'Peaking EQ', 'Orta frekansları ayarla (1000Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'peaking', 'Peaking EQ', 'Orta frekansları ayarla') end
             },
             {
                 title = '🎧 Telefon/Radyo Efekti',
-                description = 'Dar bant filtre (300-3400Hz)',
+                description = 'Dar bant filtre',
                 icon = 'phone',
                 iconColor = 'green',
-                onSelect = function() FilterConfirmMenu(musicId, 'telephone', 'Telefon/Radyo Efekti', 'Dar bant filtre (300-3400Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'bandpass', 'Telefon/Radyo Efekti', 'Dar bant filtre') end
             },
             {
                 title = '🎹 Vokal Booster',
-                description = 'Vokal frekanslarını artır (2500Hz)',
+                description = 'Vokal frekanslarını artır',
                 icon = 'microphone',
                 iconColor = 'pink',
-                onSelect = function() FilterConfirmMenu(musicId, 'vocal', 'Vokal Booster', 'Vokal frekanslarını artır (2500Hz)') end
+                onSelect = function() FilterInputDialog(musicId, 'peaking', 'Vokal Booster', 'Vokal frekanslarını artır') end
             },
             {
                 title = '──────────────',
@@ -761,43 +761,53 @@ function FiltersMenu()
     lib.showContext('filters_menu')
 end
 
--- FİLTRE ONAYLAMA MENÜSÜ
-function FilterConfirmMenu(musicId, filterType, filterName, filterDesc)
-    lib.registerContext({
-        id = 'filter_confirm_menu',
-        title = filterName,
-        menu = 'filters_menu',
-        options = {
-            {
-                title = 'Açıklama',
-                description = filterDesc,
-                icon = 'info',
-                disabled = true
-            },
-            {
-                title = '──────────────',
-                disabled = true
-            },
-            {
-                title = '✅ Onayla',
-                description = 'Filtreyi uygula',
-                icon = 'check',
-                iconColor = 'green',
-                onSelect = function()
-                    ApplyFilter(musicId, filterType)
-                    QBCore.Functions.Notify('✅ ' .. filterName .. ' aktif', 'success')
-                end
-            },
-            {
-                title = '❌ İptal',
-                description = 'Filtre menüsüne dön',
-                icon = 'times',
-                iconColor = 'red',
-                onSelect = function() FiltersMenu() end
-            }
+-- FİLTRE DEĞER GİRİŞ MENÜSÜ
+function FilterInputDialog(musicId, filterType, filterName, filterDesc)
+    local input = lib.inputDialog(filterName, {
+        {
+            type = 'slider',
+            label = 'Frequency (Hz)',
+            description = '10 ile 20000 arasında',
+            default = 1000,
+            min = 10,
+            max = 20000
+        },
+        {
+            type = 'slider',
+            label = 'Gain (dB)',
+            description = '-40 ile 40 arasında',
+            default = 0,
+            min = -40,
+            max = 40
+        },
+        {
+            type = 'slider',
+            label = 'Q (Bandwidth)',
+            description = '0.1 ile 10 arasında',
+            default = 1.0,
+            min = 0.1,
+            max = 10
         }
     })
-    lib.showContext('filter_confirm_menu')
+
+    if input then
+        local frequency = input[1]
+        local gain = input[2]
+        local Q = input[3]
+
+        print('[SWX Speaker] Filtre uygulanıyor:', filterType, 'freq:', frequency, 'gain:', gain, 'Q:', Q)
+
+        local success, err = pcall(function()
+            exports.xsound:setFilter(musicId, filterType, frequency, Q, gain)
+        end)
+
+        if not success then
+            print('[SWX Speaker] XSound setFilter hatası:', err)
+            QBCore.Functions.Notify('⚠️ Filtre uygulanamadı!', 'error')
+        else
+            QBCore.Functions.Notify(string.format('✅ %s uygulandı: %dHz, %ddB, Q=%.1f', filterName, frequency, gain, Q), 'success')
+        end
+    end
 end
 
 -- ÖZEL FİLTRE DIALOG - Frequency, Gain, Detune
