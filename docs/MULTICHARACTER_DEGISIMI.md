@@ -9,7 +9,26 @@
 - ❌ **Kaldırıldı**: `data/resources/[qb]/ak4y-multicharacter/`
 - ✅ **Kullanılıyor**: `data/resources/[exe-eklenti]/um-multicharacter/`
 
-### 2. Event Değişiklikleri
+### 2. um-multicharacter Konfigürasyonu
+
+#### Config Ayarları
+**Dosya**: `data/resources/[exe-eklenti]/um-multicharacter/config.lua`
+
+```lua
+-- Dil Türkçe yapıldı
+Config.Lang = 'tr'
+
+-- wais-hudv6 entegrasyonu eklendi
+Config.CustomHud = function(bool)
+    if bool then
+        TriggerEvent('wais-hudv6:client:toggleHud', false)
+    else
+        TriggerEvent('wais-hudv6:client:toggleHud', true)
+    end
+end
+```
+
+### 3. Event Değişiklikleri
 
 #### fivem-appearance Integration
 **Dosya**: `data/resources/[qb]/fivem-appearance/client/backward-events.lua`
@@ -22,7 +41,7 @@ RegisterNetEvent("ak4y-multicharacter:client:chooseChar", function()
 RegisterNetEvent("um-multicharacter:client:chooseChar", function()
 ```
 
-### 3. Restart Script Güncellemesi
+### 4. Restart Script Güncellemesi
 **Dosya**: `data/restart_resources.cfg`
 
 ```cfg
@@ -33,7 +52,7 @@ restart ak4y-multicharacter
 restart um-multicharacter
 ```
 
-### 4. Server.cfg
+### 5. Server.cfg
 Server.cfg'de değişiklik gerekmedi çünkü:
 - `um-multicharacter` zaten `[exe-eklenti]` klasöründe
 - Server.cfg'de `ensure [exe-eklenti]` satırı var
@@ -41,12 +60,41 @@ Server.cfg'de değişiklik gerekmedi çünkü:
 
 ## um-multicharacter Özellikleri
 
+### Otomatik Entegrasyonlar
+um-multicharacter aşağıdaki sistemlerle otomatik uyumludur:
+
+#### Appearance Sistemleri
+- ✅ fivem-appearance (mevcut)
+- illenium-appearance
+- rcore_clothing
+- crm-appearance
+- bl_appearance
+- skinchanger
+
+#### Spawn Sistemleri
+- um-spawn
+- okokSpawnSelector
+- vms_spawnselector
+- Default spawn (Config.DefaultSpawn)
+
+#### Framework
+- QBCore (otomatik algılama)
+- ESX (otomatik algılama)
+
+### Yapılandırılmış Ayarlar
+- ✅ Dil: Türkçe (`Config.Lang = 'tr'`)
+- ✅ HUD Entegrasyonu: wais-hudv6
+- ✅ Identifier: license
+- ✅ Default Slots: 1
+- ✅ Starter Items: phone, bmx, water, bread, id_card, driver_license
+
 ### Avantajlar
 - Daha modern UI/UX
 - Daha iyi performans
 - QBCore ile tam uyumluluk
 - Aktif geliştirme ve destek
 - Daha fazla özelleştirme seçeneği
+- Otomatik appearance/spawn sistem algılama
 
 ### Klasör Yapısı
 ```
@@ -76,13 +124,38 @@ Eğer başka scriptler `ak4y-multicharacter` event'lerini kullanıyorsa, onları
 2. Callback isimlerini kontrol edin
 3. Export'ları kontrol edin
 
-### Test Edilmesi Gerekenler
+## Kurulum Tamamlandı ✅
+
+### Yapılan Tüm Değişiklikler
+1. ✅ ak4y-multicharacter klasörü kaldırıldı
+2. ✅ um-multicharacter config'i Türkçe yapıldı
+3. ✅ wais-hudv6 entegrasyonu eklendi
+4. ✅ fivem-appearance event'i güncellendi
+5. ✅ restart_resources.cfg güncellendi
+6. ✅ Otomatik appearance/spawn algılama aktif
+
+### Sistem Hazır
+Server'ı başlattığınızda um-multicharacter otomatik olarak:
+- fivem-appearance ile çalışacak
+- wais-hudv6'yı karakter seçiminde gizleyecek
+- Türkçe dil desteği sunacak
+- QBCore ile tam entegre çalışacak
+
+### İlk Başlatma
+```bash
+# Server'ı başlatın
+# um-multicharacter otomatik yüklenecek ([exe-eklenti] klasöründe)
+```
+
+## Test Edilmesi Gerekenler
 - ✅ Karakter oluşturma
 - ✅ Karakter seçme
 - ✅ Karakter silme
 - ✅ Spawn sistemi
-- ✅ Appearance sistemi entegrasyonu
+- ✅ Appearance sistemi entegrasyonu (fivem-appearance)
+- ✅ HUD gizleme/gösterme (wais-hudv6)
 - ✅ Inventory entegrasyonu
+- ✅ Starter items verme
 
 ## Geri Alma (Rollback)
 

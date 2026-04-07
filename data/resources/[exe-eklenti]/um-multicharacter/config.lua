@@ -182,10 +182,18 @@ Config.Speech = {
     }
 }
 
-Config.ESXEvents = {
-    --[[ Dont Touch This!!]]
-    customizationMenu = 'esx_skin:openSaveableMenu',
-
-    --[[ Dont Touch This!!]]
-    createCharacter = 'esx_identity:completedRegistration'
+-- Framework Events (Auto-detected)
+Config.FrameworkEvents = {
+    qbcore = {
+        customizationMenu = 'qb-clothing:client:openMenu',
+        createCharacter = 'QBCore:Server:OnPlayerLoaded'
+    },
+    esx = {
+        customizationMenu = 'esx_skin:openSaveableMenu',
+        createCharacter = 'esx_identity:completedRegistration'
+    }
 }
+
+-- Legacy support (will be auto-selected based on framework)
+Config.ESXEvents = Config.FrameworkEvents.esx
+Config.QBCoreEvents = Config.FrameworkEvents.qbcore
