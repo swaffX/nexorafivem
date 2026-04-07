@@ -28,7 +28,46 @@ Server-side callback `um-multicharacter:server:GetCharacters` bazen slot sayıs�
 
 ## Çözüm
 
-### Wrapper Fonksiyon Eklendi
+### 1. Client-Side Wrapper (Ana Çözüm)
+**Dosya**: `data/resources/[exe-eklenti]/um-multicharacter/bridge/clientfix.lua` (YENİ DOSYA)
+
+```lua
+-- Client-side fix for nil slot count error
+-- This file wraps the callback to ensure totalSlots is never nil
+
+local originalCallback = lib.callback.await
+
+-- Override lib.callback.await to fix nil totalSlots
+lib.callback.await = function(name, timeout, ...)
+    if name == 'um-multicharacter:server:GetCharacters' then
+        local characters, totalSlots = originalCallback(name, timeout, ...)
+        
+        -- Ensure totalSlots is never nil
+        if not totalSlots or type(totalSlots) ~= 'number' then
+            totalSlots = 1 -- Default fallback
+            print('^3[um-multicharacter] Fixed nil totalSlots on client, using default: ' .. totalSlots .. '^7')
+        end
+        
+        return characters, totalSlots
+    end
+    
+    return originalCallback(name, timeout, ...)
+end
+
+print('^2[um-multicharacter] Client-side nil-check fix loaded^7')
+```
+
+**Manifest Güncellemesi**: `fxmanifest.lua`
+```lua
+client_scripts {
+    'bridge/clientfix.lua',  -- ← YENİ EKLENEN
+    'bridge/clothingexport.lua',
+    'bridge/spawn.lua',
+    'client/*.lua'
+}
+```
+
+### 2. Server-Side Wrapper (Ek Güvenlik)
 **Dosya**: `data/resources/[exe-eklenti]/um-multicharacter/server/editable/functions.lua`
 
 ```lua
@@ -53,7 +92,24 @@ end
 
 ### Nasıl Çalışıyor?
 
-1. **Orijinal Callback'i Sakla**: 
+#### Client-Side Fix (Öncelikli)
+1. **ox_lib Callback Override**: 
+   - `lib.callback.await` fonksiyonunu wrap ediyoruz
+   - Orijinal fonksiyonu saklıyoruz
+
+2. **GetCharacters Callback'ini Yakala**:
+   - Sadece `um-multicharacter:server:GetCharacters` callback'ini kontrol et
+   - Diğer callback'lere dokunma
+
+3. **Nil Check**:
+   - Server'dan dönen `totalSlots` değerini kontrol et
+   - Nil veya number değilse `1` kullan
+
+4. **Güvenli Dönüş**:
+   - Obfuscated client kodu artık nil değer almaz
+   - String concatenation hatası oluşmaz
+
+#### Server-Side Fix (Ek Güvenlik) 
    - Obfuscated callback'i `originalGetCharacters` değişkenine kaydet
 
 2. **Yeni Callback Register Et**:
@@ -123,25 +179,40 @@ Sonuç: ✅ Fix devreye giriyor
 
 ## Kurulum
 
-### 1. Dosya Düzenlendi
+### 1. Yeni Dosya Oluşturuldu
+```
+data/resources/[exe-eklenti]/um-multicharacter/bridge/clientfix.lua
+```
+
+### 2. Manifest Güncellendi
+```
+data/resources/[exe-eklenti]/um-multicharacter/fxmanifest.lua
+```
+
+### 3. Server Editable Güncellendi
 ```
 data/resources/[exe-eklenti]/um-multicharacter/server/editable/functions.lua
 ```
 
-### 2. Server Restart
+### 4. Server Restart
 ```bash
 # Server konsolunda:
 restart um-multicharacter
 ```
 
-### 3. Test
+### 5. Test
 ```bash
-# Yeni karakter oluştur
-# Console'da şu mesajı göreceksin:
-"GetCharacters callback wrapped with nil-check fix"
+# Karakter seçim ekranına git
+# Console'da şu mesajları göreceksin:
+
+# Client-side:
+"[um-multicharacter] Client-side nil-check fix loaded"
 
 # Eğer fix devreye girerse:
-"Fixed nil totalSlots, using default: 1"
+"[um-multicharacter] Fixed nil totalSlots on client, using default: 1"
+
+# Server-side:
+"GetCharacters callback wrapped with nil-check fix"
 ```
 
 ## Sorun Giderme
@@ -176,9 +247,11 @@ Config.Debug = true
 ```
 
 Console'da şunları göreceksin:
-- "GetCharacters callback wrapped with nil-check fix"
-- "Fixed nil totalSlots, using default: X"
-- "Total Number of Slots: X"
+- "[um-multicharacter] Client-side nil-check fix loaded" (client)
+- "[um-multicharacter] Fixed nil totalSlots on client, using default: 1" (client, eğer fix devreye girerse)
+- "GetCharacters callback wrapped with nil-check fix" (server)
+- "Fixed nil totalSlots, using default: X" (server, eğer fix devreye girerse)
+- "Total Number of Slots: X" (server)
 
 ## Notlar
 

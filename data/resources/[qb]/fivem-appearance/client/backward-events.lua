@@ -148,7 +148,7 @@ RegisterNetEvent('qb-clothing:client:loadOutfit', function(oData)
     end
 end)
 
-RegisterNetEvent("um-multicharacter:client:chooseChar", function()
+RegisterNetEvent("ak4y-multicharacter:client:chooseChar", function()
     local ped = PlayerPedId()
     exports[resourceName]:setPedTattoos(ped, {})
     ClearPedDecorations(ped)
