@@ -3,23 +3,6 @@
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Sunucu IP tespiti
-local serverPublicIp = "localhost"
-PerformHttpRequest('https://api.ipify.org', function(errorCode, resultData, resultHeaders)
-    if errorCode == 200 and resultData then
-        serverPublicIp = resultData
-        print('[SWX Speaker] Sunucu Public IP Tespit Edildi: ' .. serverPublicIp)
-    else
-        print('[SWX Speaker] Sunucu IP tespit edilemedi, localhost kullanılacak.')
-    end
-end)
-
--- YouTube Audio Extract Cache (sunucu belleğinde sakla)
-local audioCache = {} -- { [videoId] = { title, duration, timestamp, extractNeeded } }
-local CACHE_EXPIRY = 3600 -- 1 saat (saniye)
--- NOT: Google Video URL'leri expire oluyor, bu yüzden sadece metadata cache'liyoruz
--- Her playback'te yeni URL extract edilecek
-
 -- YouTube Title Çekme (oEmbed API kullanarak)
 QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, cb, url)
     -- Video ID'yi çıkar
@@ -48,63 +31,6 @@ QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, 
         else
             print('[SWX Speaker] HTTP hatası: ' .. statusCode)
             cb(nil)
-        end
-    end, 'GET')
-end)
-
--- YouTube Audio Extract (Kendi VPS extractor servisini kullan + Cache)
-RegisterNetEvent('swx_speaker:server:extractYouTubeAudio', function(videoUrl, musicId, volume, distance, coords, requestId)
-    local src = source
-    
-    -- Video ID'yi çıkar
-    local videoId = string.match(videoUrl, '[?&]v=([^&]+)') or string.match(videoUrl, 'youtu%.be/([^?]+)')
-    
-    if not videoId then
-        TriggerClientEvent('QBCore:Notify', src, 'Geçersiz YouTube URL!', 'error')
-        TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
-        return
-    end
-    
-    -- CACHE KONTROLÜ: Metadata cache var mı? (title, duration)
-    local cached = audioCache[videoId]
-    local useCache = cached and (os.time() - cached.timestamp) < CACHE_EXPIRY
-    
-    if useCache then
-        print('[SWX Speaker Server] Metadata cache hit: ' .. videoId)
-        print('[SWX Speaker Server] Title:', cached.title)
-        -- URL her zaman fresh extract edilir (expire olmaması için)
-    end
-    
-    print('[SWX Speaker Server] Extracting fresh audio URL: ' .. videoId)
-    
-    -- Kendi localhost extractor servisimiz
-    local extractorUrl = 'http://localhost:3000/extract?url=' .. videoUrl
-    
-    PerformHttpRequest(extractorUrl, function(statusCode, response, headers)
-        if statusCode == 200 and response then
-            local success, data = pcall(function() return json.decode(response) end)
-            
-            if success and data and data.success and data.url then
-                -- CACHE'E METADATA KAYDET (sadece title, duration - URL expire oluyor)
-                audioCache[videoId] = {
-                    title = data.title or 'YouTube Şarkı',
-                    duration = data.duration or 0,
-                    timestamp = os.time()
-                }
-                
-                print('[SWX Speaker Server] Sending fresh URL to client with requestId:', requestId)
-                
-                -- Client'a gönder (her zaman fresh URL)
-                TriggerClientEvent('swx_speaker:client:playExtractedAudio', src, data.url, musicId, volume, distance, coords, data.title, videoUrl, requestId, serverPublicIp)
-            else
-                TriggerClientEvent('QBCore:Notify', src, 'YouTube sesi çıkarılamadı!', 'error')
-            end
-        elseif statusCode == 0 then
-            TriggerClientEvent('QBCore:Notify', src, 'Extractor servisi çalışmıyor!', 'error')
-            TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
-        else
-            TriggerClientEvent('QBCore:Notify', src, 'Extractor hatası!', 'error')
-            TriggerClientEvent('swx_speaker:client:extractFailed', src, requestId)
         end
     end, 'GET')
 end)

@@ -155,7 +155,7 @@ class SoundPlayer {
                 html5: true,
                 autoplay: false,
                 volume: 0.00,
-                format: [ 'mp3', 'mp4', 'm4a', 'webm', 'aac' ],
+                format: [ 'mp3' ],
                 onload: () => {
                     $.post('https://xsound/events', JSON.stringify({ type: "onLoading", id: this.getName() }));
                 },

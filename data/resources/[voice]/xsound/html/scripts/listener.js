@@ -169,15 +169,10 @@ $(function () {
             case "setFilter":
                 sound = soundList[item.name];
                 if (sound != null && window.audioFilterManager) {
-                    // Debug log
-                    console.log(`[xSound Listener] 🎯 setFilter request:`, item);
-                    
                     // İlk kez filtre ekleniyorsa initialize et (retry mekanizması ile)
                     if (!window.audioFilterManager.soundFilters[item.name]) {
                         const howlInstance = sound.getAudioPlayer();
                         if (howlInstance) {
-                            console.log('[xSound Listener] ℹ️  Initializing filters for:', item.name);
-                            
                             // Retry mekanizması: 5 kez dene, her seferinde 500ms bekle
                             let attempts = 0;
                             const maxAttempts = 5;
@@ -187,57 +182,35 @@ $(function () {
                                 const success = window.audioFilterManager.initializeFilters(item.name, howlInstance);
                                 
                                 if (success) {
-                                    console.log('[xSound Listener] ✅ Initialized successfully on attempt', attempts);
-                                    
-                                    // Kısa bir bekleme sonra filtreyi uygula (node'un hazır olduğundan emin olmak için)
-                                    setTimeout(() => {
-                                        console.log('[xSound Listener] 🎵 Applying bass filter...');
-                                        const filterSuccess = window.audioFilterManager.setFilter(
-                                            item.name,
-                                            item.filterType,
-                                            item.frequency,
-                                            item.Q,
-                                            item.gain
-                                        );
-                                        
-                                        if (filterSuccess) {
-                                            console.log('[xSound Listener] ✅ Bass filter applied successfully!');
-                                        } else {
-                                            console.error('[xSound Listener] ❌ Failed to apply bass filter');
-                                        }
-                                    }, 300);
+                                    console.log('[xSound Filters] Initialized successfully on attempt', attempts);
+                                    // Filtreyi uygula
+                                    window.audioFilterManager.setFilter(
+                                        item.name,
+                                        item.filterType,
+                                        item.frequency,
+                                        item.Q,
+                                        item.gain
+                                    );
                                 } else if (attempts < maxAttempts) {
-                                    console.log('[xSound Listener] 🔄 Retry', attempts, 'of', maxAttempts);
+                                    console.log('[xSound Filters] Retry', attempts, 'of', maxAttempts);
                                     setTimeout(tryInitialize, 500);
                                 } else {
-                                    console.error('[xSound Listener] ❌ Failed to initialize after', maxAttempts, 'attempts');
-                                    console.error('[xSound Listener] 💡 Tip: Make sure the sound is playing and loaded before applying filters');
+                                    console.error('[xSound Filters] Failed to initialize after', maxAttempts, 'attempts');
                                 }
                             };
                             
                             tryInitialize();
-                        } else {
-                            console.error('[xSound Listener] ❌ No Howler instance found for:', item.name);
                         }
                     } else {
                         // Zaten initialize edilmiş, direkt filtreyi uygula
-                        console.log('[xSound Listener] 🎵 Applying filter to existing chain...');
-                        const success = window.audioFilterManager.setFilter(
+                        window.audioFilterManager.setFilter(
                             item.name,
                             item.filterType,
                             item.frequency,
                             item.Q,
                             item.gain
                         );
-                        
-                        if (success) {
-                            console.log('[xSound Listener] ✅ Filter applied!');
-                        } else {
-                            console.error('[xSound Listener] ❌ Filter application failed');
-                        }
                     }
-                } else {
-                    console.warn('[xSound Listener] ⚠️  setFilter called but sound or audioFilterManager not available');
                 }
                 break;
             case "clearFilter":
