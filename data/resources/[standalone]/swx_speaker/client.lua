@@ -96,6 +96,8 @@ function OpenSpeakerMenu()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     local musicId = GetVehicleMusicId(vehicle)
+    local volPercent = math.floor(currentVolume * 100)
+    local distText = tostring(math.floor(currentDistance)) .. 'm'
 
     lib.registerContext({
         id = 'speaker_menu',
@@ -110,19 +112,11 @@ function OpenSpeakerMenu()
                 onSelect = function() PlaylistMenu() end
             },
             {
-                title = 'Müzik geçmişi',
-                description = 'Daha önce çalınan şarkıları gör',
-                icon = 'history',
+                title = 'Ses seviyesi ve aralık',
+                description = string.format('Ses: %d%% | Mesafe: %s', volPercent, distText),
+                icon = 'volume-up',
                 arrow = true,
-                onSelect = function() MusicHistoryMenu() end
-            },
-            {
-                title = 'Filtreler',
-                description = 'Filtreleri çıkışa uygula',
-                icon = 'sliders',
-                arrow = true,
-                disabled = not isPlaying,
-                onSelect = function() FiltersMenu() end
+                onSelect = function() VolumeRangeDialog() end
             },
             {
                 title = 'Bağlan',
@@ -166,9 +160,6 @@ end
 
 -- DİĞER AYARLAR MENÜSÜ
 function OtherSettingsMenu()
-    local volPercent = math.floor(currentVolume * 100)
-    local distText = tostring(math.floor(currentDistance)) .. 'm'
-
     lib.registerContext({
         id = 'other_settings_menu',
         title = 'Diğer ayarlar',
@@ -214,11 +205,19 @@ function OtherSettingsMenu()
                 disabled = true
             },
             {
-                title = '🔊 Ses seviyesi ve aralık',
-                description = string.format('Ses: %d%% | Mesafe: %s', volPercent, distText),
-                icon = 'volume-up',
-                iconColor = 'cyan',
-                onSelect = function() VolumeRangeDialog() end
+                title = 'Müzik geçmişi',
+                description = 'Daha önce çalınan şarkıları gör',
+                icon = 'history',
+                arrow = true,
+                onSelect = function() MusicHistoryMenu() end
+            },
+            {
+                title = 'Filtreler',
+                description = 'Filtreleri çıkışa uygula',
+                icon = 'sliders',
+                arrow = true,
+                disabled = not isPlaying,
+                onSelect = function() FiltersMenu() end
             }
         }
     })
@@ -601,9 +600,10 @@ function MusicHistoryMenu()
             
             table.insert(options, {
                 title = song.title,
-                description = '📅 ' .. dateStr .. ' | ▶️ Çalmak için tıkla',
+                description = '📅 ' .. dateStr,
                 icon = 'history',
-                onSelect = function() PlayMusic(song.url, song.title) end
+                arrow = true,
+                onSelect = function() SongActionMenu(song) end
             })
         end
     end
@@ -611,10 +611,56 @@ function MusicHistoryMenu()
     lib.registerContext({
         id = 'history_menu',
         title = 'Müzik geçmişi',
-        menu = 'speaker_menu',
+        menu = 'other_settings_menu',
         options = options
     })
     lib.showContext('history_menu')
+end
+
+-- ŞARKI EYLEM MENÜSÜ
+function SongActionMenu(song)
+    lib.registerContext({
+        id = 'song_action_menu',
+        title = song.title,
+        menu = 'history_menu',
+        options = {
+            {
+                title = '▶️ Çal',
+                description = 'Şarkıyı hemen çal',
+                icon = 'play',
+                iconColor = 'green',
+                onSelect = function() PlayMusic(song.url, song.title) end
+            },
+            {
+                title = '📋 Sıraya ekle',
+                description = 'Şarkıyı sıraya ekle',
+                icon = 'list',
+                iconColor = 'blue',
+                onSelect = function()
+                    table.insert(playlist, { url = song.url, title = song.title })
+                    QBCore.Functions.Notify('📋 ' .. song.title .. ' sıraya eklendi', 'success')
+                end
+            },
+            {
+                title = '🗑️ Geçmişten sil',
+                description = 'Şarkıyı geçmişten kaldır',
+                icon = 'trash',
+                iconColor = 'red',
+                onSelect = function()
+                    for i, s in ipairs(musicHistory) do
+                        if s.url == song.url then
+                            table.remove(musicHistory, i)
+                            break
+                        end
+                    end
+                    TriggerServerEvent('swx_speaker:server:updateHistory', musicHistory)
+                    QBCore.Functions.Notify('🗑️ Şarkı geçmişten silindi', 'info')
+                    MusicHistoryMenu()
+                end
+            }
+        }
+    })
+    lib.showContext('song_action_menu')
 end
 
 -- SES FİLTRELERİ MENÜSÜ
@@ -628,107 +674,77 @@ function FiltersMenu()
     lib.registerContext({
         id = 'filters_menu',
         title = 'Filtreler',
-        menu = 'speaker_menu',
+        menu = 'other_settings_menu',
         options = {
             {
                 title = '🔊 Subwoofer Modu',
                 description = 'Maximum bass - sadece düşük frekanslar (20-80Hz)',
                 icon = 'speaker',
                 iconColor = 'darkred',
-                onSelect = function()
-                    ApplyFilter(musicId, 'subwoofer')
-                    QBCore.Functions.Notify('🔊 Subwoofer modu aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'subwoofer', 'Subwoofer Modu', 'Maximum bass - sadece düşük frekanslar (20-80Hz)') end
             },
             {
                 title = '🎵 Lowshelf Bass Boost',
                 description = 'Düşük frekansları artır (+20dB @ 100Hz)',
                 icon = 'arrow-up',
                 iconColor = 'red',
-                onSelect = function()
-                    ApplyFilter(musicId, 'lowshelf_boost')
-                    QBCore.Functions.Notify('🎵 Lowshelf bass boost aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'lowshelf_boost', 'Lowshelf Bass Boost', 'Düşük frekansları artır (+20dB @ 100Hz)') end
             },
             {
                 title = '📉 Lowshelf Bass Cut',
                 description = 'Düşük frekansları kes (-15dB @ 200Hz)',
                 icon = 'arrow-down',
                 iconColor = 'orange',
-                onSelect = function()
-                    ApplyFilter(musicId, 'lowshelf_cut')
-                    QBCore.Functions.Notify('📉 Lowshelf bass cut aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'lowshelf_cut', 'Lowshelf Bass Cut', 'Düşük frekansları kes (-15dB @ 200Hz)') end
             },
             {
                 title = '🎸 Highshelf Treble Boost',
                 description = 'Yüksek frekansları artır (+15dB @ 8000Hz)',
                 icon = 'music',
                 iconColor = 'yellow',
-                onSelect = function()
-                    ApplyFilter(musicId, 'highshelf_boost')
-                    QBCore.Functions.Notify('🎸 Highshelf treble boost aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'highshelf_boost', 'Highshelf Treble Boost', 'Yüksek frekansları artır (+15dB @ 8000Hz)') end
             },
             {
                 title = '📉 Highshelf Treble Cut',
                 description = 'Yüksek frekansları kes (-15dB @ 6000Hz)',
                 icon = 'volume-mute',
                 iconColor = 'grey',
-                onSelect = function()
-                    ApplyFilter(musicId, 'highshelf_cut')
-                    QBCore.Functions.Notify('� Highshelf treble cut aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'highshelf_cut', 'Highshelf Treble Cut', 'Yüksek frekansları kes (-15dB @ 6000Hz)') end
             },
             {
                 title = '🎼 Lowpass Filter',
                 description = 'Sadece bas frekansları bırak (400Hz altı)',
                 icon = 'filter',
                 iconColor = 'blue',
-                onSelect = function()
-                    ApplyFilter(musicId, 'lowpass')
-                    QBCore.Functions.Notify('🎼 Lowpass filter aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'lowpass', 'Lowpass Filter', 'Sadece bas frekansları bırak (400Hz altı)') end
             },
             {
                 title = '📢 Highpass Filter',
                 description = 'Sadece tiz frekansları bırak (1000Hz üstü)',
                 icon = 'broadcast-tower',
                 iconColor = 'purple',
-                onSelect = function()
-                    ApplyFilter(musicId, 'highpass')
-                    QBCore.Functions.Notify('📢 Highpass filter aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'highpass', 'Highpass Filter', 'Sadece tiz frekansları bırak (1000Hz üstü)') end
             },
             {
-                title = '� Peaking EQ',
+                title = '🎯 Peaking EQ',
                 description = 'Orta frekansları ayarla (1000Hz)',
                 icon = 'adjust',
                 iconColor = 'cyan',
-                onSelect = function()
-                    ApplyFilter(musicId, 'peaking')
-                    QBCore.Functions.Notify('🎯 Peaking EQ aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'peaking', 'Peaking EQ', 'Orta frekansları ayarla (1000Hz)') end
             },
             {
                 title = '🎧 Telefon/Radyo Efekti',
                 description = 'Dar bant filtre (300-3400Hz)',
                 icon = 'phone',
                 iconColor = 'green',
-                onSelect = function()
-                    ApplyFilter(musicId, 'telephone')
-                    QBCore.Functions.Notify('� Telefon efekti aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'telephone', 'Telefon/Radyo Efekti', 'Dar bant filtre (300-3400Hz)') end
             },
             {
                 title = '🎹 Vokal Booster',
-                description = 'Orta frekansları artır (+10dB @ 2500Hz)',
+                description = 'Vokal frekanslarını artır (2500Hz)',
                 icon = 'microphone',
                 iconColor = 'pink',
-                onSelect = function()
-                    ApplyFilter(musicId, 'vocal')
-                    QBCore.Functions.Notify('🎹 Vokal booster aktif', 'success')
-                end
+                onSelect = function() FilterConfirmMenu(musicId, 'vocal', 'Vokal Booster', 'Vokal frekanslarını artır (2500Hz)') end
             },
             {
                 title = '──────────────',
@@ -758,6 +774,45 @@ function FiltersMenu()
         }
     })
     lib.showContext('filters_menu')
+end
+
+-- FİLTRE ONAYLAMA MENÜSÜ
+function FilterConfirmMenu(musicId, filterType, filterName, filterDesc)
+    lib.registerContext({
+        id = 'filter_confirm_menu',
+        title = filterName,
+        menu = 'filters_menu',
+        options = {
+            {
+                title = 'Açıklama',
+                description = filterDesc,
+                icon = 'info',
+                disabled = true
+            },
+            {
+                title = '──────────────',
+                disabled = true
+            },
+            {
+                title = '✅ Onayla',
+                description = 'Filtreyi uygula',
+                icon = 'check',
+                iconColor = 'green',
+                onSelect = function()
+                    ApplyFilter(musicId, filterType)
+                    QBCore.Functions.Notify('✅ ' .. filterName .. ' aktif', 'success')
+                end
+            },
+            {
+                title = '❌ İptal',
+                description = 'Filtre menüsüne dön',
+                icon = 'times',
+                iconColor = 'red',
+                onSelect = function() FiltersMenu() end
+            }
+        }
+    })
+    lib.showContext('filter_confirm_menu')
 end
 
 -- ÖZEL FİLTRE DIALOG - Frequency, Gain, Detune
