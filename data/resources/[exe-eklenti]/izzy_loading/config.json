@@ -1,0 +1,71 @@
+{
+	"Rules": [
+		{
+			"title": "Kural 1",
+			"rule": "ADK DDK MDK Yasaktır"
+		},
+		{
+			"title": "Kural 2",
+			"rule": "TT Yasaktır"
+		},
+		{
+			"title": "Kural 3",
+			"rule": "RDM VDM Yasaktır"
+		}
+	],
+
+	"Gallery": ["", "", ""],
+
+	"Team": [
+		{
+			"img": "swaffdev.gif",
+			"rank": "Developer",
+			"name": "swaffdev"
+		},
+		{
+			"img": "oguzdev.gif",
+			"rank": "Developer",
+			"name": "oguzxdev"
+		}
+	],
+
+	"Updates": [
+		{
+			"img": "",
+			"title": "Nexora Roleplay Açıldı!",
+			"update": "Sunucumuz yepyeni içeriklerle hizmetinize açıldı."
+		},
+		{
+			"img": "",
+			"title": "Performans Güncellemesi",
+			"update": "FPS optimizasyonları ve bug fixleri uygulandı."
+		}
+	],
+
+	"Music": [
+		{
+			"name": "ÇIKTIN KARŞIMA 2.0",
+			"author": "DEEPRISE & JABBAR ft. UZI",
+			"path": "../music.mp3"
+		}
+	],
+
+	"Keys": {
+		"1": {
+			"title": "Telefon",
+			"description": "Telefonu açmanızı sağlar"
+		},
+		"2": {
+			"title": "Envanter",
+			"description": "Envanteri açmanızı sağlar"
+		},
+		"3": {
+			"title": "Radialmenu",
+			"description": "Radialmenu açmanızı sağlar"
+		}
+	},
+
+	"Discord": "https://discord.gg/Nexora",
+	"Instagram": "yok",
+	"Youtube": "yok"
+}
