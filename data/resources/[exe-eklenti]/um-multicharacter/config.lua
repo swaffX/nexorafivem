@@ -2,7 +2,7 @@ Config = {}
 
 Config.Debug = false           -- If you want to see the debug messages in the console, you can make it true.
 
-Config.Lang = 'pt'             -- [locales/.lua] (en, de, es, fr, pt, tr, zh)
+Config.Lang = 'tr'             -- [locales/.lua] (en, de, es, fr, pt, tr, zh)
 
 Config.PerformanceMode = false --  true (optional)
 
@@ -34,10 +34,12 @@ Config.Logs = {
 --]]
 Config.CustomHud = function(bool)
     if bool then
-        -- Example: exports['hud']:SetDisplay(false)
+        -- Hide wais-hudv6
+        TriggerEvent('wais-hudv6:client:toggleHud', false)
         Debug('Hud is hidden', 'debug')
     else
-        -- Example: exports['hud']:SetDisplay(true)
+        -- Show wais-hudv6
+        TriggerEvent('wais-hudv6:client:toggleHud', true)
         Debug('Hud is show', 'debug')
     end
 end
