@@ -22,6 +22,7 @@ shared_scripts {
 }
 
 client_scripts {
+    'bridge/clientfix.lua',
     'bridge/clothingexport.lua',
     'bridge/spawn.lua',
     'client/*.lua'
