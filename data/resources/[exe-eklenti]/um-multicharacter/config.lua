@@ -8,7 +8,7 @@ Config.PerformanceMode = false --  true (optional)
 
 Config.CleanZone = false       --  true (optional)
 
-Config.HideRadar = false       --  true (optional)
+Config.HideRadar = true       --  true (optional) - Hides minimap in character selection
 
 Config.Identifier = 'license'  -- license or steam or discord [check your SQL > users table > identifier type]
 
@@ -34,12 +34,12 @@ Config.Logs = {
 --]]
 Config.CustomHud = function(bool)
     if bool then
-        -- Hide wais-hudv6
-        TriggerEvent('wais-hudv6:client:toggleHud', false)
+        -- Hide HUD and Radar in multicharacter
+        DisplayRadar(false)
         Debug('Hud is hidden', 'debug')
     else
-        -- Show wais-hudv6
-        TriggerEvent('wais-hudv6:client:toggleHud', true)
+        -- Show HUD and Radar in game
+        DisplayRadar(true)
         Debug('Hud is show', 'debug')
     end
 end
