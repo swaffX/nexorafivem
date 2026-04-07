@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>easy Loading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/fivem.js"></script>
+    <style>
+      .key-container:hover .key-tooltip {
+        visibility: visible !important;
+        opacity: 1 !important;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      
+      .background-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        overflow: hidden;
+        background-color: #000;
+      }
+      
+      .background-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: cover;
+        border: none;
+        z-index: -1;
+        transform: scale(1.2); 
+        transform-origin: center center;
+      }
+      
+      .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="w-[100%] h-[100%] flex justify-center items-center">
+        <div class="background-container">
+          <div v-if="config.background.type === 'video'" class="w-full h-full absolute top-0 left-0">
+            <iframe 
+              v-if="isYoutubeUrl(config.background.source)" 
+              class="background-video w-screen h-screen" 
+              :src="convertToEmbedUrl(config.background.source)"
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              width="120%" 
+              height="120%"
+              allowfullscreen
+              style="transform: scale(1.2); transform-origin: center center;"
+            ></iframe>
+            <video 
+              v-else
+              class="background-video w-screen h-screen" 
+              :src="config.background.source" 
+              :autoplay="true" 
+              :loop="config.background.videoOptions.loop" 
+              :muted="config.background.videoOptions.muted"
+              width="120%" 
+              height="120%"
+              style="transform: scale(1.2); transform-origin: center center;"
+            ></video>
+          </div>
+          
+          <div v-else class="background-image" :style="{ backgroundImage: 'url(' + config.background.source + ')' }"></div>
+        </div>
+        
+        <div class="w-[97.8646vw] h-[52.7083vw] flex justify-between items-center relative">
+          <div class="w-[20vw] h-[100%] flex flex-col">
+            <div class="flex gap-[.0521vw] items-center">
+              <div class="relative z-40 easyLoading">
+                  <div class="w-[2.9688vw] h-[3.0208vw] bg-[#71ba69a2] blur-[1.3021vw] mt-[1.0938vw] ml-[1.0938vw]"></div>
+              </div>
+              <div class="flex flex-col">
+                  <div class="text-[#FFF] text-[1.0417vw] font-[800] inter"><p>{{ config.serverInfo.name }}</p></div>
+                  <div class="text-[#ffffff80] text-[1.0417vw] font-[400] inter"><p>{{ config.serverInfo.description }}</p></div>
+              </div>
+            </div>
+            <div class="w-[20vw] h-[100%] mt-[3.4375vw] flex flex-col gap-[2.1138vw]">
+              <div class="w-[20vw] h-[21.9792vw] flex flex-col gap-[.5208vw]">
+                <div class="flex gap-[.625vw] items-center">
+                  <div class="w-[2.3958vw] h-[1.9792vw] bg-[#d9d9d90d] flex justify-center items-center rounded-[.2604vw]">
+                    <div class="w-[1.0417vw] h-[1.0417vw] bg-[url('img/rules-book.png')] bg-no-repeat bg-cover"></div>
+                  </div>
+                  <div class="w-[15.8333vw] h-[1.9792vw] bg-[#d9d9d90d] flex justify-center items-center rounded-[.2604vw]">
+                    <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.rulesTitle }}</p></div>
+                  </div>
+                </div>
+                <div class="w-[20vw] h-[19.5313vw] flex flex-col overflow-y-scroll gap-[.5208vw]">
+                  <div v-for="rule in config.rules" :key="rule.number" class="w-[18.8542vw] px-[.6771vw] py-[.5208vw] bg-[#d9d9d90d] rounded-[.2604vw]">
+                    <div class="flex flex-col gap-[.2083vw]">
+                      <div class="flex gap-[.2604vw] items-center">
+                        <div class="w-[1.0417vw] h-[1.0417vw] bg-[url('img/rules-book.png')] bg-cover bg-no-repeat"></div>
+                        <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>#{{ rule.number }} {{ rule.title }}</p></div>
+                      </div>
+                      <div class="w-[17.2396vw] text-[#fff] text-[.5208vw] font-[400] inter"><p>{{ rule.description }}</p></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="w-[18.8542vw] h-[11.5625vw] flex flex-col gap-[.4688vw]">
+                <div class="flex gap-[.625vw] items-center">
+                  <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="w-[1.0417vw] h-[1.0417vw] bg-cover bg-no-repeat bg-[url('img/start.svg')]"></div>
+                  </div>
+                  <div class="w-[10.6771vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.mediaTitle }}</p></div>
+                  </div>
+                  <div class="flex gap-[.525vw] items-center">
+                    <div @click="prevMedia" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer hover:bg-[#d9d9d930] transition-all duration-300">
+                      <i class="fa-solid fa-chevron-left text-[.9844vw] text-[#fff]"></i>
+                    </div>
+                    <div @click="nextMedia" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer hover:bg-[#d9d9d930] transition-all duration-300">
+                      <i class="fa-solid fa-chevron-right text-[.9844vw] text-[#fff]"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="w-[18.8542vw] h-[9.1146vw] flex justify-center items-center rounded-[.2604vw] relative overflow-hidden">
+                  <div v-if="currentMedia.type === 'image'" class="w-full h-full">
+                    <img :src="currentMedia.source" class="w-full h-full object-cover" :alt="currentMedia.title">
+                    <div class="absolute bottom-[.5208vw] left-[.5208vw] bg-[#00000080] px-[.5208vw] py-[.2604vw] rounded-[.1563vw]">
+                      <p class="text-[#fff] text-[.625vw] font-[600]">{{ currentMedia.title }}</p>
+                    </div>
+                  </div>
+                  <div v-if="currentMedia.type === 'youtube'" class="w-full h-full bg-cover bg-no-repeat bg-[url('img/car-img.png')] flex justify-center items-center">
+                    <div @click="openYouTube" class="text-[2.4271vw] text-[#FC667A] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 2.6042vw 0vw rgba(0, 0, 0, 0.25);">
+                      <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div class="absolute bottom-[.5208vw] left-[.5208vw] bg-[#00000080] px-[.5208vw] py-[.2604vw] rounded-[.1563vw]">
+                      <p class="text-[#fff] text-[.625vw] font-[600]">{{ currentMedia.title }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="w-[18.8542vw] h-[6.6667vw] flex flex-col items-center gap-[1.1458vw]">
+                <div class="flex gap-[1.4583vw] items-center">
+                  <div v-show="config.socialMedia.links[0].enabled" @click="openSocialLink(config.socialMedia.links[0].url)" class="w-[2.6042vw] h-[2.6042vw] bg-[#e396ff40] flex justify-center items-center rounded-[.2604vw] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 1.0417vw 0vw #e396ff40;">
+                    <div class="text-[#E396FF] text-[1.5625vw]"><i class="fa-brands fa-instagram"></i></div>
+                  </div>
+                  <div v-show="config.socialMedia.links[1].enabled" @click="openSocialLink(config.socialMedia.links[1].url)" class="w-[2.6042vw] h-[2.6042vw] bg-[#74b5ff40] flex justify-center items-center rounded-[.2604vw] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 1.0417vw 0vw #74b5ff40;">
+                    <div class="text-[#74B5FF] text-[1.5625vw]"><i class="fa-brands fa-twitter"></i></div>
+                  </div>
+                  <div v-show="config.socialMedia.links[2].enabled" @click="openSocialLink(config.socialMedia.links[2].url)" class="w-[2.6042vw] h-[2.6042vw] bg-[#fc667a40] flex justify-center items-center rounded-[.2604vw] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 1.0417vw 0vw #fc667a40;">
+                    <div class="text-[#FC667A] text-[1.5625vw]"><i class="fa-brands fa-youtube"></i></div>
+                  </div>
+                  <div v-show="config.socialMedia.links[3].enabled" @click="openSocialLink(config.socialMedia.links[3].url)" class="w-[2.6042vw] h-[2.6042vw] bg-[#8a8cff40] flex justify-center items-center rounded-[.2604vw] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 1.0417vw 0vw #8a8cff40;">
+                    <div class="text-[#8A8CFF] text-[1.5625vw]"><i class="fa-brands fa-discord"></i></div>
+                  </div>
+                  <div v-show="config.socialMedia.links[4].enabled" @click="openSocialLink(config.socialMedia.links[4].url)" class="w-[2.6042vw] h-[2.6042vw] bg-[#71ba6940] flex justify-center items-center rounded-[.2604vw] cursor-pointer hover:scale-110 transition-all duration-300" style="box-shadow: 0vw 0vw 1.0417vw 0vw #71ba6940;">
+                    <div class="text-[#71BA69] text-[1.5625vw]"><i class="fa-solid fa-globe"></i></div>
+                  </div>
+                </div>
+                <div class="w-[17.6563vw] flex flex-col gap-[.8854vw]" v-if="config.music.enabled && config.music.showPlayer">
+                  <div class="flex justify-between items-center">
+                    <div class="flex gap-[1.0938vw] items-center">
+                      <div class="flex flex-col gap-0">
+                        <div class="text-[.7292vw] font-[800] text-[#ffffff99] akrobat"><p>{{ config.music.nowPlayingText }}</p></div>
+                        <div class="text-[.8333vw] font-[800] text-[#FFF] akrobat">
+                          <p>{{ currentTrack.artist }} - {{ currentTrack.title }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex gap-[.7813vw] items-center">
+                      <svg @click="prevTrack" xmlns="http://www.w3.org/2000/svg" width=".7813vw" height=".625vw" viewBox="0 0 15 12" fill="none" class="cursor-pointer hover:scale-110 transition-all duration-300">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 3L15 0L15 12L10 9L10 12L5.24537e-07 6L10 -4.37114e-07L10 3Z" fill="white"/>
+                      </svg>
+                      <div @click="togglePlay" class="w-[1.3542vw] h-[1.3542vw] flex justify-center items-center rounded-[.2083vw] bg-[#ffffff0d] cursor-pointer hover:bg-[#ffffff20] transition-all duration-300">
+                        <div class="text-[.7208vw] text-[#fff]">
+                          <i class="fa-solid" :class="isPlaying ? 'fa-pause' : 'fa-play'"></i>
+                        </div>
+                      </div>
+                      <svg @click="nextTrack" xmlns="http://www.w3.org/2000/svg" width=".7813vw" height=".625vw" viewBox="0 0 15 12" fill="none" class="cursor-pointer hover:scale-110 transition-all duration-300">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5 9L0 12V0L5 3V0L15 6L5 12V9Z" fill="white"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="w-[17.6563vw] h-[.2083vw] bg-[#ffffff0d] relative cursor-pointer" @click="seekTrack">
+                    <div class="absolute h-[.2083vw] bg-[#fff]" :style="{ width: musicProgress + '%' }"></div>
+                    <div class="flex justify-between text-[.5208vw] text-[#ffffff80] mt-[.2604vw]">
+                      <span>{{ formatTime(currentTime) }}</span>
+                      <span>{{ formatTime(duration) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-show="showServerTeam" class="fixed top-0 left-0 w-[100vw] h-[100vh] flex justify-center items-center z-40 bg-[#0000009c]">
+            <div class="w-[54.475vw] h-[11.9375vw] flex flex-col gap-[.5729vw]">
+              <div class="flex gap-[.625vw] items-center">
+                <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.8272vw]">
+                    <i class="fa-solid fa-gamepad"></i>
+                  </div>
+                </div>
+                <div class="w-[47.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.serverTeam.title }} - <span class="text-[#ffffffb3] text-[.7292vw] font-[700] inter">{{ config.serverTeam.subtitle }}</span></p></div>
+                </div>
+                <div class="flex gap-[.6771vw] items-center">
+                  <div @click="prevTeamPage" :class="{'opacity-50': config.serverTeam.currentPage === 0}" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer duration-300 hover:scale-105">
+                    <i class="fa-solid fa-chevron-left text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                  <div @click="nextTeamPage" :class="{'opacity-50': config.serverTeam.currentPage >= totalTeamPages - 1}" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer duration-300 hover:scale-105">
+                    <i class="fa-solid fa-chevron-right text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                  <div @click="toggleServerTeam" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer hover:bg-[#d9d9d930]">
+                    <i class="fa-solid fa-times text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-[2.6875vw]">
+                <div v-for="member in currentTeamMembers" :key="member.name" class="flex flex-col gap-[.4328vw]">
+                  <div class="w-[4.8628vw] h-[1.2339vw] flex justify-center items-center rounded-[.1563vw] bg-[#ffffff1a]">
+                    <div class="text-[#fff] text-[.7292vw] font-[700] inter w-full text-center">
+                      <p class="whitespace-nowrap overflow-hidden text-ellipsis px-[.5208vw]">{{ member.role }}</p>
+                    </div>
+                  </div>
+                  <div class="w-[8.75vw] h-[10.9896vw] bg-[#ffffff0c] rounded-[.2083vw] flex flex-col items-center justify-center">
+                    <div class="flex flex-col items-center gap-[.4688vw]">
+                      <div class="w-[5.0521vw] h-[4.8438vw] rounded-[.5208vw] bg-cover bg-no-repeat" :style="{ backgroundImage: 'url(' + member.image + ')' }"></div>
+                      <div class="flex flex-col w-[7.8125vw]">
+                        <div class="text-[#fff] text-[.8333vw] font-[600] inter w-full">
+                          <p class="whitespace-nowrap overflow-hidden text-ellipsis text-center">{{ member.name }}</p>
+                        </div>
+                        <div class="text-[#fff] opacity-[0.3] text-[.6771vw] font-[500] akrobat w-full">
+                          <p class="overflow-hidden text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 2.0833vw;">{{ member.description }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="centerBox ml-[2vw] flex justify-center items-center">
+            <div class="w-[51.875vw] h-[10.9375vw]">
+              <div class="w-[51.875vw] h-[10.9375vw] flex flex-col gap-[.5729vw]" style="display: none;">
+                <div class="flex gap-[.625vw]">
+                  <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="text-[#fff] text-[.8272vw]">
+                      <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                  </div>
+                  <div class="w-[25.4688vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>LOADING SCREEN GAMES  - <span class="text-[#ffffffb3] text-[.7292vw] font-[700] inter">PLAY SOME GAMES WHILE WAITING</span></p></div>
+                  </div>
+                </div>
+                <div class="flex gap-[.9896vw] items-center">
+                  <div class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat bg-[url('img/subway-surfer.png')] cursor-pointer duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center w-[100%]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-cover bg-no-repeat bg-[url('img/subway-logo.png')]"></div>
+                      <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                        <div class="flex flex-col ml-[.3125vw]">
+                          <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>SUBWAY SURFER</p></div>
+                          <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter"><p>Lorem ipsum dolor sit amet.</p></div>
+                        </div>
+                        <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                          <div class="text-[#fff] text-[.8272vw]">
+                            <i class="fa-solid fa-gamepad"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat bg-[url('img/red-bal.png')] cursor-pointer duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center w-[100%]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-cover bg-no-repeat bg-[url('img/redbal-logo.png')]"></div>
+                      <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                        <div class="flex flex-col ml-[.3125vw]">
+                          <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>SUBWAY SURFER</p></div>
+                          <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter"><p>Lorem ipsum dolor sit amet.</p></div>
+                        </div>
+                        <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                          <div class="text-[#fff] text-[.8272vw]">
+                            <i class="fa-solid fa-gamepad"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat bg-[url('img/subway-surfer.png')] cursor-pointer duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center w-[100%]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-cover bg-no-repeat bg-[url('img/subway-logo.png')]"></div>
+                      <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                        <div class="flex flex-col ml-[.3125vw]">
+                          <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>SUBWAY SURFER</p></div>
+                          <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter"><p>Lorem ipsum dolor sit amet.</p></div>
+                        </div>
+                        <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                          <div class="text-[#fff] text-[.8272vw]">
+                            <i class="fa-solid fa-gamepad"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat bg-[url('img/ball-poll.png')] cursor-pointer duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center w-[100%]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-cover bg-no-repeat bg-[url('img/ball-logo.png')]"></div>
+                      <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                        <div class="flex flex-col ml-[.3125vw]">
+                          <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>SUBWAY SURFER</p></div>
+                          <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter"><p>Lorem ipsum dolor sit amet.</p></div>
+                        </div>
+                        <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                          <div class="text-[#fff] text-[.8272vw]">
+                            <i class="fa-solid fa-gamepad"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat bg-[url('img/mini-golf.png')] cursor-pointer duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center w-[100%]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-cover bg-no-repeat bg-[url('img/golf-logo.png')]"></div>
+                      <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                        <div class="flex flex-col ml-[.3125vw]">
+                          <div class="text-[#fff] text-[.625vw] font-[700] inter"><p>SUBWAY SURFER</p></div>
+                          <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter"><p>Lorem ipsum dolor sit amet.</p></div>
+                        </div>
+                        <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                          <div class="text-[#fff] text-[.8272vw]">
+                            <i class="fa-solid fa-gamepad"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-show="showHotkeys" class="w-[50.9896vw] flex flex-col gap-[.5729vw] h-[20.7813vw] relative bottom-[5vw]">
+                <div class="flex gap-[.625vw] items-center">
+                  <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="w-[1.0417vw] h-[1.0417vw] bg-cover bg-no-repeat bg-[url('/img/f1.png')] rounded-[.1042vw]"></div>
+                  </div>
+                  <div class="w-[25.3125vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                    <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.serverHotkeys.title }} - <span class="text-[#ffffffb3] text-[.7292vw] font-[700] inter">{{ config.serverHotkeys.subtitle }}</span></p></div>
+                  </div>
+                </div>
+                
+                <div class="flex gap-[.3552vw]">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'ESC')"
+                       :key="key.key"
+                       class="w-[4.9215vw] h-[1.6478vw] flex items-center rounded-[.1042vw] relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="ml-[.2208vw] text-[#fff] text-[.625vw] font-[500] escTitle inter"><p>{{ key.key }}</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex gap-[.4057vw] items-center">
+                    <div v-for="key in config.serverHotkeys.keys.filter(k => k.key.startsWith('F'))" 
+                         :key="key.key" 
+                         class="w-[2.892vw] h-[1.6478vw] flex items-center rounded-[.1042vw] relative key-container"
+                         :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                      <div class="escTitle ml-[.662vw] text-[#fff] text-[.625vw] font-[500] inter"><p>{{ key.key }}</p></div>
+                      <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                        {{ key.description }}
+                        <div class="tooltip-arrow"></div>
+                      </div>
+                    </div>
+                    
+                    <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'PRNSC')"
+                         :key="key.key"
+                         class="w-[2.892vw] h-[1.6478vw] flex items-center rounded-[.1042vw] relative key-container"
+                         :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                      <div class="escTitle ml-[.662vw] text-[#fff] text-[.625vw] font-[500] inter"><p>Prnsc</p></div>
+                      <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                        {{ key.description }}
+                        <div class="tooltip-arrow"></div>
+                      </div>
+                    </div>
+                    <div class="w-[2.892vw] h-[1.6478vw] flex items-center rounded-[.1042vw] bg-[#d9d9d90d]"></div>
+                  </div>
+                </div>
+                
+                <div class="flex gap-[.3401vw] items-center">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => ['`','1','2','3','4','5','6','7','8','9','0','-','='].includes(k.key))" 
+                       :key="key.key" 
+                       class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>{{ key.key }}</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'DELETE')" 
+                       :key="key.key"
+                       class="w-[5vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>Delete</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                </div>
+                
+                <div class="flex gap-[.3401vw] items-center">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'TAB')"
+                       :key="key.key"
+                       class="w-[4.9215vw] h-[2.9867vw] flex items-center rounded-[.1563vw] relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] ml-[.7448vw] text-[.625vw] font-[500] inter"><p>TAB</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => ['Q','W','E','R','T','Y','U','I','O','P','[',']'].includes(k.key))" 
+                       :key="key.key" 
+                       class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>{{ key.key }}</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[3.6023vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                </div>
+                
+                <div class="flex gap-[.3401vw] items-center">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'CAPS')"
+                       :key="key.key"
+                       class="w-[5.7333vw] h-[2.9352vw] flex items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] ml-[.7448vw] text-[.625vw] font-[500] inter"><p>Caps lock</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => ['A','S','D','F','G','H','J','K','L',';','\''].includes(k.key))" 
+                       :key="key.key" 
+                       class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>{{ key.key }}</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'ENTER')"
+                       :key="key.key"
+                       class="w-[6.0885vw] h-[2.9867vw] flex items-center rounded-[.1563vw] relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] ml-[.8995vw] text-[.625vw] font-[500] inter"><p>Enter</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[3.6023vw] h-[2.9867vw] rounded-[.1563vw] flex justify-center items-center bg-[#d9d9d90d]"></div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] rounded-[.1563vw] flex justify-center items-center bg-[#d9d9d90d]"></div>
+                </div>
+                
+                <div class="flex gap-[.3401vw] items-center">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'SHIFT')"
+                       :key="key.key"
+                       class="w-[7.1032vw] h-[2.9352vw] flex items-center rounded-[.1563vw] relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] ml-[.7448vw] text-[.625vw] font-[500] inter"><p>Shift</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => ['Z','X','C','V','B','N','M',',','.','/'].includes(k.key))" 
+                       :key="key.key" 
+                       class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>{{ key.key }}</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[5.5664vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>Shift</p></div>
+                  </div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width=".6771vw" height=".3646vw" viewBox="0 0 13 7" fill="none">
+                      <path d="M6.5 0L12.1292 6.20455H0.870835L6.5 0Z" fill="white"/>
+                      <path d="M1.99958 5.70455L6.5 0.744123L11.0004 5.70455H1.99958Z" stroke="white" stroke-opacity="0.06"/>
+                    </svg>
+                  </div>
+                  <div class="w-[2.9623vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                </div>
+                
+                <div class="flex gap-[.3401vw] items-center">
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'CTRL')"
+                       :key="key.key"
+                       class="w-[4.0082vw] h-[2.9352vw] flex items-center rounded-[.1563vw] relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] ml-[.7448vw] text-[.625vw] font-[500] inter"><p>Ctrl</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'ALT')"
+                       :key="key.key"
+                       class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>Alt</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div v-for="key in config.serverHotkeys.keys.filter(k => k.key === 'SPACE')" 
+                       :key="key.key" 
+                       class="w-[19.2188vw] h-[2.9167vw] flex justify-center rounded-[.1563vw] items-center relative key-container"
+                       :class="key.active ? 'bg-[#d9d9d936]' : 'bg-[#d9d9d90d]'">
+                    <div class="escTitle text-[#fff] text-[.625vw] font-[500] inter"><p>Spacebar</p></div>
+                    <div v-if="key.description" class="absolute w-[8vw] opacity-0 invisible p-[.5vw] text-center bg-[#00000080] text-white text-[.5vw] rounded-[.3vw] bottom-[100%] left-[50%] transform translate-x-[-50%] transition-all duration-200 key-tooltip">
+                      {{ key.description }}
+                      <div class="tooltip-arrow"></div>
+                    </div>
+                  </div>
+                  <div class="w-[3.892vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                  <div class="w-[4.6171vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]"></div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width=".3646vw" height=".6771vw" viewBox="0 0 7 13" fill="none">
+                      <path d="M0.363281 6.5L6.56783 0.870834L6.56783 12.1292L0.363281 6.5Z" fill="white"/>
+                      <path d="M6.06783 11.0004L1.1074 6.5L6.06783 1.99958L6.06783 11.0004Z" stroke="white" stroke-opacity="0.06"/>
+                    </svg>
+                  </div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width=".6771vw" height=".3646vw" viewBox="0 0 13 7" fill="none">
+                      <path d="M6.5 7L0.870835 0.795454L12.1292 0.795455L6.5 7Z" fill="white"/>
+                      <path d="M11.0004 1.29545L6.5 6.25588L1.99958 1.29545L11.0004 1.29545Z" stroke="white" stroke-opacity="0.06"/>
+                    </svg>
+                  </div>
+                  <div class="w-[2.9428vw] h-[2.9867vw] flex justify-center rounded-[.1563vw] items-center bg-[#d9d9d90d]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width=".3646vw" height=".6771vw" viewBox="0 0 7 13" fill="none">
+                      <path d="M6.27246 6.5L0.0679154 12.1292L0.0679159 0.870835L6.27246 6.5Z" fill="white"/>
+                      <path d="M0.567916 1.99958L5.52834 6.5L0.567915 11.0004L0.567916 1.99958Z" stroke="white" stroke-opacity="0.06"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-show="showServerUpdates" class="fixed top-0 left-0 w-[100vw] h-[100vh] flex justify-center items-center z-40 bg-[#0000009c]">
+            <div class="w-[54.475vw] h-[11.9375vw] flex flex-col gap-[.5729vw]">
+              <div class="flex gap-[.625vw] items-center">
+                <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.8272vw]">
+                    <i class="fa-solid fa-gamepad"></i>
+                  </div>
+                </div>
+                <div class="w-[47.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.serverUpdates.title }} - <span class="text-[#ffffffb3] text-[.7292vw] font-[700] inter">{{ config.serverUpdates.subtitle }}</span></p></div>
+                </div>
+                <div class="flex gap-[.6771vw] items-center">
+                  <div @click="prevUpdatePage" :class="{'opacity-50': config.serverUpdates.currentPage === 0}" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer duration-300 hover:scale-105">
+                    <i class="fa-solid fa-chevron-left text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                  <div @click="nextUpdatePage" :class="{'opacity-50': config.serverUpdates.currentPage >= totalUpdatePages - 1}" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer duration-300 hover:scale-105">
+                    <i class="fa-solid fa-chevron-right text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                  <div @click="toggleServerUpdates" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer hover:bg-[#d9d9d930]">
+                    <i class="fa-solid fa-times text-[.9844vw] text-[#fff]"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-[.2208vw]">
+                <div v-for="update in currentUpdates" :key="update.date + update.title" class="w-[13.4375vw] h-[9.3229vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat" :style="{ backgroundImage: 'url(' + update.image + ')' }">
+                  <div class="flex flex-col w-[12.6042vw] h-[7.6375vw] relative">
+                    <div class="w-[4.7917vw] h-[1.3021vw] flex justify-center items-center rounded-[.1563vw] bg-[#fff]">
+                      <div class="text-[#3D3C3C] text-[.625vw] inter font-[700]"><p>{{ update.date }}</p></div>
+                    </div>
+                    <div class="absolute bottom-0 flex justify-between items-center w-[100%]">
+                      <div class="flex flex-col">
+                        <div class="text-[#FFF] text-[.625vw] inter font-[700]">
+                          <p class="whitespace-nowrap overflow-hidden text-ellipsis w-[9.0625vw]">{{ update.title }}</p>
+                        </div>
+                        <div class="w-[9.0625vw] text-[#ffffff80] text-[.5208vw] inter font-[400]">
+                          <p class="overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 1.5625vw;">{{ update.description }}</p>
+                        </div>
+                      </div>
+                      <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center rounded-[.2604vw]" :style="{ 'background-color': getPlatformColor(update.platform) + '25', 'box-shadow': '0vw 0vw 1.0417vw 0vw ' + getPlatformColor(update.platform) + '5b' }">
+                        <div class="text-[.9375vw]" :style="{ color: getPlatformColor(update.platform) }"><i :class="getPlatformIcon(update.platform)"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-show="showMiniGames" class="fixed top-0 left-0 w-[100vw] h-[100vh] flex justify-center items-center z-40 bg-[#0000009c]">
+            <div class="w-[54.475vw] h-[11.9375vw] flex flex-col gap-[.5729vw]">
+              <div class="flex gap-[.625vw] items-center">
+                <div class="w-[2.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.8272vw]">
+                    <i class="fa-solid fa-gamepad"></i>
+                  </div>
+                </div>
+                <div class="w-[47.3958vw] h-[1.9792vw] flex justify-center items-center rounded-[.2604vw] bg-[#d9d9d90d]">
+                  <div class="text-[#fff] text-[.7292vw] font-[700] inter"><p>{{ config.miniGames.title }}  - <span class="text-[#ffffffb3] text-[.7292vw] font-[700] inter">{{ config.miniGames.subtitle }}</span></p></div>
+                </div>
+                <div @click="toggleMiniGames" class="w-[1.9792vw] h-[1.9792vw] flex justify-center items-center rounded-[.1563vw] bg-[#d9d9d90d] cursor-pointer hover:bg-[#d9d9d930]">
+                  <i class="fa-solid fa-times text-[.9844vw] text-[#fff]"></i>
+                </div>
+              </div>
+              <div class="flex gap-[.9896vw] items-center">
+                <div v-for="game in currentGames" :key="game.title" @click="openGame(game.embed)" class="w-[9.5833vw] h-[8.3417vw] relative flex justify-center items-center flex-col bg-cover bg-no-repeat cursor-pointer duration-300 hover:scale-105" :style="{ backgroundImage: 'url(' + game.photo + ')' }">
+                  <div class="flex flex-col items-center w-[100%]">
+                    <div class="w-[3.5vw] h-[3.5vw] rounded-full flex justify-center items-center bg-[#00000080]">
+                      <div class="w-[2.6042vw] h-[2.6042vw] bg-contain bg-center bg-no-repeat" :style="{ backgroundImage: 'url(' + game.logo + ')' }"></div>
+                    </div>
+                    <div class="flex items-center justify-between w-[100%] absolute bottom-[.1563vw]">
+                      <div class="flex flex-col ml-[.3125vw]">
+                        <div class="text-[#fff] text-[.625vw] font-[700] inter">
+                          <p class="whitespace-nowrap overflow-hidden text-ellipsis w-[8vw]">{{ game.title }}</p>
+                        </div>
+                        <div class="text-[#ffffff80] text-[.4167vw] font-[700] inter">
+                          <p class="whitespace-nowrap overflow-hidden text-ellipsis w-[8vw]">{{ game.description }}</p>
+                        </div>
+                      </div>
+                      <div class="w-[1.5625vw] h-[1.5625vw] flex justify-center items-center mr-[.2604vw] rounded-[.1042vw] bg-[#d9d9d91a]">
+                        <div class="text-[#fff] text-[.8272vw]">
+                          <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="showGameFrame" class="fixed top-0 left-0 w-[100vw] h-[100vh] bg-[#00000099] flex justify-center items-center z-50">
+            <div class="relative w-[80vw] h-[80vh] bg-[#0d0d0d] rounded-[.5vw] flex flex-col">
+              <div class="flex justify-between items-center w-full h-[3vw] px-[1vw] border-b border-[#ffffff33]">
+                <div @click="closeGame" class="text-[#fff] text-[1.5vw] cursor-pointer hover:text-[#ff5555]">
+                  <i class="fa-solid fa-times"></i>
+                </div>
+              </div>
+              <div class="w-full h-full overflow-hidden">
+                <iframe :src="currentGameEmbed" class="w-full h-full border-0" allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+          
+          <div class="w-[19.7917vw] flex justify-end relative h-[32.2396vw] mt-[18vw]">
+            <div class="w-[4.375vw] h-[11.25vw] flex items-center justify-center bg-[#d9d9d905] leftMenu">
+              <div class="  w-[1.0938vw] h-[7.6042vw] flex flex-col items-center gap-[0.7vw] bg-[#d9d9d905]">
+                <div @click="toggleHotkeys" class="text-[#76787B] text-[1.0417vw] cursor-pointer duration-300 hover:text-[#fff]">
+                  <i class="fa-solid fa-keyboard"></i>
+                </div>
+                <div @click="toggleMiniGames" class="text-[#76787B] text-[.9375vw] cursor-pointer duration-300 hover:text-[#fff]">
+                  <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div @click="toggleServerUpdates" class="text-[#76787B] text-[.7245vw] cursor-pointer duration-300 hover:text-[#fff]">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+                <div @click="toggleServerTeam" class="text-[#76787B] text-[1.0938vw] cursor-pointer duration-300 hover:text-[#fff]">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex gap-[.6771vw] items-center absolute bottom-0">
+              <div class="flex flex-col gap-0 justify-start">
+                <div class="text-[#fff] text-[.8333vw] inter font-[700]" style="text-align: right;"><p>{{ config.serverInfo.loadingText }}</p></div>
+                <div class="w-[17.0313vw] text-[#ffffff80] text-[.625vw] inter font-[400]" style="text-align: right;"><p>{{ config.serverInfo.loadingDescription }}</p></div>
+              </div>
+              <div class="flex justify-center items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2.6042vw" height="2.6042vw" viewBox="0 0 50 50" fill="none">
+                  <circle cx="25" cy="25" r="23" fill="transparent" stroke="white" stroke-opacity="0.1" stroke-width="4"/>
+                  <circle 
+                    cx="25" 
+                    cy="25" 
+                    r="23" 
+                    fill="transparent" 
+                    stroke="white" 
+                    stroke-width="4"
+                    stroke-dasharray="144.51"
+                    :stroke-dashoffset="144.51 * (1 - loadingProgress / 100)"
+                    transform="rotate(-90, 25, 25)"
+                    class="transition-all duration-300 ease-out"
+                  />
+                </svg>
+                <div class="absolute text-[#fff] text-[.7292vw] inter font-[700]"><p>{{ loadingProgress }}%</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </body>
+</html>
