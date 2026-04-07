@@ -1,8 +1,14 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local PlayerData = {}
+local PlayerData = QBCore.Functions.GetPlayerData()
 
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
   PlayerData = val
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+  if GetCurrentResourceName() == resourceName then
+    PlayerData = QBCore.Functions.GetPlayerData()
+  end
 end)
 
 local function CheckPlayer()
@@ -19,8 +25,11 @@ end
 
 --https://cookbook.fivem.net/2020/01/06/using-the-new-console-key-bindings/
 RegisterCommand('+Megaphoneaga', function()
-  if not PlayerData.job then PlayerData = QBCore.Functions.GetPlayerData() end
-  if PlayerData.job.name == "police" and CheckPlayer() then
+  if not PlayerData or not PlayerData.job then 
+    PlayerData = QBCore.Functions.GetPlayerData() 
+  end
+  
+  if PlayerData and PlayerData.job and PlayerData.job.name == "police" and CheckPlayer() then
     exports["pma-voice"]:overrideProximityRange(60.0, true)
     TriggerServerEvent('torpak-policemegaphone:applySubmix', true)
     QBCore.Functions.Notify('Megafon Devrede', 'success')
@@ -67,9 +76,11 @@ CreateThread(function()
 end)
 
 RegisterCommand('-Megaphoneaga', function()
-
-  if not PlayerData.job then PlayerData = QBCore.Functions.GetPlayerData() end
-  if PlayerData.job.name == "police" and CheckPlayer() then
+  if not PlayerData or not PlayerData.job then 
+    PlayerData = QBCore.Functions.GetPlayerData() 
+  end
+  
+  if PlayerData and PlayerData.job and PlayerData.job.name == "police" and CheckPlayer() then
     exports["pma-voice"]:clearProximityOverride()
     QBCore.Functions.Notify('Megafon Devre Dışı', 'error')
     TriggerServerEvent('torpak-policemegaphone:applySubmix', false)
