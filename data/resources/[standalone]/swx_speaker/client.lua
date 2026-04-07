@@ -91,8 +91,13 @@ end, false)
 
 RegisterKeyMapping('speaker', 'Hoparlör Etkileşimi', 'keyboard', Config.OpenKey)
 
--- ANA MENÜ - Hoparlör Ayarları
+-- ANA MENÜ - Hoparlör Ayarları (K tuşuna basınca açılır)
 function OpenSpeakerMenu()
+    OtherSettingsMenu()
+end
+
+-- DİĞER AYARLAR MENÜSÜ (K tuşuna basınca açılır)
+function OtherSettingsMenu()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     local musicId = GetVehicleMusicId(vehicle)
@@ -100,9 +105,8 @@ function OpenSpeakerMenu()
     local distText = tostring(math.floor(currentDistance)) .. 'm'
 
     lib.registerContext({
-        id = 'speaker_menu',
+        id = 'other_settings_menu',
         title = 'Hoparlör ayarları',
-        menu = 'speaker_menu',
         options = {
             {
                 title = 'Sırayı yönet',
@@ -146,25 +150,6 @@ function OpenSpeakerMenu()
                 title = '──────────────',
                 disabled = true
             },
-            {
-                title = 'Diğer',
-                description = 'Diğer ayarlar',
-                icon = 'ellipsis-h',
-                arrow = true,
-                onSelect = function() OtherSettingsMenu() end
-            }
-        }
-    })
-    lib.showContext('speaker_menu')
-end
-
--- DİĞER AYARLAR MENÜSÜ
-function OtherSettingsMenu()
-    lib.registerContext({
-        id = 'other_settings_menu',
-        title = 'Diğer ayarlar',
-        menu = 'speaker_menu',
-        options = {
             {
                 title = '🎵 Yeni müzik çal',
                 description = isExtracting and '⏳ YouTube sesi işleniyor...' or 'YouTube URL veya direkt MP3 linki girin',
@@ -561,7 +546,7 @@ function PlaylistMenu()
     lib.registerContext({
         id = 'playlist_menu',
         title = 'Sırayı yönet',
-        menu = 'speaker_menu',
+        menu = 'other_settings_menu',
         options = options
     })
     lib.showContext('playlist_menu')
