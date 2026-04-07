@@ -243,6 +243,7 @@ function PlayMusic(url, title)
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
         
+        -- 3D pozisyonel ses (dışarıdakiler için)
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
         exports.xsound:Distance(currentMusicId, currentDistance)
         
@@ -268,10 +269,21 @@ function PlayMusic(url, title)
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
+        -- Pozisyon güncelleme thread'i
         CreateThread(function()
             while isPlaying and DoesEntityExist(vehicle) do
                 local newCoords = GetEntityCoords(vehicle)
                 exports.xsound:Position(currentMusicId, newCoords)
+                
+                -- Araç içindeki oyuncular için ses seviyesini artır
+                local playersInVehicle = GetVehicleOccupants(vehicle)
+                for _, playerId in ipairs(playersInVehicle) do
+                    if playerId == PlayerId() then
+                        -- Kendi aracındaysan sesi biraz daha yüksek duy
+                        exports.xsound:setVolumeMax(currentMusicId, currentVolume * 1.5, PlayerId())
+                    end
+                end
+                
                 Wait(500)
             end
         end)
@@ -279,6 +291,24 @@ function PlayMusic(url, title)
         QBCore.Functions.Notify('Müzik çalıyor!', 'success')
         print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
     end
+end
+
+-- Araçtaki tüm oyuncuları al
+function GetVehicleOccupants(vehicle)
+    local occupants = {}
+    local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
+    
+    for seat = -1, maxSeats do
+        local ped = GetPedInVehicleSeat(vehicle, seat)
+        if ped ~= 0 then
+            local playerId = NetworkGetPlayerIndexFromPed(ped)
+            if playerId ~= -1 then
+                table.insert(occupants, playerId)
+            end
+        end
+    end
+    
+    return occupants
 end
 
 function PlayNextSong()
@@ -316,10 +346,11 @@ function TogglePause()
 end
 
 function VolumeRangeDialog()
-    local input = lib.inputDialog('Ses seviyesini/aralığını değiştir', {
+    local input = lib.inputDialog('Ses ve Uzaklık Ayarları', {
         {
             type = 'slider',
-            label = 'Ses seviyesi (0.10-1.5)',
+            label = 'Ses Seviyesi',
+            description = 'Müziğin ne kadar yüksek sesle çalacağı (0.10-1.5)',
             min = 10,
             max = 150,
             default = math.floor(currentVolume * 100),
@@ -327,7 +358,8 @@ function VolumeRangeDialog()
         },
         {
             type = 'slider',
-            label = 'Müzik aralığı (1.0-75.0)',
+            label = 'Duyulma Uzaklığı (Metre)',
+            description = 'Müziğin kaç metre uzaktan duyulacağı (1-75m)',
             min = 10,
             max = 750,
             default = math.floor(currentDistance * 10),
@@ -344,7 +376,7 @@ function VolumeRangeDialog()
             exports.xsound:setVolume(currentMusicId, currentVolume)
         end
         
-        QBCore.Functions.Notify('Ses: ' .. string.format("%.2f", currentVolume) .. ' | Mesafe: ' .. string.format("%.1f", currentDistance) .. 'm', 'success')
+        QBCore.Functions.Notify('✅ Ses: ' .. string.format("%.2f", currentVolume) .. ' | Uzaklık: ' .. string.format("%.1f", currentDistance) .. 'm', 'success')
     end
 end
 
