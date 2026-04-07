@@ -42,3 +42,21 @@ function GiveStarterItems(src)
         end
     end
 end
+
+-- Fix for nil slot count in GetCharacters callback
+-- This ensures totalSlots is always a number, never nil
+local originalGetCharacters = lib.callback.registered['um-multicharacter:server:GetCharacters']
+if originalGetCharacters then
+    lib.callback.register('um-multicharacter:server:GetCharacters', function(source)
+        local characters, totalSlots = originalGetCharacters(source)
+        
+        -- Ensure totalSlots is never nil
+        if not totalSlots or type(totalSlots) ~= 'number' then
+            totalSlots = Config.DefaultSlots or 1
+            Debug('Fixed nil totalSlots, using default: ' .. totalSlots)
+        end
+        
+        return characters, totalSlots
+    end)
+    Debug('GetCharacters callback wrapped with nil-check fix')
+end
