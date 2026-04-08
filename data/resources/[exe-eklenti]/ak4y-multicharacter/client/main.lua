@@ -119,44 +119,66 @@ RegisterNetEvent('ak4y-multicharacter:client:spawnLastLocation', function(positi
     DeleteEntity(charPed)
     SetNuiFocus(false, false)
     DoScreenFadeOut(500)
-    Wait(1000)
+    Wait(1500)
     
-    -- QBCore eventlerini tetikle (spawn öncesi)
+    -- QBCore eventlerini tetikle
     TriggerServerEvent('QBCore:Server:OnPlayerLoaded')
     TriggerEvent('QBCore:Client:OnPlayerLoaded')
     TriggerServerEvent('qb-houses:server:SetInsideMeta', 0, false)
     TriggerServerEvent('qb-apartments:server:SetInsideMeta', 0, 0, false)
     
-    Wait(500)
+    Wait(1000)
     
-    -- Karakteri görünür yap
-    SetEntityVisible(PlayerPedId(), true)
-    FreezeEntityPosition(PlayerPedId(), true)
+    -- Karakteri görünür yap ve dondur
+    local ped = PlayerPedId()
+    SetEntityVisible(ped, true)
+    FreezeEntityPosition(ped, true)
+    SetEntityCollision(ped, false, false)
     
-    -- Direkt son konuma teleport (SetEntityCoords)
+    -- Hedef pozisyonu belirle
+    local targetPos = nil
     if position and position.x and position.y and position.z then
-        print('[ak4y-multicharacter] Son konuma spawn: '..position.x..', '..position.y..', '..position.z)
-        SetEntityCoords(PlayerPedId(), position.x, position.y, position.z, false, false, false, false)
-        if position.w then
-            SetEntityHeading(PlayerPedId(), position.w)
+        -- Multicharacter kamera pozisyonu kontrolü
+        if math.abs(position.x - (-812.0)) > 10 or math.abs(position.y - 182.0) > 10 then
+            targetPos = vector4(position.x, position.y, position.z, position.w or 0.0)
+            print('[ak4y-multicharacter] Son konuma spawn: '..targetPos.x..', '..targetPos.y..', '..targetPos.z)
+        else
+            print('[ak4y-multicharacter] WARNING: DB position is multicharacter camera, using default!')
         end
-    else
-        -- Son konum yoksa varsayılan spawn noktasına git
-        print('[ak4y-multicharacter] Varsayılan konuma spawn')
-        SetEntityCoords(PlayerPedId(), AK4Y.DefaultSpawn.x, AK4Y.DefaultSpawn.y, AK4Y.DefaultSpawn.z, false, false, false, false)
-        SetEntityHeading(PlayerPedId(), AK4Y.DefaultSpawn.w or 0.0)
+    end
+    
+    -- Eğer hala geçerli pozisyon yoksa varsayılan kullan
+    if not targetPos then
+        targetPos = vector4(AK4Y.DefaultSpawn.x, AK4Y.DefaultSpawn.y, AK4Y.DefaultSpawn.z, AK4Y.DefaultSpawn.w or 0.0)
+        print('[ak4y-multicharacter] Varsayılan konuma spawn: '..targetPos.x..', '..targetPos.y..', '..targetPos.z)
+    end
+    
+    -- AGRESİF SPAWN - Pozisyonu defalarca set et (QBCore override etmesin diye)
+    local spawnAttempts = 0
+    while spawnAttempts < 10 do
+        SetEntityCoords(ped, targetPos.x, targetPos.y, targetPos.z, false, false, false, false)
+        SetEntityHeading(ped, targetPos.w)
+        Wait(100)
+        local currentPos = GetEntityCoords(ped)
+        -- Eğer pozisyon değiştiyse (QBCore müdahale etmediyse) başarılı
+        if math.abs(currentPos.x - targetPos.x) < 2.0 and math.abs(currentPos.y - targetPos.y) < 2.0 then
+            print('[ak4y-multicharacter] Spawn başarılı! Deneme: '..(spawnAttempts + 1))
+            break
+        end
+        spawnAttempts = spawnAttempts + 1
+        print('[ak4y-multicharacter] Spawn deneme '..spawnAttempts..' - pozisyon reset ediliyor...')
     end
     
     -- Zemine sabitle
-    Wait(100)
-    local ped = PlayerPedId()
-    local groundFound, groundZ = GetGroundZFor_3dCoord(GetEntityCoords(ped).x, GetEntityCoords(ped).y, GetEntityCoords(ped).z, false)
+    Wait(200)
+    local groundFound, groundZ = GetGroundZFor_3dCoord(GetEntityCoords(ped).x, GetEntityCoords(ped).y, GetEntityCoords(ped).z + 10.0, false)
     if groundFound then
-        SetEntityCoords(ped, GetEntityCoords(ped).x, GetEntityCoords(ped).y, groundZ, false, false, false, false)
+        SetEntityCoords(ped, GetEntityCoords(ped).x, GetEntityCoords(ped).y, groundZ + 1.0, false, false, false, false)
     end
     
     Wait(500)
-    FreezeEntityPosition(PlayerPedId(), false)
+    SetEntityCollision(ped, true, true)
+    FreezeEntityPosition(ped, false)
     DoScreenFadeIn(250)
     TriggerEvent('qb-weathersync:client:EnableSync')
 end)

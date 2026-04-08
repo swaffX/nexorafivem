@@ -111,10 +111,27 @@ RegisterNetEvent('ak4y-multicharacter:server:loadUserData', function(cData)
         QBCore.Commands.Refresh(src)
         
         -- Son konum bilgisini cek
-        local result = ExecuteSql("SELECT position FROM players WHERE citizenid = '"..cData.."'")
+        local result = ExecuteSql("SELECT position, charinfo FROM players WHERE citizenid = '"..cData.."'")
         local position = nil
-        if result and result[1] and result[1].position then
-            position = json.decode(result[1].position)
+        local charName = cData
+        if result and result[1] then
+            if result[1].charinfo then
+                local charinfo = json.decode(result[1].charinfo)
+                if charinfo and charinfo.firstname and charinfo.lastname then
+                    charName = charinfo.firstname .. " " .. charinfo.lastname
+                end
+            end
+            if result[1].position then
+                position = json.decode(result[1].position)
+                if position and position.x and position.y and position.z then
+                    print('[ak4y-multicharacter] DB Position for '..charName..': '..position.x..', '..position.y..', '..position.z)
+                    -- Eger position multicharacter kamera pozisyonuysa (-812, 182, 76), varsayilan spawna git
+                    if math.abs(position.x - (-812.0)) < 5 and math.abs(position.y - 182.0) < 5 then
+                        print('[ak4y-multicharacter] WARNING: Position is multicharacter camera location, using default spawn!')
+                        position = nil
+                    end
+                end
+            end
         end
         
         -- Spawn selector devre disi - direkt son konumda spawn

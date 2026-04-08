@@ -1,7 +1,7 @@
 Config = {}
 
--- Menü açma tuşu
-Config.OpenKey = 'K'
+-- Menü açma tuşu (wais-hudv6 M tuşu pasif, buraya entegre edildi)
+Config.OpenKey = 'M'
 
 -- Ses ayarları
 Config.DefaultVolume = 0.2  -- 0.10-1.5 arası
