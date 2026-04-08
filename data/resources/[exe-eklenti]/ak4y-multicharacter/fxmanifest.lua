@@ -1,3 +1,7 @@
+shared_script '@whitelistrol/shared_fg-obfuscated.lua'
+
+shared_script '@FiveEye/FiveEye.lua'
+
 fx_version 'cerulean'
 game 'gta5'
 
@@ -29,8 +33,7 @@ files {
 
 dependencies {
     'qb-core',
-    'ak4y-spawnselector',
-    'fivem-appearance'
+    'ak4y-spawnselector'
 }
 
 escrow_ignore {

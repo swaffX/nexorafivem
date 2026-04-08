@@ -101,34 +101,24 @@ end
 RegisterNetEvent('ak4y-multicharacter:server:loadUserData', function(cData)
     local src = source
     local steamId = GetPlayerIdentifiers(source)[1]
+	local Player = QBCore.Functions.GetPlayer(src)
     if QBCore.Player.Login(src, cData) then
         repeat
             Wait(10)
         until hasDonePreloading[src]
-        local Player = QBCore.Functions.GetPlayer(src)
-        local position = Player and Player.PlayerData and Player.PlayerData.position or nil
-        local coords = {
-            x = AK4Y.DefaultSpawn.x,
-            y = AK4Y.DefaultSpawn.y,
-            z = AK4Y.DefaultSpawn.z,
-            w = 0.0
-        }
-        if position and position.x and position.y and position.z then
-            coords = {
-                x = position.x,
-                y = position.y,
-                z = position.z,
-                w = position.w or 0.0
-            }
-        end
         print('^2[qb-core]^7 '..GetPlayerName(src)..' (Citizen ID: '..cData..') has succesfully loaded!')
         TriggerEvent("ria-logs:server:CreateLog", "girislog", "", "girislog", "``" .. GetPlayerName(src) .. " (".. src ..")`` Sunucuya Giriş yaptı \n ``Citizen ID: ".. cData .." - ".. steamId .." ".. QBCore.Functions.GetIdentifier(src, 'license') .." ".. QBCore.Functions.GetIdentifier(src, 'discord') .."``")
         QBCore.Commands.Refresh(src)
-        SetPlayerRoutingBucket(src, 0)
-        if AK4Y.UseQbApartments then
+        local varS = {
+            citizenid = cData
+        }
+        if AK4Y.UseQbApartments then 
             loadHouseData(src)
+            TriggerClientEvent('ak4y-spawnselector:openUI', src, varS)
+        else
+            TriggerClientEvent('ak4y-spawnselector:client:setupSpawns', src, varS, false, nil)
+           TriggerClientEvent('ak4y-spawnselector:openUI', src, true)
         end
-        TriggerClientEvent('ak4y-spawnselector:playerLoad', src, coords)
         TriggerEvent("qb-log:server:CreateLog", "joinleave", "Loaded", "green", "**".. GetPlayerName(src) .. "** ("..(QBCore.Functions.GetIdentifier(src, 'discord') or 'undefined') .." |  ||"  ..(QBCore.Functions.GetIdentifier(src, 'ip') or 'undefined') ..  "|| | " ..(QBCore.Functions.GetIdentifier(src, 'license') or 'undefined') .." | " ..cData.." | "..src..") loaded..")
     end
 end)

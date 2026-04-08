@@ -55,7 +55,7 @@ end
 
 function openCharMenu(bool)
     QBCore.Functions.TriggerCallback("ak4y-multicharacter:server:GetNumberOfCharacters", function(result)
-        local defaultOpenCharSlot = result.numOfChars
+        local defaultOpenCharSlot = AK4Y.DefaultOpenCharSlot + result.addedCount
         if bool then 
             while not opened do 
                 SetNuiFocus(bool, bool)
