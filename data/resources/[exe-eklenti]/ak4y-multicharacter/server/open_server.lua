@@ -112,13 +112,8 @@ RegisterNetEvent('ak4y-multicharacter:server:loadUserData', function(cData)
         local varS = {
             citizenid = cData
         }
-        if AK4Y.UseQbApartments then 
-            loadHouseData(src)
-            TriggerClientEvent('ak4y-spawnselector:openUI', src, varS)
-        else
-            TriggerClientEvent('ak4y-spawnselector:client:setupSpawns', src, varS, false, nil)
-           TriggerClientEvent('ak4y-spawnselector:openUI', src, true)
-        end
+        -- Spawn selector devre disi - direkt son konumda spawn
+        TriggerClientEvent('ak4y-multicharacter:client:spawnLastLocation', src)
         TriggerEvent("qb-log:server:CreateLog", "joinleave", "Loaded", "green", "**".. GetPlayerName(src) .. "** ("..(QBCore.Functions.GetIdentifier(src, 'discord') or 'undefined') .." |  ||"  ..(QBCore.Functions.GetIdentifier(src, 'ip') or 'undefined') ..  "|| | " ..(QBCore.Functions.GetIdentifier(src, 'license') or 'undefined') .." | " ..cData.." | "..src..") loaded..")
     end
 end)
