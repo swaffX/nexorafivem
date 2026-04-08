@@ -178,7 +178,16 @@ ConfigSv.GetItemAmount = function(src, item)
         p:resolve(count)
     elseif Config.Framework.Framework == "qbcore" or Config.Framework.Framework == "qbox" then
         local Player = Config.Framework.Framework == "qbcore" and wFramework.Functions.GetPlayer(src) or getPlayerFromQbx(src)
-        p:resolve(Player.Functions.GetItemByName(item).amount)
+        if Player and Player.Functions then
+            local itemData = Player.Functions.GetItemByName(item)
+            if itemData then
+                p:resolve(itemData.amount or 0)
+            else
+                p:resolve(0)
+            end
+        else
+            p:resolve(0)
+        end
     end
 
     return Citizen.Await(p)
