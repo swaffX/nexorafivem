@@ -76,11 +76,11 @@ Config.Commands = {
     ["carcontrol"] = {
         ["key"] = "M", -- Q ( RADIO KEYBIND )
         ["command"] = "carcontrol", -- Command to open car control menu
-        ["disabled"] = false, -- If you set this variable to `true`, car control menu will be completely disabled.
+        ["disabled"] = true, -- MENÜ TAMAMEN DEVRE DIŞI BIRAKILDI
         ["openevent"] = "wais:hudv6:client:openCarControl", -- Event to open car control menu
-        ["disableKey"] = false, -- If you set this variable to `true`, the keymapping system will be disabled and only command or event will be used to open car control menu.
+        ["disableKey"] = true, -- Keymapping devre dışı
         ["description"] = "Araç Kontrol Menüsünü Aç", -- Description of the command
-        ["mouseControl"] = false, -- Allows you to control both the mouse and keyboard simultaneously. If you set it to `true`, you can control car control without splitting the game. If set to `false`, the game will split because your keyboard will only focus on car control.
+        ["mouseControl"] = false, -- Allows you to control both the mouse and keyboard simultaneously. If you set this to `true`, you can control car control without splitting the game. If set to `false`, the game will split because your keyboard will only focus on car control.
     },
     ["postal"] = {
         ["disabled"] = false, -- If you set this variable to `true`, postal code will be completely disabled.

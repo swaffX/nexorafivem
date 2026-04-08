@@ -121,35 +121,42 @@ RegisterNetEvent('ak4y-multicharacter:client:spawnLastLocation', function(positi
     DoScreenFadeOut(500)
     Wait(1000)
     
-    -- QBCore spawn sistemi ile pozisyonu ayarla
-    if position and position.x and position.y and position.z then
-        -- Position varsa son konuma spawn
-        print('[ak4y-multicharacter] Son konuma spawn: '..position.x..', '..position.y..', '..position.z)
-        TriggerEvent('qb-spawn:client:spawn', {
-            x = position.x,
-            y = position.y,
-            z = position.z,
-            heading = position.w or 0.0
-        })
-    else
-        -- Position yoksa varsayılan spawn
-        print('[ak4y-multicharacter] Varsayılan konuma spawn')
-        TriggerEvent('qb-spawn:client:spawn', {
-            x = AK4Y.DefaultSpawn.x,
-            y = AK4Y.DefaultSpawn.y,
-            z = AK4Y.DefaultSpawn.z,
-            heading = 0.0
-        })
-    end
-    
-    Wait(1000)
+    -- QBCore eventlerini tetikle (spawn öncesi)
     TriggerServerEvent('QBCore:Server:OnPlayerLoaded')
     TriggerEvent('QBCore:Client:OnPlayerLoaded')
     TriggerServerEvent('qb-houses:server:SetInsideMeta', 0, false)
     TriggerServerEvent('qb-apartments:server:SetInsideMeta', 0, 0, false)
+    
     Wait(500)
+    
+    -- Karakteri görünür yap
     SetEntityVisible(PlayerPedId(), true)
+    FreezeEntityPosition(PlayerPedId(), true)
+    
+    -- Direkt son konuma teleport (SetEntityCoords)
+    if position and position.x and position.y and position.z then
+        print('[ak4y-multicharacter] Son konuma spawn: '..position.x..', '..position.y..', '..position.z)
+        SetEntityCoords(PlayerPedId(), position.x, position.y, position.z, false, false, false, false)
+        if position.w then
+            SetEntityHeading(PlayerPedId(), position.w)
+        end
+    else
+        -- Son konum yoksa varsayılan spawn noktasına git
+        print('[ak4y-multicharacter] Varsayılan konuma spawn')
+        SetEntityCoords(PlayerPedId(), AK4Y.DefaultSpawn.x, AK4Y.DefaultSpawn.y, AK4Y.DefaultSpawn.z, false, false, false, false)
+        SetEntityHeading(PlayerPedId(), AK4Y.DefaultSpawn.w or 0.0)
+    end
+    
+    -- Zemine sabitle
+    Wait(100)
+    local ped = PlayerPedId()
+    local groundFound, groundZ = GetGroundZFor_3dCoord(GetEntityCoords(ped).x, GetEntityCoords(ped).y, GetEntityCoords(ped).z, false)
+    if groundFound then
+        SetEntityCoords(ped, GetEntityCoords(ped).x, GetEntityCoords(ped).y, groundZ, false, false, false, false)
+    end
+    
     Wait(500)
+    FreezeEntityPosition(PlayerPedId(), false)
     DoScreenFadeIn(250)
     TriggerEvent('qb-weathersync:client:EnableSync')
 end)

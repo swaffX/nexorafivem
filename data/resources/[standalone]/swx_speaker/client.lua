@@ -243,9 +243,13 @@ function PlayMusic(url, title)
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
         
-        -- 3D pozisyonel ses (dışarıdakiler için)
-        exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false)
-        exports.xsound:Distance(currentMusicId, currentDistance)
+        -- 3D pozisyonel ses (dışarıdakiler için) - networked=true diger oyuncular duysun
+        exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
+            isNetworked = true,
+            maxDistance = currentDistance,
+            rolloffFactor = 1.0,
+            refDistance = 10.0
+        })
         
         -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
         exports.xsound:destroyOnFinish(currentMusicId, false)
@@ -274,15 +278,6 @@ function PlayMusic(url, title)
             while isPlaying and DoesEntityExist(vehicle) do
                 local newCoords = GetEntityCoords(vehicle)
                 exports.xsound:Position(currentMusicId, newCoords)
-                
-                -- Araç içindeki oyuncular için ses seviyesini artır
-                local playersInVehicle = GetVehicleOccupants(vehicle)
-                for _, playerId in ipairs(playersInVehicle) do
-                    if playerId == PlayerId() then
-                        -- Kendi aracındaysan sesi biraz daha yüksek duy
-                        exports.xsound:setVolumeMax(currentMusicId, currentVolume * 1.5, PlayerId())
-                    end
-                end
                 
                 Wait(500)
             end
