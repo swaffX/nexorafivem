@@ -1,13 +1,6 @@
-QBCore = nil
-local coreLoaded = false
-Citizen.CreateThread(function()
-    while QBCore == nil do
-        TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
-        Citizen.Wait(200)
-    end
-    PlayerData = QBCore.Functions.GetPlayerData()
-    coreLoaded = true
-end)
+local QBCore = exports['qb-core']:GetCoreObject()
+local coreLoaded = true
+local PlayerData = QBCore.Functions.GetPlayerData()
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
@@ -81,8 +74,9 @@ end)
 Citizen.CreateThread(function()
     for store,data in pairs(Config.Locations) do
         for i=1, #data.coords do
-            exports["gr-base"]:addNotif(data["icon"], "E", data["label"], 2, 2, vector3(data.coords[i].x, data.coords[i].y, data.coords[i].z))
-            exports["gr-base"]:pedcreate("qb-shops-"..store.."-"..i, data.pedHash, data.coords[i].x, data.coords[i].y, data.coords[i].z - 1, data.coords[i].h)
+            -- gr-base kullanımı kaldırıldı - qb-target veya ox_target kullanılabilir
+            -- exports["gr-base"]:addNotif(data["icon"], "E", data["label"], 2, 2, vector3(data.coords[i].x, data.coords[i].y, data.coords[i].z))
+            -- exports["gr-base"]:pedcreate("qb-shops-"..store.."-"..i, data.pedHash, data.coords[i].x, data.coords[i].y, data.coords[i].z - 1, data.coords[i].h)
         end
 
         if data["blip"] then
