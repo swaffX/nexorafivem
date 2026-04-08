@@ -66,7 +66,7 @@ Config.Dob = {
 Config.CinematicMode = false -- If you want to use cinematic mode, you can make it true (um special?)
 
 Config.BackgroundMusic = {
-    Status = true,       -- If you want to use background music, you can make it true.
+    Status = false,       -- If you want to use background music, you can make it true.
     Name = 'bgmusic.mp3', -- [web/build/audio/]
     Volume = 0.5
 }
