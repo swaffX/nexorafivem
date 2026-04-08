@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Debug = false           -- If you want to see the debug messages in the console, you can make it true.
+Config.Debug = true           -- If you want to see the debug messages in the console, you can make it true.
 
 Config.Lang = 'tr'             -- [locales/.lua]
 
@@ -8,7 +8,7 @@ Config.PerformanceMode = false --  true (optional)
 
 Config.CleanZone = false       --  true (optional) (for zombie servers)
 
-Config.HideRadar = false       --  true (optional)
+Config.HideRadar = true       --  true (optional)
 
 Config.Logs = {
     Status = false,    --  true (optional)
