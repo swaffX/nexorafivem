@@ -109,11 +109,16 @@ RegisterNetEvent('ak4y-multicharacter:server:loadUserData', function(cData)
         print('^2[qb-core]^7 '..GetPlayerName(src)..' (Citizen ID: '..cData..') has succesfully loaded!')
         TriggerEvent("ria-logs:server:CreateLog", "girislog", "", "girislog", "``" .. GetPlayerName(src) .. " (".. src ..")`` Sunucuya Giriş yaptı \n ``Citizen ID: ".. cData .." - ".. steamId .." ".. QBCore.Functions.GetIdentifier(src, 'license') .." ".. QBCore.Functions.GetIdentifier(src, 'discord') .."``")
         QBCore.Commands.Refresh(src)
-        local varS = {
-            citizenid = cData
-        }
+        
+        -- Son konum bilgisini cek
+        local result = ExecuteSql("SELECT position FROM players WHERE citizenid = '"..cData.."'")
+        local position = nil
+        if result and result[1] and result[1].position then
+            position = json.decode(result[1].position)
+        end
+        
         -- Spawn selector devre disi - direkt son konumda spawn
-        TriggerClientEvent('ak4y-multicharacter:client:spawnLastLocation', src)
+        TriggerClientEvent('ak4y-multicharacter:client:spawnLastLocation', src, position)
         TriggerEvent("qb-log:server:CreateLog", "joinleave", "Loaded", "green", "**".. GetPlayerName(src) .. "** ("..(QBCore.Functions.GetIdentifier(src, 'discord') or 'undefined') .." |  ||"  ..(QBCore.Functions.GetIdentifier(src, 'ip') or 'undefined') ..  "|| | " ..(QBCore.Functions.GetIdentifier(src, 'license') or 'undefined') .." | " ..cData.." | "..src..") loaded..")
     end
 end)

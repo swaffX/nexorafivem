@@ -115,13 +115,34 @@ RegisterNetEvent('ak4y-multicharacter:client:closeNUI', function()
     SetNuiFocus(false, false)
 end)
 
-RegisterNetEvent('ak4y-multicharacter:client:spawnLastLocation', function()
+RegisterNetEvent('ak4y-multicharacter:client:spawnLastLocation', function(position)
     DeleteEntity(charPed)
     SetNuiFocus(false, false)
     DoScreenFadeOut(500)
-    Wait(2000)
+    Wait(1000)
     
-    -- Son konumda spawn (QBCore spawn sistemi kullan)
+    -- QBCore spawn sistemi ile pozisyonu ayarla
+    if position and position.x and position.y and position.z then
+        -- Position varsa son konuma spawn
+        print('[ak4y-multicharacter] Son konuma spawn: '..position.x..', '..position.y..', '..position.z)
+        TriggerEvent('qb-spawn:client:spawn', {
+            x = position.x,
+            y = position.y,
+            z = position.z,
+            heading = position.w or 0.0
+        })
+    else
+        -- Position yoksa varsayılan spawn
+        print('[ak4y-multicharacter] Varsayılan konuma spawn')
+        TriggerEvent('qb-spawn:client:spawn', {
+            x = AK4Y.DefaultSpawn.x,
+            y = AK4Y.DefaultSpawn.y,
+            z = AK4Y.DefaultSpawn.z,
+            heading = 0.0
+        })
+    end
+    
+    Wait(1000)
     TriggerServerEvent('QBCore:Server:OnPlayerLoaded')
     TriggerEvent('QBCore:Client:OnPlayerLoaded')
     TriggerServerEvent('qb-houses:server:SetInsideMeta', 0, false)
