@@ -10,6 +10,49 @@ local MenuItemId = nil
 local VehicleClassMap = {}
 local GarageZones = {}
 
+-- Özel araç isimlendirmeleri (QBCore.Shared.Vehicles'te olmayan araçlar için)
+local CustomVehicleNames = {
+    -- Arabalar
+    ['redeye'] = { brand = 'Dodge', name = 'Challenger Redeye' },
+    ['r820'] = { brand = 'Audi', name = 'R8' },
+    ['skyline'] = { brand = 'Nissan', name = 'Skyline R34' },
+    ['cla250'] = { brand = 'Mercedes', name = 'CLA 250' },
+    -- Polis araçları
+    ['pdexe1'] = { brand = 'Police', name = 'Explorer' },
+    ['pdexe2'] = { brand = 'Police', name = 'Explorer 2' },
+    ['pdexe3'] = { brand = 'Police', name = 'Tahoe' },
+    ['pdexe4'] = { brand = 'Police', name = 'Charger' },
+    ['pdexe5'] = { brand = 'Police', name = 'Mustang' },
+    ['pdexe6'] = { brand = 'Police', name = 'Camaro' },
+    ['pdexe7'] = { brand = 'Police', name = 'Durango' },
+    ['pdexe8'] = { brand = 'Police', name = 'F150' },
+    ['pdexe9'] = { brand = 'Police', name = 'Ram' },
+    ['shexe1'] = { brand = 'Sheriff', name = 'Explorer' },
+}
+
+-- Araç adını formatla (model kodu yerine güzel isim)
+local function GetVehicleDisplayName(model, vehData)
+    -- Önce QBCore.Shared.Vehicles'ten kontrol et
+    if vehData and vehData.name then
+        local brand = vehData.brand or ""
+        if brand ~= "" then
+            return brand .. " " .. vehData.name
+        else
+            return vehData.name
+        end
+    end
+    
+    -- Custom tablosundan kontrol et
+    local customName = CustomVehicleNames[model:lower()]
+    if customName then
+        return customName.brand .. " " .. customName.name
+    end
+    
+    -- Son çare: model adını formatla (redeye → Redeye)
+    local formatted = model:gsub("^%l", string.upper):gsub("_%l", string.upper)
+    return formatted
+end
+
 -- helper functions
 
 local function TableContains (tab, val)
@@ -683,10 +726,8 @@ RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
                 local bodyPercent = Round(v.body / 10, 0)
                 local currentFuel = v.fuel
                 local vehData = QBCore.Shared.Vehicles[v.vehicle]
-                -- Eğer QBCore.Shared.Vehicles'te yoksa, model adını kullan
-                local vname = vehData and vehData.name or v.vehicle:upper()
-                local brand = vehData and vehData.brand or ""
-                local fullName = brand ~= "" and (brand .. " " .. vname) or vname
+                -- Yeni fonksiyon ile araç adını al (QBCore, Custom tablo veya formatlanmış)
+                local fullName = GetVehicleDisplayName(v.vehicle, vehData)
 
                 if v.state == 0 then
                     v.state = Lang:t("status.out")
