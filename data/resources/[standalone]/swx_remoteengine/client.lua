@@ -209,12 +209,13 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
             SetVehicleEngineHealth(vehicle, 1000.0)
         end
         
-        -- SetVehicleEngineOn
-        SetVehicleEngineOn(vehicle, engineState, false, true)
-        
         -- Motoru çalıştır/kapat
         Citizen.CreateThread(function()
+            print('[SWX-RemoteEngine] Thread başladı, engineState:', engineState)
+            
             if engineState then
+                print('[SWX-RemoteEngine] Motor çalıştırılıyor...')
+                
                 -- Anahtarı set et (önce)
                 TriggerEvent("vehiclekeys:client:SetOwner", GetVehicleNumberPlateText(vehicle))
                 
@@ -224,30 +225,25 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleHasBeenOwnedByPlayer(vehicle, true)
                 
-                -- ÖNEMLİ: Önce motoru KAPAT (sıfırlamak için)
+                print('[SWX-RemoteEngine] Önce motoru kapatıyorum...')
                 SetVehicleEngineOn(vehicle, false, true, true)
                 
                 Wait(500)
+                print('[SWX-RemoteEngine] Şimdi açıyorum...')
                 
-                -- Şimdi GERÇEK motor çalıştırma sesiyle birlikte aç
-                -- isInstantly = false (yavaşça, marş sesiyle)
-                -- disableAutoStart = false (otomatik start açık - sesler aktif)
+                -- Marş sesiyle aç
                 SetVehicleEngineOn(vehicle, true, false, false)
                 
                 Wait(1000)
+                print('[SWX-RemoteEngine] 1sn sonra motor durumu:', GetIsVehicleEngineRunning(vehicle))
                 
-                -- Motorun gerçekten çalıştığını garantile
+                -- Motor çalışmadıysa tekrar dene
                 if not GetIsVehicleEngineRunning(vehicle) then
+                    print('[SWX-RemoteEngine] Çalışmadı, tekrar deniyorum...')
                     SetVehicleEngineOn(vehicle, true, false, false)
                 end
-                
-                -- 500ms sonra tekrar kontrol et
-                Citizen.SetTimeout(500, function()
-                    if not GetIsVehicleEngineRunning(vehicle) then
-                        SetVehicleEngineOn(vehicle, true, false, false)
-                    end
-                end)
             else
+                print('[SWX-RemoteEngine] Motor kapatılıyor...')
                 SetVehicleEngineOn(vehicle, false, false, true)
                 SetVehicleUndriveable(vehicle, true)
             end

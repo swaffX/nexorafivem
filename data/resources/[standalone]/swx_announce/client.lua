@@ -1,25 +1,24 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Modern duyuru göster
+-- Modern duyuru göster (sadece üstten animasyonlu bildirim)
 RegisterNetEvent('swx_announce:ShowAnnouncement', function(message, adminName)
-    -- ox_lib alert kullanarak modern bildirim
-    lib.alertDialog({
-        header = '📢 ' .. Config.TitleStyle,
-        content = message,
-        centered = true,
-        cancel = false,
-        size = 'lg'
-    })
-    
-    -- Ayrıca bildirim olarak da göster
+    -- Modern bildirim (animasyonlu, yukarıdan gelen)
     lib.notify({
-        title = Config.TitleStyle,
+        title = '📢 ' .. Config.TitleStyle,
         description = message,
         type = Config.NotifyType,
         duration = Config.NotifyDuration,
         position = Config.NotifyPosition,
         icon = Config.Icon,
-        iconColor = '#FFD700'
+        iconColor = '#FFD700',
+        showDuration = true
+    })
+    
+    -- Ayrıca chat'e de yaz
+    TriggerEvent('chat:addMessage', {
+        color = {255, 215, 0},
+        multiline = true,
+        args = {'[DUYURU] ' .. adminName, message}
     })
 end)
 
