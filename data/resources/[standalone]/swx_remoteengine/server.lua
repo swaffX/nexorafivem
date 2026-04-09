@@ -4,12 +4,19 @@ print('[SWX-RemoteEngine] Server script yükleniyor...')
 
 -- Oyuncunun araçlarını getir
 QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(source, cb)
-    print('[SWX-RemoteEngine] Callback çağrıldı, source:', source, 'type:', type(source))
+    print('[SWX-RemoteEngine] Callback çağrıldı, source:', source)
     
-    local Player = QBCore.Functions.GetPlayer(source)
+    -- Tüm oyuncuları kontrol et ve source'a göre bul
+    local Player = nil
+    for _, playerId in ipairs(QBCore.Functions.GetPlayers()) do
+        if tonumber(playerId) == tonumber(source) then
+            Player = QBCore.Functions.GetPlayer(playerId)
+            break
+        end
+    end
+    
     if not Player then
         print('[SWX-RemoteEngine] Player bulunamadı! source:', source)
-        print('[SWX-RemoteEngine] QBCore.Players:', QBCore.Functions.GetPlayers())
         cb({})
         return
     end
