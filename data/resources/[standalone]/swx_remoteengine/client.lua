@@ -246,6 +246,14 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
     if vehicle and vehicle ~= 0 then
         print('[SWX-RemoteEngine] Motor çalıştırma deneniyor...')
         
+        -- Kapı kilidini kontrol et ve aç
+        local lockStatus = GetVehicleDoorLockStatus(vehicle)
+        print('[SWX-RemoteEngine] Kapı kilidi durumu:', lockStatus)
+        if lockStatus ~= 1 then
+            SetVehicleDoorsLocked(vehicle, 1) -- 1 = Unlocked
+            print('[SWX-RemoteEngine] Kapılar açıldı')
+        end
+        
         -- Motor sağlığını kontrol et ve düzelt
         local engineHealth = GetVehicleEngineHealth(vehicle)
         print('[SWX-RemoteEngine] Motor sağlığı:', engineHealth)
@@ -255,24 +263,53 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
             print('[SWX-RemoteEngine] Motor sağlığı düzeltildi')
         end
         
-        -- Alternatif 1: SetVehicleEngineOn
+        -- Alternatif 1: SetVehicleEngineOn (standart)
         SetVehicleEngineOn(vehicle, engineState, false, true)
+        print('[SWX-RemoteEngine] SetVehicleEngineOn çağrıldı')
         
-        -- Alternatif 2: SetVehicleUndriveable ile birlikte
-        SetVehicleUndriveable(vehicle, not engineState)
-        
-        -- Alternatif 3: Motoru aktif et (biraz gecikmeli)
-        if engineState then
-            -- Motoru biraz ısıt
+        -- Alternatif 2: Motoru çalıştırma (farklı parametrelerle)
+        Citizen.CreateThread(function()
+            Wait(50)
+            -- Motoru ısıt ve çalıştır
             SetVehicleEngineHealth(vehicle, 1000.0)
-            -- Aktif hale getir
-            Citizen.CreateThread(function()
-                Wait(100)
+            SetVehiclePetrolTankHealth(vehicle, 1000.0)
+            
+            -- Araç tipine göre motoru çalıştır
+            if engineState then
+                -- Motoru çalıştır (isInstantStart = false, disableAutoStart = false)
                 SetVehicleEngineOn(vehicle, true, false, false)
-                Wait(100)
+                Wait(200)
                 SetVehicleEngineOn(vehicle, true, false, true)
-            end)
-        end
+                
+                -- Ek: Aracı sürülebilir yap
+                SetVehicleUndriveable(vehicle, false)
+                
+                -- Ek: Motorun gerçekten çalıştığını kontrol et
+                local actualEngineState = GetIsVehicleEngineRunning(vehicle)
+                print('[SWX-RemoteEngine] Gerçek motor durumu:', actualEngineState)
+                
+                if not actualEngineState then
+                    -- Son çare: Araca binip inerek motoru çalıştır
+                    print('[SWX-RemoteEngine] Motor çalışmadı, son çare deneniyor...')
+                    local ped = PlayerPedId()
+                    local veh = GetVehiclePedIsIn(ped, false)
+                    if veh == 0 then
+                        -- Araca bin
+                        TaskEnterVehicle(ped, vehicle, 5000, -1, 1.0, 1, 0)
+                        Wait(1000)
+                        -- Motoru çalıştır
+                        SetVehicleEngineOn(vehicle, true, false, true)
+                        Wait(500)
+                        -- Araçtan in
+                        TaskLeaveVehicle(ped, vehicle, 0)
+                    end
+                end
+            else
+                -- Motoru kapat
+                SetVehicleEngineOn(vehicle, false, false, true)
+                SetVehicleUndriveable(vehicle, true)
+            end
+        end)
         
         print('[SWX-RemoteEngine] Motor durumu değiştirildi!')
         
