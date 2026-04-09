@@ -12,11 +12,11 @@ local GarageZones = {}
 
 -- Özel araç isimlendirmeleri (QBCore.Shared.Vehicles'te olmayan araçlar için)
 local CustomVehicleNames = {
-    -- Arabalar
-    ['redeye'] = { brand = 'Dodge', name = 'Challenger Redeye' },
+    -- Arabalar (Galeri isimleri - model kodu yok)
+    ['redeye'] = { brand = 'Dodge', name = 'Challenger' },
     ['r820'] = { brand = 'Audi', name = 'R8' },
     ['skyline'] = { brand = 'Nissan', name = 'Skyline R34' },
-    ['cla250'] = { brand = 'Mercedes', name = 'CLA 250' },
+    ['cla250'] = { brand = 'Mercedes', name = 'CLA' },
     -- Polis araçları
     ['pdexe1'] = { brand = 'Police', name = 'Explorer' },
     ['pdexe2'] = { brand = 'Police', name = 'Explorer 2' },
@@ -723,7 +723,6 @@ RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
             
             for k, v in pairs(result) do
                 local enginePercent = Round(v.engine / 10, 0)
-                local bodyPercent = Round(v.body / 10, 0)
                 local currentFuel = v.fuel
                 local vehData = QBCore.Shared.Vehicles[v.vehicle]
                 -- Yeni fonksiyon ile araç adını al (QBCore, Custom tablo veya formatlanmış)
@@ -741,7 +740,7 @@ RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
                     title = type == "depot" and 
                         Lang:t('menu.header.depot', {value = fullName, value2 = v.depotprice }) or
                         Lang:t('menu.header.garage', {value = fullName, value2 = v.plate}),
-                    description = Lang:t('menu.text.garage', {value = v.state, value2 = currentFuel, value3 = enginePercent, value4 = bodyPercent}),
+                    description = Lang:t('menu.text.garage', {value = v.state, value2 = currentFuel, value3 = enginePercent}),
                     icon = 'car',
                     disabled = v.state == Lang:t("status.out"), -- Dışarıda olan araçları disable et
                     onSelect = function()

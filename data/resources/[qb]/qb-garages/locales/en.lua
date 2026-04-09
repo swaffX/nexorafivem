@@ -43,8 +43,8 @@ local Translations = {
         },
         text = {
             vehicles = "Araçlarınızı görüntüleyin!",
-            depot = "Plaka: %{value}<br>Benzin: %{value2} | Motor: %{value3} | Vücut: %{value4}",
-            garage = "Durum: %{value}<br>Benzin: %{value2} | Motor: %{value3} | Vücut: %{value4}",
+            depot = "Plaka: %{value}\nBenzin: %{value2} | Motor: %{value3}",
+            garage = "Durum: %{value}\nBenzin: %{value2} | Motor: %{value3}",
         }
     },
     status = {
