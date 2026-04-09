@@ -7,18 +7,29 @@ QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(s
     print('[SWX-RemoteEngine] Callback çağrıldı, source:', source)
     
     -- Tüm oyuncuları kontrol et ve source'a göre bul
+    local allPlayers = QBCore.Functions.GetPlayers()
+    print('[SWX-RemoteEngine] Tüm oyuncular:', json.encode(allPlayers))
+    print('[SWX-RemoteEngine] Oyuncu sayısı:', #allPlayers)
+    
     local Player = nil
-    for _, playerId in ipairs(QBCore.Functions.GetPlayers()) do
+    for _, playerId in ipairs(allPlayers) do
+        print('[SWX-RemoteEngine] Kontrol edilen playerId:', playerId, 'type:', type(playerId))
         if tonumber(playerId) == tonumber(source) then
             Player = QBCore.Functions.GetPlayer(playerId)
+            print('[SWX-RemoteEngine] Eşleşen playerId bulundu:', playerId, 'Player:', Player and 'VAR' or 'YOK')
             break
         end
     end
     
     if not Player then
         print('[SWX-RemoteEngine] Player bulunamadı! source:', source)
-        cb({})
-        return
+        -- Son çare: source'dan doğrudan dene
+        Player = QBCore.Functions.GetPlayer(tonumber(source))
+        print('[SWX-RemoteEngine] Son çare denemesi:', Player and 'BULUNDU' or 'YOK')
+        if not Player then
+            cb({})
+            return
+        end
     end
     
     local citizenid = Player.PlayerData.citizenid
