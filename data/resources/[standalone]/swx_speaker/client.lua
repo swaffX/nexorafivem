@@ -62,8 +62,8 @@ RegisterNetEvent('swx_speaker:client:receiveHistory', function(history)
     historyLoaded = true
 end)
 
--- K tuşu ile menü aç
-RegisterCommand('speaker', function()
+-- M tuşu ile menü aç
+RegisterCommand('swxspeaker', function()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
     
@@ -81,7 +81,7 @@ RegisterCommand('speaker', function()
     OpenSpeakerMenu()
 end, false)
 
-RegisterKeyMapping('speaker', 'Hoparlör Etkileşimi', 'keyboard', Config.OpenKey)
+RegisterKeyMapping('swxspeaker', 'Hoparlör Etkileşimi (M Tuşu)', 'keyboard', Config.OpenKey)
 
 function OpenSpeakerMenu()
     lib.registerContext({

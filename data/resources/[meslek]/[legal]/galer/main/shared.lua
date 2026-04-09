@@ -55,7 +55,6 @@ Config.Vehicles = {
             {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='sport'},
             {model='r820',       label='Audi R8 2020',  price=100000,  category='sport'},
             {model='redeye',     label='Dodge Challenger', price=80000, category='sport'},
-            {model='ford',       label='Ford Shelby GT350R', price=100000, category='sport'},
             {model='cla250',     label='Mercedes Benz CLA 250', price=85000, category='sport'},
             {model='hermes',     label='Hermes',        price=38000,   category='trunk'},
             {model='blade',      label='Blade',         price=24000,   category='trunk'},
