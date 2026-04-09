@@ -6,15 +6,28 @@ local cruiseControl = {
     lastVehicle = nil
 }
 
--- B tuşu ile hız sabitleme
-cruiseControl.keybind = lib.addKeybind({
-    name = 'swx_cruise_control',
-    description = 'Hız Sabitleme (Cruise Control)',
-    defaultKey = 'B',
-    onPressed = function()
-        ToggleCruiseControl()
+-- ox_lib ve player loaded bekle, sonra keybind kaydet
+CreateThread(function()
+    -- ox_lib hazır olana kadar bekle
+    while GetResourceState('ox_lib') ~= 'started' do
+        Wait(100)
     end
-})
+    
+    -- Player loaded olana kadar bekle
+    while not LocalPlayer.state.isLoggedIn do
+        Wait(100)
+    end
+    
+    -- B tuşu ile hız sabitleme
+    cruiseControl.keybind = lib.addKeybind({
+        name = 'swx_cruise_control',
+        description = 'Hız Sabitleme (Cruise Control)',
+        defaultKey = 'B',
+        onPressed = function()
+            ToggleCruiseControl()
+        end
+    })
+end)
 
 function ToggleCruiseControl()
     local ped = PlayerPedId()

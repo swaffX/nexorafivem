@@ -27,17 +27,19 @@ wFramework.GetGangFromScript = nil
 -- ============================================
 
 function wFramework.sendMoneyToUI()
-    SendNUIMessage({
-        type = "SET_PLAYER_CASH",
-        cash = wFramework.Money.cash
-    })
+    -- Cash gizlendi - gönderim devre dışı
+    -- SendNUIMessage({
+    --     type = "SET_PLAYER_CASH",
+    --     cash = wFramework.Money.cash
+    -- })
 end
 
 function wFramework.sendBankToUI()
-    SendNUIMessage({
-        type = "SET_PLAYER_BANK",
-        bank = wFramework.Money.bank
-    })
+    -- Bank gizlendi - gönderim devre dışı
+    -- SendNUIMessage({
+    --     type = "SET_PLAYER_BANK",
+    --     bank = wFramework.Money.bank
+    -- })
 end
 
 function wFramework.sendJobToUI()

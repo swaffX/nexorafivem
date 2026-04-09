@@ -50,10 +50,11 @@ return {
     -- İş menüsü
     ["open_job_menu"] = "[E] - İş Menüsünü Aç",
     ["job_menu_title"] = "İş Aktiviteleri",
-    ["take_outfit"] = "İş kıyafetini giy",
-    ["take_outfit_desc"] = "İşin kıyafetlerini giy",
-    ["take_default_outfit"] = "Kendi kıyafetlerini giy",
-    ["take_default_outfit_desc"] = "Kendi kıyafetlerini geri giy",
+    -- Kıyafet seçenekleri kaldırıldı
+    -- ["take_outfit"] = "İş kıyafetini giy",
+    -- ["take_outfit_desc"] = "İşin kıyafetlerini giy",
+    -- ["take_default_outfit"] = "Kendi kıyafetlerini giy",
+    -- ["take_default_outfit_desc"] = "Kendi kıyafetlerini geri giy",
     ["take_a_car"] = "Araç al",
     ["take_a_car_desc"] = "İşe başlamak için araç al",
     ["delete_car"] = "Aracı iade et",
