@@ -577,12 +577,14 @@ RegisterNetEvent("high_phone:updateVehicles", function()
     QBCore.Functions.TriggerCallback("high_phone:getVehicles", function(vehicles)
         local data = {}
         for k, v in pairs(vehicles) do
-            data[#data + 1] = {
-                brand = QBCore.Shared.Vehicles[v.vehicle].brand,
-                name = QBCore.Shared.Vehicles[v.vehicle].name,
-                plate = v.plate,
-                garage = v.garage
-            }
+            if QBCore.Shared.Vehicles[v.vehicle] then
+                data[#data + 1] = {
+                    brand = QBCore.Shared.Vehicles[v.vehicle].brand,
+                    name = QBCore.Shared.Vehicles[v.vehicle].name,
+                    plate = v.plate,
+                    garage = v.garage
+                }
+            end
         end
 
         SendNUIMessage({
