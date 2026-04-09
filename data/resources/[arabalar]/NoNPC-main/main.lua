@@ -8,10 +8,10 @@ Citizen.CreateThread(function()
 		SetCreateRandomCopsOnScenarios(false)
 		SetGarbageTrucks(true)  -- Çöp kamyonları açık
 		SetRandomBoats(true)    -- Tekneler açık
-       		SetVehicleDensityMultiplierThisFrame(0.3)      -- Trafik yoğunluğu düşük
-       		SetPedDensityMultiplierThisFrame(0.4)          -- NPC yoğunluğu düşük-orta
-		SetRandomVehicleDensityMultiplierThisFrame(0.3) -- Rastgele araçlar
-		SetScenarioPedDensityMultiplierThisFrame(0.4, 0.4) -- Scenario NPC'ler
+        	SetVehicleDensityMultiplierThisFrame(0.5)      -- Trafik yoğunluğu orta
+       		SetPedDensityMultiplierThisFrame(0.6)          -- NPC yoğunluğu artırıldı
+		SetRandomVehicleDensityMultiplierThisFrame(0.5) -- Rastgele araçlar
+		SetScenarioPedDensityMultiplierThisFrame(0.6, 0.6) -- Scenario NPC'ler
 		SetParkedVehicleDensityMultiplierThisFrame(0.5)  -- Park edilmiş araçlar
     end
 end)

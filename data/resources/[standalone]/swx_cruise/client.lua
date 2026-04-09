@@ -8,9 +8,28 @@ local cruiseControl = {
 
 -- ox_lib ve player loaded bekle, sonra keybind kaydet
 CreateThread(function()
-    -- ox_lib hazır olana kadar bekle
-    while GetResourceState('ox_lib') ~= 'started' do
+    -- ox_lib hazır olana kadar bekle (exports kontrolü)
+    local ox_lib = nil
+    while not ox_lib do
         Wait(100)
+        local status, result = pcall(function()
+            return exports['ox_lib']
+        end)
+        if status and result then
+            ox_lib = result
+        end
+    end
+    
+    -- lib global'inin hazır olmasını bekle
+    local attempts = 0
+    while not _G.lib and attempts < 50 do
+        Wait(100)
+        attempts = attempts + 1
+    end
+    
+    if not _G.lib then
+        print('[SWX Cruise] Uyarı: ox_lib global değişkeni bulunamadı!')
+        return
     end
     
     -- Player loaded olana kadar bekle
@@ -19,14 +38,20 @@ CreateThread(function()
     end
     
     -- B tuşu ile hız sabitleme
-    cruiseControl.keybind = lib.addKeybind({
-        name = 'swx_cruise_control',
-        description = 'Hız Sabitleme (Cruise Control)',
-        defaultKey = 'B',
-        onPressed = function()
-            ToggleCruiseControl()
-        end
-    })
+    local success, result = pcall(function()
+        cruiseControl.keybind = lib.addKeybind({
+            name = 'swx_cruise_control',
+            description = 'Hız Sabitleme (Cruise Control)',
+            defaultKey = 'B',
+            onPressed = function()
+                ToggleCruiseControl()
+            end
+        })
+    end)
+    
+    if not success then
+        print('[SWX Cruise] Keybind kaydedilemedi: ' .. tostring(result))
+    end
 end)
 
 function ToggleCruiseControl()

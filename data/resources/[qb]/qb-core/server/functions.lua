@@ -705,11 +705,36 @@ end
 
 ---Notify
 ---@param source any
----@param text string
----@param type string
----@param length number
+---@param source number - Oyuncu ID
+---@param text string - Bildirim mesajı
+---@param type string - Bildirim tipi: primary | error | success | warning | info
+---@param length number - Bildirim süresi (ms)
 function QBCore.Functions.Notify(source, text, type, length)
-    TriggerClientEvent('QBCore:Notify', source, text, type, length)
+    if text == nil or text == "" then 
+        text = "Bildirim"
+    end
+    
+    if type == nil or type == "" then 
+        type = "info"
+    end
+    
+    if length == nil or length == "" then 
+        length = 5000
+    end
+    
+    -- QBCore tipini xs-notify tipine çevir (Türkçe başlıklar)
+    local typeMap = {
+        ["primary"] = {notifyType = 3, title = "BİLGİ"},
+        ["error"] = {notifyType = 0, title = "HATA"},
+        ["success"] = {notifyType = 1, title = "BAŞARILI"},
+        ["warning"] = {notifyType = 2, title = "UYARI"},
+        ["info"] = {notifyType = 3, title = "BİLGİ"}
+    }
+    
+    local notifyData = typeMap[type] or typeMap["info"]
+    
+    -- xs-notify kullan (Türkçe başlık, orta pozisyon)
+    TriggerClientEvent('xs:notify', source, notifyData.title, text, length, notifyData.notifyType, 3, "Nexora")
 end
 
 ---???? ... ok
