@@ -312,9 +312,24 @@ Config.MenuItems = {
         id = 'vehicle',
         title = 'Araç',
         icon = 'car',
-        type = 'client',
-        event = 'ron-carmenu:openUI',
-        shouldClose = true
+        items = {
+            {
+                id = 'remotestart',
+                title = 'Aracı Çalıştır',
+                icon = 'key',
+                type = 'client',
+                event = 'swx_remoteengine:OpenRadialMenu',
+                shouldClose = true
+            },
+            {
+                id = 'carui',
+                title = 'Araç Menüsü',
+                icon = 'car',
+                type = 'client',
+                event = 'ron-carmenu:openUI',
+                shouldClose = true
+            }
+        }
     },
 }
 

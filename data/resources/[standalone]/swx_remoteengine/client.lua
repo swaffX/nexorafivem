@@ -207,23 +207,20 @@ local function OpenRemoteEngineMenu()
     end)
 end
 
--- Komut kaydet (benzersiz isim - eski tuş çakışmasını önlemek için)
-RegisterCommand('swxremoteengine', function()
-    print('[SWX-RemoteEngine] Komut çalıştırıldı!')
+-- Radial Menü entegrasyonu - Araç dışındayken "Aracı Çalıştır" seçeneği
+RegisterNetEvent('swx_remoteengine:OpenRadialMenu', function()
+    print('[SWX-RemoteEngine] Radial menüden çağrıldı')
     -- Sadece araç dışındayken çalışsın
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
-        print('[SWX-RemoteEngine] Araçtayken menü açılmaz')
-        return -- Araçtayken menü açılmasın
+        QBCore.Functions.Notify('Araçtayken bu menüyü kullanamazsınız!', 'error', 3000)
+        return
     end
     
-    print('[SWX-RemoteEngine] Menü açılıyor...')
     OpenRemoteEngineMenu()
-end, false)
+end)
 
--- Tuş atama (K tuşu - M tuşu swx_speaker tarafından kullanılıyor)
-RegisterKeyMapping('swxremoteengine', 'Uzaktan Araç Kontrolü (Anahtar)', 'keyboard', 'K')
-print('[SWX-RemoteEngine] K tuşu ataması yapıldı')
+print('[SWX-RemoteEngine] Radial menü entegrasyonu hazır')
 
 -- Motor durumu senkronizasyonu
 RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
