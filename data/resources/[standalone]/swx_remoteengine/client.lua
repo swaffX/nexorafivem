@@ -2,9 +2,12 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = {}
 local MenuOpen = false
 
+print('[SWX-RemoteEngine] Client script yükleniyor...')
+
 -- Oyuncu verilerini al
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
+    print('[SWX-RemoteEngine] Oyuncu verileri yüklendi')
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
@@ -180,17 +183,21 @@ end
 
 -- Komut kaydet (benzersiz isim - eski tuş çakışmasını önlemek için)
 RegisterCommand('swxremoteengine', function()
+    print('[SWX-RemoteEngine] Komut çalıştırıldı!')
     -- Sadece araç dışındayken çalışsın
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
+        print('[SWX-RemoteEngine] Araçtayken menü açılmaz')
         return -- Araçtayken menü açılmasın
     end
     
+    print('[SWX-RemoteEngine] Menü açılıyor...')
     OpenRemoteEngineMenu()
 end, false)
 
 -- Tuş atama (K tuşu - M tuşu swx_speaker tarafından kullanılıyor)
 RegisterKeyMapping('swxremoteengine', 'Uzaktan Araç Kontrolü (Anahtar)', 'keyboard', 'K')
+print('[SWX-RemoteEngine] K tuşu ataması yapıldı')
 
 -- Motor durumu senkronizasyonu
 RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)

@@ -1,5 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
+print('[SWX-RemoteEngine] Server script yükleniyor...')
+
 -- Oyuncunun araçlarını getir
 QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(source, cb)
     local Player = QBCore.Functions.GetPlayer(source)
@@ -41,7 +43,7 @@ RegisterNetEvent('swx_remoteengine:ToggleEngine', function(plate, netId, engineS
             
             -- Araç modeli izin verilen listede mi kontrol et
             if not AllowedVehicles[vehicleModel] then
-                TriggerClientEvent('QBCore:Notify', src, Config.Messages.vehicle_not_supported, 'error')
+                TriggerClientEvent('QBCore:Notify', src, 'Bu araç uzaktan çalıştırma desteklemiyor!', 'error')
                 return
             end
             
