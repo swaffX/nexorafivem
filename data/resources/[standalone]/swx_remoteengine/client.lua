@@ -79,12 +79,21 @@ end
 
 -- F3 Menü - Araç Listesi
 local function OpenRemoteEngineMenu()
-    if MenuOpen then return end
+    print('[SWX-RemoteEngine] OpenRemoteEngineMenu() çağrıldı')
+    
+    if MenuOpen then 
+        print('[SWX-RemoteEngine] MenuOpen true, menü zaten açık')
+        return 
+    end
     
     MenuOpen = true
+    print('[SWX-RemoteEngine] Callback çağrılıyor...')
     
     QBCore.Functions.TriggerCallback('swx_remoteengine:GetPlayerVehicles', function(vehicles)
+        print('[SWX-RemoteEngine] Callback yanıt verdi. Araç sayısı:', vehicles and #vehicles or 0)
+        
         if not vehicles or #vehicles == 0 then
+            print('[SWX-RemoteEngine] Araç bulunamadı!')
             QBCore.Functions.Notify('Kayıtlı aracınız bulunamadı!', 'error', Config.NotifyDuration)
             MenuOpen = false
             return
@@ -95,23 +104,33 @@ local function OpenRemoteEngineMenu()
         local playerCoords = GetEntityCoords(ped)
         local hasNearbyVehicle = false
         
+        print('[SWX-RemoteEngine] Menzilde araç aranıyor...')
         for _, veh in ipairs(vehicles) do
+            print('[SWX-RemoteEngine] Kontrol edilen:', veh.vehicle, 'Plaka:', veh.plate)
             -- Sadece izin verilen araç modellerini kontrol et
             if Config.AllowedVehicles[veh.vehicle] then
+                print('[SWX-RemoteEngine] İzin verilen araç bulundu:', veh.vehicle)
                 local nearbyVeh = FindVehicleByPlate(veh.plate)
                 if nearbyVeh then
                     local vehicleCoords = GetEntityCoords(nearbyVeh)
                     local distance = #(playerCoords - vehicleCoords)
+                    print('[SWX-RemoteEngine] Araç bulundu, mesafe:', distance)
                     if distance <= Config.KeyRange then
                         hasNearbyVehicle = true
+                        print('[SWX-RemoteEngine] Menzilde araç bulundu!')
                         break
                     end
+                else
+                    print('[SWX-RemoteEngine] Araç yakında değil (spawn olmamış olabilir)')
                 end
+            else
+                print('[SWX-RemoteEngine] Araç izin listesinde değil:', veh.vehicle)
             end
         end
         
         -- Menzilde araç yoksa menüyü açma
         if not hasNearbyVehicle then
+            print('[SWX-RemoteEngine] Menzilde uygun araç yok!')
             QBCore.Functions.Notify(Config.Messages.no_allowed_vehicle, 'error', Config.NotifyDuration)
             MenuOpen = false
             return
@@ -170,12 +189,15 @@ local function OpenRemoteEngineMenu()
         end
         
         -- Menü göster
+        print('[SWX-RemoteEngine] Menü oluşturuluyor, seçenek sayısı:', #options)
         lib.registerContext({
             id = 'remote_engine_menu',
             title = Config.Messages.menu_title,
             options = options
         })
+        print('[SWX-RemoteEngine] Menü kaydedildi, gösteriliyor...')
         lib.showContext('remote_engine_menu')
+        print('[SWX-RemoteEngine] Menü gösterildi!')
         
         MenuOpen = false
     end)
