@@ -33,61 +33,80 @@ function GetFramework()
 Config.Vehicles = {
     Car = {
         ['car'] = {
-            {model='bati',       label='Bati',          price=800000,    category='luxury'},
-            {model='zentorno',   label='Zentorno',      price=1000000,    category='luxury'},
-            {model='sanchez',    label='Sanchez',       price=500000,    category='luxury'},
-            {model='asea',       label='Asea',          price=100000,    category='luxury'},
-            {model='emperor',    label='Emperor',       price=98000,    category='luxury'},
-            {model='fugitive',   label='Fugitive',      price=600000,    category='luxury'},
-            {model='Injection',  label='Injection',     price=7600,    category='luxury'},        
-            {model='bifta',      label='Bifta',         price=110000,    category='jeep'},
-            {model='brawler',    label='Brawler',       price=700000,    category='jeep'},
-            {model='rancherxl',  label='Rancher XL',    price=99000,    category='jeep'},
-            {model='rebel2',     label='Rebel Or',      price=50000,    category='jeep'},
-            {model='rancherxl',  label='Rancher XL',    price=70000,    category='jeep'},
-            {model='mesa3',      label='Rancher XL',    price=1000000,    category='jeep'},
-            {model='comet7',     label='Comet',         price=2000000,    category='sedan'},
-            {model='reever',     label='Reever',        price=1500000,    category='sedan'},
-            {model='granger2',   label='Granger',       price=1000000,    category='sedan'},
-            {model='iwagen',     label='İwagen',        price=1500000,    category='sedan'},
-            {model='shinobi',    label='Shinobi',       price=2000000,    category='sedan'},
-            {model='patriot3',   label='Patriot',       price=6000000,    category='sedan'},
-            {model='buffalo4',   label='Buffalo STX',   price=3600,    category='sport'},
-            {model='ignus',      label='İgnus',         price=6400,    category='sport'},
-            {model='deity',      label='Enus Deity',    price=6100,    category='sport'},
-            {model='cinquemila', label='Cinquemila',    price=6200,    category='sport'},
-            {model='astron',     label='Pfister Astron',price=6060,    category='sport'},
-            {model='champion',   label='Champion',      price=6020,    category='sport'},
-            {model='hermes',     label='Hermes',        price=6300,    category='trunk'},
-            {model='hotknife',   label='Hotknife',      price=60000,    category='trunk'},
-            {model='moonbeam',   label='Moon Beam',     price=70000,    category='trunk'},
-            {model='avarus',     label='Avarus',        price=80000,    category='trunk'},
-            {model='blade',      label='Blade',         price=70000,    category='trunk'},
-            {model='buccaneer',  label='Buccaneer',     price=60000,    category='trunk'},
-
+            -- [BAŞLANGIÇ/ECONOMY ARAÇLARI]
+            {model='asea',       label='Asea',          price=6500,    category='luxury'},
+            {model='emperor',    label='Emperor',       price=8000,    category='luxury'},
+            {model=' Injection',  label='Injection',     price=12000,   category='luxury'},        
+            {model='bifta',      label='Bifta',         price=15000,   category='jeep'},
+            {model='rebel2',     label='Rebel',         price=8500,    category='jeep'},
+            {model='rancherxl',  label='Rancher XL',    price=18000,   category='jeep'},
+            {model='mesa3',      label='Mesa',          price=35000,   category='jeep'},
+            
+            -- [ORTA SEVİYE SEDANLAR]
+            {model='fugitive',   label='Fugitive',      price=18000,   category='luxury'},
+            {model='glendale',   label='Glendale',      price=14000,   category='luxury'},
+            {model='premier',    label='Premier',       price=16000,   category='luxury'},
+            
+            -- [SPOR ARABALAR]
+            {model='buffalo4',   label='Buffalo STX',   price=42000,   category='sport'},
+            {model='drafter',    label='Drafter',       price=55000,   category='sport'},
+            {model='jester',     label='Jester',        price=48000,   category='sport'},
+            {model='elegy2',     label='Elegy Retro',   price=52000,   category='sport'},
+            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='sport'},
+            {model='r820',       label='Audi R8 2020',  price=100000,  category='sport'},
+            {model='dodge',      label='Dodge Challenger', price=80000, category='sport'},
+            {model='bmw',        label='BMW',           price=75000,   category='sport'},
+            {model='hermes',     label='Hermes',        price=38000,   category='trunk'},
+            {model='blade',      label='Blade',         price=24000,   category='trunk'},
+            
+            -- [LÜKS ARABALAR]
+            {model='zentorno',   label='Zentorno',      price=145000,  category='luxury'},
+            
+            -- [MOTOSİKLETLER]
+            {model='bati',       label='Bati',          price=22000,   category='luxury'},
+            {model='sanchez',    label='Sanchez',       price=9500,    category='luxury'},
+            {model='avarus',     label='Avarus',        price=15000,   category='trunk'},
+            
+            -- [MUSCLE/CLASSIC]
+            {model='buccaneer',  label='Buccaneer',     price=16500,   category='trunk'},
+            {model='hotknife',   label='Hotknife',      price=28000,   category='trunk'},
+            {model='moonbeam',   label='Moon Beam',     price=22000,   category='trunk'},
+            {model='brawler',    label='Brawler',       price=32000,   category='jeep'},
         },
 
         ['boat'] = {
-          {model='Seashark2',       label='Seashark',          price=1000000,    category='boats'},
-          {model='Seashark3',       label='Seashark3',         price=1000000,    category='criminals'},
-          {model='Submersible2',    label='Submersible2',      price=1000000,    category='boats'},
-          {model='Dinghy4',         label='Dinghy4',           price=1000000,    category='boats'},
-          {model='Dinghy',          label='Dinghy',            price=1000000,    category='boats'},
-          {model='Toro',            label='Toro',              price=1000000,    category='boats'},
+          {model='Seashark2',       label='Seashark',          price=45000,    category='boats'},
+          {model='Seashark3',       label='Seashark3',         price=45000,    category='criminals'},
+          {model='Submersible2',    label='Submersible2',      price=185000,   category='boats'},
+          {model='Dinghy4',         label='Dinghy4',           price=55000,    category='boats'},
+          {model='Dinghy',          label='Dinghy',            price=38000,    category='boats'},
+          {model='Toro',            label='Toro',              price=125000,   category='boats'},
         },
 
         ['aircraft'] = {
-          {model='Cargobob',        label='Cargobob',          price=100000000,    category='military'},
-          {model='Maverick',        label='Maverick',          price=100000000,    category='military'},
-          {model='Valkyrie2',       label='Valkyrie2',         price=100000000,    category='airplane'},
-          {model='Swift2',          label='Swift2',            price=100000000,    category='airplane'},
+          {model='Cargobob',        label='Cargobob',          price=450000,    category='military'},
+          {model='Maverick',        label='Maverick',          price=285000,    category='military'},
+          {model='Valkyrie2',       label='Valkyrie2',         price=650000,    category='airplane'},
+          {model='Swift2',          label='Swift2',            price=520000,    category='airplane'},
         },
 
 
         ['armor'] = {
+            -- Standart LSPD Araçları
             {model='police',     label='Police',          price=1600,    category='armor'},
             {model='police2',    label='Police 2',        price=2600,    category='armor'},
             {model='police3',    label='Police 3',        price=3600,    category='armor'},
+            -- pdexe Özel Araçlar (pdbike, mrap, hellancpd, nk araçları)
+            {model='hellancpd',  label='Hellan CPD',      price=5200,    category='armor'},
+            {model='mrap',       label='MRAP',            price=8500,    category='armor'},
+            {model='nkbuffalos', label='Buffalo Police',  price=4200,    category='armor'},
+            {model='nkcoquette', label='Coquette Police', price=5500,    category='armor'},
+            {model='nkcruiser',  label='Cruiser Police',  price=3800,    category='armor'},
+            {model='nkgauntlet4',label='Gauntlet Police', price=4800,    category='armor'},
+            {model='nkscout',    label='Scout Police',    price=4500,    category='armor'},
+            {model='nkscout2020',label='Scout 2020',      price=5000,    category='armor'},
+            {model='nktorrence', label='Torrence Police', price=4600,    category='armor'},
+            {model='pdbike',     label='Police Bike',     price=1200,    category='armor'},
         },
 
     },    

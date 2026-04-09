@@ -15,38 +15,22 @@ end)
 
 -- Zmiana danych gracza (aktualizacja pieniędzy)
 RegisterNetEvent("QBCore:Player:SetPlayerData", function(val)
-    -- Store player data for QBX (QBX might pass it in the event)
-    if Config and Config.Framework and Config.Framework.Framework == "qbx" then
-        if val and type(val) == "table" and val.job then
+    -- QBCore ve QBX için gelen val verisini doğrudan kaydet
+    if val and type(val) == "table" then
+        -- PlayerData'yı güncelle (cash/bank senkronizasyonu için kritik)
+        if wFramework and wFramework.Framework then
             wFramework.Framework.PlayerData = val
-            Config.Debug("[^2INFO - QBX^0] Player data set from SetPlayerData event")
-            -- Trigger player loaded if not already loaded
-            if not wFramework.PlayerLoaded then
+            Config.Debug("[^2INFO - QB^0] PlayerData güncellendi from SetPlayerData event")
+        end
+        
+        -- QBX için player loaded kontrolü
+        if Config and Config.Framework and Config.Framework.Framework == "qbx" then
+            if val.job and not wFramework.PlayerLoaded then
                 CreateThread(function()
                     Wait(100)
                     wFramework.playerLoaded()
                 end)
             end
-        else
-            -- If val is not provided, try to get from framework
-            CreateThread(function()
-                Wait(100)
-                if wFramework.Framework and wFramework.Framework.Functions then
-                    local success, result = pcall(function()
-                        -- Try to get from cached PlayerData if available
-                        if wFramework.Framework.PlayerData and wFramework.Framework.PlayerData.job then
-                            return wFramework.Framework.PlayerData
-                        end
-                        return nil
-                    end)
-                    if success and result and result.job then
-                        wFramework.Framework.PlayerData = result
-                        if not wFramework.PlayerLoaded then
-                            wFramework.playerLoaded()
-                        end
-                    end
-                end
-            end)
         end
     end
     Wait(250)
