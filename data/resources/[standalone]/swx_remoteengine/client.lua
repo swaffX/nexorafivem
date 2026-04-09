@@ -280,15 +280,21 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 
                 Wait(100)
                 
-                -- Motoru çalıştır
-                SetVehicleEngineOn(vehicle, true, false, true)
+                -- Motoru çalıştır (native doğrudan çağrı)
+                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, true)
+                print('[SWX-RemoteEngine] Native 1 çağrıldı')
                 
                 Wait(100)
                 
-                -- Tekrar dene farklı parametrelerle
-                SetVehicleEngineOn(vehicle, true, true, false)
+                -- Tekrar dene (instantly = true)
+                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, true, false)
+                print('[SWX-RemoteEngine] Native 2 çağrıldı')
                 
-                print('[SWX-RemoteEngine] Motor çalıştırma komutları gönderildi')
+                Wait(200)
+                
+                -- Son deneme (farklı parametreler)
+                SetVehicleEngineOn(vehicle, true, false, false)
+                print('[SWX-RemoteEngine] SetVehicleEngineOn (false, false) çağrıldı')
             else
                 -- Motoru kapat
                 SetVehicleEngineOn(vehicle, false, false, true)
