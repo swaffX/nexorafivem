@@ -646,9 +646,18 @@ RegisterNUICallback("updateVehicles", function(_, cb)
     QBCore.Functions.TriggerCallback("high_phone:getVehicles", function(vehicles)
         local data = {}
         for k, v in pairs(vehicles) do
+            local vehicleData = QBCore.Shared.Vehicles[v.vehicle]
+            local brand = "Bilinmiyor"
+            local name = v.vehicle or "Araç"
+            
+            if vehicleData then
+                brand = vehicleData.brand or "Bilinmiyor"
+                name = vehicleData.name or v.vehicle
+            end
+            
             data[#data + 1] = {
-                brand = QBCore.Shared.Vehicles[v.vehicle].brand,
-                name = QBCore.Shared.Vehicles[v.vehicle].name,
+                brand = brand,
+                name = name,
                 plate = v.plate,
                 garage = v.state == 0 and "Çekilmiş" or v.garage
             }
