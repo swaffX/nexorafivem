@@ -2,21 +2,16 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0) -- Prevent crashing.
 
-		-- Stop Spawn
+		-- Polisler kapalı kalsın (gerekirse true yap)
 		SetCreateRandomCops(false)
 		SetCreateRandomCopsNotOnScenarios(false)
 		SetCreateRandomCopsOnScenarios(false)
-		SetGarbageTrucks(false)
-		SetRandomBoats(false)
-       		SetVehicleDensityMultiplierThisFrame(0.0)
-       		SetPedDensityMultiplierThisFrame(0.0)
-		SetRandomVehicleDensityMultiplierThisFrame(0.0)
-		SetScenarioPedDensityMultiplierThisFrame(0.0, 0.0)
-		SetParkedVehicleDensityMultiplierThisFrame(0.0)
-
-		-- Clear NPC
-		local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
-		ClearAreaOfVehicles(x, y, z, 1000, false, false, false, false, false)
-		RemoveVehiclesFromGeneratorsInArea(x - 500.0, y - 500.0, z - 500.0, x + 500.0, y + 500.0, z + 500.0);
+		SetGarbageTrucks(true)  -- Çöp kamyonları açık
+		SetRandomBoats(true)    -- Tekneler açık
+       		SetVehicleDensityMultiplierThisFrame(0.3)      -- Trafik yoğunluğu düşük
+       		SetPedDensityMultiplierThisFrame(0.4)          -- NPC yoğunluğu düşük-orta
+		SetRandomVehicleDensityMultiplierThisFrame(0.3) -- Rastgele araçlar
+		SetScenarioPedDensityMultiplierThisFrame(0.4, 0.4) -- Scenario NPC'ler
+		SetParkedVehicleDensityMultiplierThisFrame(0.5)  -- Park edilmiş araçlar
     end
 end)

@@ -11,7 +11,7 @@ Config.AutoSQLSave = false
 
 Config.Mechanics = {
 	["Bennys"] = {
-		Job = "unjob", -- job name or unjob
+		Job = "mechanic", -- Sadece 'mechanic' mesleğine sahip oyuncular erişebilir
 		Coords = vector4(-211.7776, -1324.457, 30.45644, 177.6539),
 	},
 }

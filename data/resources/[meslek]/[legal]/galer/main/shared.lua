@@ -74,21 +74,22 @@ Config.Vehicles = {
             {model='brawler',    label='Brawler',       price=32000,   category='jeep'},
         },
 
-        ['boat'] = {
-          {model='Seashark2',       label='Seashark',          price=45000,    category='boats'},
-          {model='Seashark3',       label='Seashark3',         price=45000,    category='criminals'},
-          {model='Submersible2',    label='Submersible2',      price=185000,   category='boats'},
-          {model='Dinghy4',         label='Dinghy4',           price=55000,    category='boats'},
-          {model='Dinghy',          label='Dinghy',            price=38000,    category='boats'},
-          {model='Toro',            label='Toro',              price=125000,   category='boats'},
-        },
+        -- TEKNE VE HAVA ARACI SATIŞI KAPALI
+        -- ['boat'] = {
+        --   {model='Seashark2',       label='Seashark',          price=45000,    category='boats'},
+        --   {model='Seashark3',       label='Seashark3',         price=45000,    category='criminals'},
+        --   {model='Submersible2',    label='Submersible2',      price=185000,   category='boats'},
+        --   {model='Dinghy4',         label='Dinghy4',           price=55000,    category='boats'},
+        --   {model='Dinghy',          label='Dinghy',            price=38000,    category='boats'},
+        --   {model='Toro',            label='Toro',              price=125000,   category='boats'},
+        -- },
 
-        ['aircraft'] = {
-          {model='Cargobob',        label='Cargobob',          price=450000,    category='military'},
-          {model='Maverick',        label='Maverick',          price=285000,    category='military'},
-          {model='Valkyrie2',       label='Valkyrie2',         price=650000,    category='airplane'},
-          {model='Swift2',          label='Swift2',            price=520000,    category='airplane'},
-        },
+        -- ['aircraft'] = {
+        --   {model='Cargobob',        label='Cargobob',          price=450000,    category='military'},
+        --   {model='Maverick',        label='Maverick',          price=285000,    category='military'},
+        --   {model='Valkyrie2',       label='Valkyrie2',         price=650000,    category='airplane'},
+        --   {model='Swift2',          label='Swift2',            price=520000,    category='airplane'},
+        -- },
 
 
         ['armor'] = {

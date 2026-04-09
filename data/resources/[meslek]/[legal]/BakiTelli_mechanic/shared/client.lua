@@ -63,7 +63,13 @@ function DrawText3D(x,y,z, text)
   end
 
   function checkJob(k)
-     if Config.Mechanics[k].Job == "unjob" then 
+    -- Güvenlik kontrolü: PlayerJob false veya nil ise erişimi reddet
+    if not PlayerJob or type(PlayerJob) ~= "table" or not PlayerJob.name then
+        return false
+    end
+    
+    -- Meslek kontrolü
+    if Config.Mechanics[k].Job == "unjob" then 
         return true
     else 
         return Config.Mechanics[k].Job == PlayerJob.name
