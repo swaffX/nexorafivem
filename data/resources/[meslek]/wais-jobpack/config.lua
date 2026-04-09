@@ -61,8 +61,8 @@ Config.Jobs = {
         },
         ["CameraOffsets"] = { x = 0.75, y = -0.75, z = 0.5, zRot = 0.5, fov = 30.0 },
         ["reward"] = {
-            ["min"] = 50,
-            ["max"] = 100
+            ["min"] = 150,
+            ["max"] = 250
         },
         ["timer"] = {
             ["extra_time"] = 2 * 60 * 1000,
@@ -318,8 +318,8 @@ Config.Jobs = {
             }
         },
         ["reward"] = {
-            ["min"] = 25,
-            ["max"] = 50
+            ["min"] = 80,
+            ["max"] = 150
         },
         ["randomPedTime"] = math.random(5, 7),
         ["prop"] = {

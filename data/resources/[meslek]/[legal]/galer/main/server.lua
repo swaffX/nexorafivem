@@ -64,13 +64,6 @@ if Config.Framework == "ESX" or Config.Framework == "NewESX" then
                 local src = source
                 local Player = Framework.GetPlayerFromId(src).identifier
                 
-                -- Araç tipi kontrolü - Helikopter (15), Uçak (16), Tekne (14) engelle
-                local vehicleClass = GetVehicleClassFromName(GetHashKey(Model))
-                if vehicleClass == 14 or vehicleClass == 15 or vehicleClass == 16 then
-                    TriggerClientEvent('QBCore:Notify', src, 'Bu araç tipi satın alınamaz!', 'error')
-                    return
-                end
-                
                 if GetResourceState('oxmysql') == 'started' then
                     exports.oxmysql:insert('INSERT INTO owned_vehicles (owner, plate, vehicle) VALUES (?, ?, ?) ', {Player, Plate, json.encode(Props)})
                 elseif GetResourceState('ghmattimysql') == 'started' then
@@ -112,13 +105,6 @@ elseif Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
         RegisterServerEvent('vehicleshop:setVehicleOwned', function(Plate, Props, Model)
             local src = source
             local Player = Framework.Functions.GetPlayer(src)
-            
-            -- Araç tipi kontrolü - Helikopter (15), Uçak (16), Tekne (14) engelle
-            local vehicleClass = GetVehicleClassFromName(GetHashKey(Model))
-            if vehicleClass == 14 or vehicleClass == 15 or vehicleClass == 16 then
-                TriggerClientEvent('QBCore:Notify', src, 'Bu araç tipi satın alınamaz!', 'error')
-                return
-            end
             
             if GetResourceState('oxmysql') == 'started' then
                 exports.oxmysql:insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, state) VALUES (?, ?, ?, ?, ?, ?, ?) ', {Player.PlayerData.license, Player.PlayerData.citizenid, Model, GetHashKey(Model), json.encode(Props), Plate, 0})

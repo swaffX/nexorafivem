@@ -242,13 +242,18 @@ function PlayMusic(url, title)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
         local coords = GetEntityCoords(vehicle)
+        local playerId = GetPlayerServerId(PlayerId())
         
-        -- 3D pozisyonel ses (dışarıdakiler için) - networked=true diger oyuncular duysun
+        -- 3D pozisyonel ses - TÜM OYUNCULAR DUYABİLSİN
+        -- isNetworked=true ile diger oyunculara senkronize ediliyor
         exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
             isNetworked = true,
             maxDistance = currentDistance,
-            rolloffFactor = 1.0,
-            refDistance = 10.0
+            rolloffFactor = 0.8,        -- Düşük = daha uzak mesafede duyulur
+            refDistance = 5.0,          -- Referans mesafe (5 metre)
+            coneInnerAngle = 360,       -- 360 derece = her yönde eşit ses
+            coneOuterAngle = 360,
+            coneOuterGain = 1.0         -- Dışarıda da tam ses
         })
         
         -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
@@ -273,11 +278,27 @@ function PlayMusic(url, title)
         -- Server'a kaydet (kalıcı)
         TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
         
+        -- DİGER OYUNCULARA MÜZİK BİLGİSİNİ GÖNDER
+        local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
+        TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
+        
         -- Pozisyon güncelleme thread'i
         CreateThread(function()
-            while isPlaying and DoesEntityExist(vehicle) do
-                local newCoords = GetEntityCoords(vehicle)
-                exports.xsound:Position(currentMusicId, newCoords)
+            while isPlaying and currentMusicId do
+                -- Araç hala var mi kontrol et
+                if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) then
+                    break
+                end
+                
+                -- Music ID hala gecerli mi
+                local success = pcall(function()
+                    local newCoords = GetEntityCoords(vehicle)
+                    exports.xsound:Position(currentMusicId, newCoords)
+                end)
+                
+                if not success then
+                    break
+                end
                 
                 Wait(500)
             end
@@ -349,13 +370,22 @@ end
 -- Araçtaki tüm oyuncuları al
 function GetVehicleOccupants(vehicle)
     local occupants = {}
+    
+    -- Entity kontrolü ekle
+    if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) then
+        return occupants
+    end
+    
     local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
     
     for seat = -1, maxSeats do
         local ped = GetPedInVehicleSeat(vehicle, seat)
-        if ped ~= 0 then
-            local playerId = NetworkGetPlayerIndexFromPed(ped)
-            if playerId ~= -1 then
+        if ped ~= 0 and DoesEntityExist(ped) then
+            -- pcall ile network hatasini engelle
+            local success, playerId = pcall(function()
+                return NetworkGetPlayerIndexFromPed(ped)
+            end)
+            if success and playerId and playerId ~= -1 then
                 table.insert(occupants, playerId)
             end
         end
@@ -1267,3 +1297,69 @@ function RemoveFilter(filterId)
     QBCore.Functions.Notify('Filtre kaldırıldı: ' .. filterType:upper(), 'success')
     print('[SWX Speaker] Filtre kaldırıldı: ' .. filterType:upper())
 end
+
+-- ============================================
+-- DİĞER OYUNCULARIN MÜZİĞİNİ DİNLEME SİSTEMİ
+-- ============================================
+
+-- Diğer oyunculardan gelen müzik senkronizasyonu
+RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
+    -- Kendi müziğimizi tekrar çalmayalım
+    if data.playerId == GetPlayerServerId(PlayerId()) then
+        return
+    end
+    
+    -- Araç entity'sini bul
+    local vehicle = nil
+    if data.vehicleNetId then
+        vehicle = NetworkGetEntityFromNetworkId(data.vehicleNetId)
+    end
+    
+    -- Eğer araç yoksa veya geçersizse, koordinatlardan ara
+    if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) then
+        -- Koordinatlara göre ses çal (3D positional)
+        if data.coords then
+            local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
+            exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, data.coords, false, {
+                isNetworked = true,
+                maxDistance = data.maxDistance or 60.0,
+                rolloffFactor = 0.8,
+                refDistance = 5.0,
+                coneInnerAngle = 360,
+                coneOuterAngle = 360,
+                coneOuterGain = 1.0
+            })
+            
+            print(string.format('[SWX Speaker] Diğer oyuncunun müziği çalınıyor: Player=%s, Title=%s', 
+                data.playerId, data.title or 'Bilinmeyen'))
+        end
+    else
+        -- Araç varsa, araca bağlı ses çal
+        local coords = GetEntityCoords(vehicle)
+        local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
+        exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, coords, false, {
+            isNetworked = true,
+            maxDistance = data.maxDistance or 60.0,
+            rolloffFactor = 0.8,
+            refDistance = 5.0,
+            coneInnerAngle = 360,
+            coneOuterAngle = 360,
+            coneOuterGain = 1.0
+        })
+        
+        print(string.format('[SWX Speaker] Diğer oyuncunun aracında müzik çalınıyor: Player=%s, Title=%s', 
+            data.playerId, data.title or 'Bilinmeyen'))
+    end
+end)
+
+-- Diğer oyuncunun müziği durduğunda
+RegisterNetEvent('swx_speaker:client:stopMusic', function(data)
+    if data.playerId == GetPlayerServerId(PlayerId()) then
+        return
+    end
+    
+    -- Remote müzik ID'sini bul ve durdur
+    local prefix = "speaker_remote_" .. data.playerId .. "_"
+    -- xsound tüm sesleri otomatik yönetir
+    print('[SWX Speaker] Diğer oyuncunun müziği durduruldu: Player=' .. data.playerId)
+end)

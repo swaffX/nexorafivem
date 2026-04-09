@@ -8,6 +8,5 @@ version '1.0.0'
 client_script 'client.lua'
 
 dependencies {
-    'qb-core',
-    'ox_lib'
+    'qb-core'
 }
