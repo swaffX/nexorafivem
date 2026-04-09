@@ -168,36 +168,19 @@ end
 
 -- NUI Calls
 
----@param text string - The message to display
----@param textype string - The type of message: primary | error | success | warning | info
----@param length number - The duration of the notification in milliseconds
-
-QBCore.Functions.Notify = function(text, textype, length) -- [text] = message, [type] = primary | error | success | warning | info, [length] = time till fadeout.
+QBCore.Functions.Notify = function(text, textype, length) -- [text] = message, [type] = primary | error | success, [length] = time till fadeout.
     if text == nil or text == "" then 
-        text = "Bildirim"
+        text = "Notify Yazısı Bulunamadı"
     end
 
     if textype == nil or textype == "" then 
-        textype = "info"
+        textype = "primary"
     end
 
     if length == nil or length == "" then 
         length = 5000
     end
-    
-    -- QBCore tipini xs-notify tipine çevir (Türkçe başlıklar)
-    local typeMap = {
-        ["primary"] = {type = 3, title = "BİLGİ"},
-        ["error"] = {type = 0, title = "HATA"},
-        ["success"] = {type = 1, title = "BAŞARILI"},
-        ["warning"] = {type = 2, title = "UYARI"},
-        ["info"] = {type = 3, title = "BİLGİ"}
-    }
-    
-    local notifyData = typeMap[textype] or typeMap["info"]
-    
-    -- xs-notify kullan (Türkçe başlık, orta pozisyon)
-    TriggerEvent("xs:notify", notifyData.title, text, length, notifyData.type, 3, "Nexora")
+    exports['alanNotify']:SendAlert(text, textype, length) 
 end
 
 
