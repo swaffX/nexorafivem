@@ -2,12 +2,9 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = {}
 local MenuOpen = false
 
-print('[SWX-RemoteEngine] Client script yükleniyor...')
-
 -- Oyuncu verilerini al
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
-    print('[SWX-RemoteEngine] Oyuncu verileri yüklendi')
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
@@ -43,13 +40,9 @@ end
 
 -- Araç motorunu kontrol et
 local function ToggleVehicleEngine(plate)
-    print('[SWX-RemoteEngine] ToggleVehicleEngine() başladı, plate:', plate)
-    
     local vehicle = FindVehicleByPlate(plate)
-    print('[SWX-RemoteEngine] Araç bulundu:', vehicle and 'EVET' or 'HAYIR')
     
     if not vehicle then
-        print('[SWX-RemoteEngine] Araç bulunamadı!')
         QBCore.Functions.Notify(Config.Messages.no_vehicle, 'error', Config.NotifyDuration)
         return
     end
@@ -59,55 +52,37 @@ local function ToggleVehicleEngine(plate)
     local playerCoords = GetEntityCoords(ped)
     local vehicleCoords = GetEntityCoords(vehicle)
     local distance = #(playerCoords - vehicleCoords)
-    print('[SWX-RemoteEngine] Mesafe:', distance)
     
     if distance > Config.KeyRange then
-        print('[SWX-RemoteEngine] Çok uzak!')
         QBCore.Functions.Notify(Config.Messages.too_far .. ' (' .. math.floor(distance) .. 'm)', 'error', Config.NotifyDuration)
         return
     end
     
     -- Anahtar kontrolü
-    local hasKeys = HasVehicleKeys(plate)
-    print('[SWX-RemoteEngine] Anahtar var mı:', hasKeys and 'EVET' or 'HAYIR')
-    if not hasKeys then
-        print('[SWX-RemoteEngine] Anahtar yok!')
+    if not HasVehicleKeys(plate) then
         QBCore.Functions.Notify(Config.Messages.no_keys, 'error', Config.NotifyDuration)
         return
     end
     
-    print('[SWX-RemoteEngine] Tüm kontroller başarılı, motor değiştiriliyor...')
     -- Animasyon oynat
     PlayKeyAnimation()
     
-    -- Motor durumunu değiştir
-    local engineState = GetIsVehicleEngineRunning(vehicle)
-    print('[SWX-RemoteEngine] Mevcut motor durumu:', engineState)
-    
     -- Server'a bildir ve motoru çalıştır/stop et
-    local netId = VehToNet(vehicle)
-    print('[SWX-RemoteEngine] NetID:', netId, 'Yeni durum:', not engineState)
-    TriggerServerEvent('swx_remoteengine:ToggleEngine', plate, netId, not engineState)
-    print('[SWX-RemoteEngine] Server event tetiklendi!')
+    TriggerServerEvent('swx_remoteengine:ToggleEngine', plate, VehToNet(vehicle), not GetIsVehicleEngineRunning(vehicle))
 end
 
 -- F3 Menü - Araç Listesi
 local function OpenRemoteEngineMenu()
-    print('[SWX-RemoteEngine] OpenRemoteEngineMenu() çağrıldı')
-    
-    -- ox_lib menüsü zaten açık mı kontrol et
-    if MenuOpen then 
-        print('[SWX-RemoteEngine] Menü zaten açık, beklemede...')
-        return 
+    -- Eğer menü takıldıysa zorla resetle (5 saniye timeout)
+    if MenuOpen then
+        QBCore.Functions.Notify('Menü hazırlanıyor, lütfen bekleyin...', 'info', 2000)
+        return
     end
     
-    print('[SWX-RemoteEngine] Callback çağrılıyor...')
+    MenuOpen = true
     
     QBCore.Functions.TriggerCallback('swx_remoteengine:GetPlayerVehicles', function(vehicles)
-        print('[SWX-RemoteEngine] Callback yanıt verdi. Araç sayısı:', vehicles and #vehicles or 0)
-        
         if not vehicles or #vehicles == 0 then
-            print('[SWX-RemoteEngine] Araç bulunamadı!')
             QBCore.Functions.Notify('Kayıtlı aracınız bulunamadı!', 'error', Config.NotifyDuration)
             MenuOpen = false
             return
@@ -118,39 +93,25 @@ local function OpenRemoteEngineMenu()
         local playerCoords = GetEntityCoords(ped)
         local hasNearbyVehicle = false
         
-        print('[SWX-RemoteEngine] Menzilde araç aranıyor...')
         for _, veh in ipairs(vehicles) do
-            print('[SWX-RemoteEngine] Kontrol edilen:', veh.vehicle, 'Plaka:', veh.plate)
-            -- Sadece izin verilen araç modellerini kontrol et
             if Config.AllowedVehicles[veh.vehicle] then
-                print('[SWX-RemoteEngine] İzin verilen araç bulundu:', veh.vehicle)
                 local nearbyVeh = FindVehicleByPlate(veh.plate)
                 if nearbyVeh then
                     local vehicleCoords = GetEntityCoords(nearbyVeh)
-                    local distance = #(playerCoords - vehicleCoords)
-                    print('[SWX-RemoteEngine] Araç bulundu, mesafe:', distance)
-                    if distance <= Config.KeyRange then
+                    if #(playerCoords - vehicleCoords) <= Config.KeyRange then
                         hasNearbyVehicle = true
-                        print('[SWX-RemoteEngine] Menzilde araç bulundu!')
                         break
                     end
-                else
-                    print('[SWX-RemoteEngine] Araç yakında değil (spawn olmamış olabilir)')
                 end
-            else
-                print('[SWX-RemoteEngine] Araç izin listesinde değil:', veh.vehicle)
             end
         end
         
         -- Menzilde araç yoksa menüyü açma
         if not hasNearbyVehicle then
-            print('[SWX-RemoteEngine] Menzilde uygun araç yok!')
             QBCore.Functions.Notify(Config.Messages.no_allowed_vehicle, 'error', Config.NotifyDuration)
+            MenuOpen = false
             return
         end
-        
-        -- Menü gösterilecek, MenuOpen'ı true yap
-        MenuOpen = true
         
         local options = {}
         
@@ -205,26 +166,25 @@ local function OpenRemoteEngineMenu()
         end
         
         -- Menü göster
-        print('[SWX-RemoteEngine] Menü oluşturuluyor, seçenek sayısı:', #options)
         lib.registerContext({
             id = 'remote_engine_menu',
             title = Config.Messages.menu_title,
             options = options,
             onExit = function()
-                print('[SWX-RemoteEngine] Menü kapandı')
                 MenuOpen = false
             end
         })
-        print('[SWX-RemoteEngine] Menü kaydedildi, gösteriliyor...')
         lib.showContext('remote_engine_menu')
-        print('[SWX-RemoteEngine] Menü gösterildi!')
+        
+        -- 10 saniye sonra menü otomatik kapatılacak (eğer kullanıcı kapatmadıysa)
+        Citizen.SetTimeout(10000, function()
+            MenuOpen = false
+        end)
     end)
 end
 
 -- Radial Menü entegrasyonu - Araç dışındayken "Aracı Çalıştır" seçeneği
 RegisterNetEvent('swx_remoteengine:OpenRadialMenu', function()
-    print('[SWX-RemoteEngine] Radial menüden çağrıldı')
-    -- Sadece araç dışındayken çalışsın
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
         QBCore.Functions.Notify('Araçtayken bu menüyü kullanamazsınız!', 'error', 3000)
@@ -234,49 +194,31 @@ RegisterNetEvent('swx_remoteengine:OpenRadialMenu', function()
     OpenRemoteEngineMenu()
 end)
 
-print('[SWX-RemoteEngine] Radial menü entegrasyonu hazır')
-
 -- Motor durumu senkronizasyonu
 RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
-    print('[SWX-RemoteEngine] SyncEngine eventi çağrıldı, netId:', netId, 'state:', engineState)
-    
     local vehicle = NetToVeh(netId)
-    print('[SWX-RemoteEngine] NetToVeh sonucu:', vehicle and 'VAR (' .. vehicle .. ')' or 'YOK/0')
     
     if vehicle and vehicle ~= 0 then
-        print('[SWX-RemoteEngine] Motor çalıştırma deneniyor...')
-        
         -- Kapı kilidini kontrol et ve aç
-        local lockStatus = GetVehicleDoorLockStatus(vehicle)
-        print('[SWX-RemoteEngine] Kapı kilidi durumu:', lockStatus)
-        if lockStatus ~= 1 then
-            SetVehicleDoorsLocked(vehicle, 1) -- 1 = Unlocked
-            print('[SWX-RemoteEngine] Kapılar açıldı')
+        if GetVehicleDoorLockStatus(vehicle) ~= 1 then
+            SetVehicleDoorsLocked(vehicle, 1)
         end
         
-        -- Motor sağlığını kontrol et ve düzelt
-        local engineHealth = GetVehicleEngineHealth(vehicle)
-        print('[SWX-RemoteEngine] Motor sağlığı:', engineHealth)
-        
-        if engineHealth <= 0 then
+        -- Motor sağlığını düzelt
+        if GetVehicleEngineHealth(vehicle) <= 0 then
             SetVehicleEngineHealth(vehicle, 1000.0)
-            print('[SWX-RemoteEngine] Motor sağlığı düzeltildi')
         end
         
-        -- Alternatif 1: SetVehicleEngineOn (standart)
+        -- SetVehicleEngineOn
         SetVehicleEngineOn(vehicle, engineState, false, true)
-        print('[SWX-RemoteEngine] SetVehicleEngineOn çağrıldı')
         
-        -- Motoru çalıştır/kapat (vehiclekeys ile birlikte)
+        -- Motoru çalıştır/kapat
         Citizen.CreateThread(function()
             Wait(100)
-            local ped = PlayerPedId()
             
             if engineState then
-                -- Önce anahtarı set et
-                local plate = GetVehicleNumberPlateText(vehicle)
-                TriggerEvent("vehiclekeys:client:SetOwner", plate)
-                print('[SWX-RemoteEngine] Anahtar set edildi:', plate)
+                -- Anahtarı set et
+                TriggerEvent("vehiclekeys:client:SetOwner", GetVehicleNumberPlateText(vehicle))
                 
                 Wait(100)
                 
@@ -284,46 +226,31 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleHasBeenOwnedByPlayer(vehicle, true)
                 
-                -- Motoru çalıştır (native doğrudan çağrı)
+                -- Motoru çalıştır
                 Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, false)
-                print('[SWX-RemoteEngine] Native 1 (false, false) çağrıldı')
-                
                 Wait(100)
-                
-                -- Tekrar dene (instantly = true)
                 Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, true, false)
-                print('[SWX-RemoteEngine] Native 2 (true, false) çağrıldı')
-                
                 Wait(100)
-                
-                -- Son deneme (noInstant = true)
                 SetVehicleEngineOn(vehicle, true, false, true)
-                print('[SWX-RemoteEngine] SetVehicleEngineOn (false, true) çağrıldı')
                 
-                -- 500ms sonra tekrar kontrol et ve çalıştırmaya çalış
+                -- 500ms sonra tekrar kontrol et
                 Citizen.SetTimeout(500, function()
                     if not GetIsVehicleEngineRunning(vehicle) then
-                        print('[SWX-RemoteEngine] 500ms sonra hala çalışmadı, tekrar deneniyor...')
                         SetVehicleEngineOn(vehicle, true, false, false)
                         SetVehicleEngineOn(vehicle, true, true, false)
                     end
                 end)
             else
-                -- Motoru kapat
                 SetVehicleEngineOn(vehicle, false, false, true)
                 SetVehicleUndriveable(vehicle, true)
             end
         end)
-        
-        print('[SWX-RemoteEngine] Motor durumu değiştirildi!')
         
         if engineState then
             QBCore.Functions.Notify(Config.Messages.engine_on, 'success', Config.NotifyDuration)
         else
             QBCore.Functions.Notify(Config.Messages.engine_off, 'info', Config.NotifyDuration)
         end
-    else
-        print('[SWX-RemoteEngine] Araç bulunamadı, netId:', netId)
     end
 end)
 
