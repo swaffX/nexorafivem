@@ -9,8 +9,8 @@ Config.AnimationDuration = 1500
 -- Bildirim süresi (ms)
 Config.NotifyDuration = 3000
 
--- Menü tuşu (varsayılan M)
-Config.MenuKey = 'M'
+-- Menü tuşu (varsayılan K - M tuşu swx_speaker tarafından kullanılıyor)
+Config.MenuKey = 'K'
 
 -- Uzaktan çalıştırma yapılabilecek özel araçlar (model kodları)
 -- Şu an sadece Dodge Challenger (redeye) için aktif

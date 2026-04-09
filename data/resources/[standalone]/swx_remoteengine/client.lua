@@ -178,8 +178,8 @@ local function OpenRemoteEngineMenu()
     end)
 end
 
--- Komut kaydet
-RegisterCommand('remoteengine', function()
+-- Komut kaydet (benzersiz isim - eski tuş çakışmasını önlemek için)
+RegisterCommand('swxremoteengine', function()
     -- Sadece araç dışındayken çalışsın
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
@@ -189,8 +189,8 @@ RegisterCommand('remoteengine', function()
     OpenRemoteEngineMenu()
 end, false)
 
--- Tuş atama (M tuşu)
-RegisterKeyMapping('remoteengine', 'Uzaktan Araç Kontrolü (Anahtar)', 'keyboard', 'M')
+-- Tuş atama (K tuşu - M tuşu swx_speaker tarafından kullanılıyor)
+RegisterKeyMapping('swxremoteengine', 'Uzaktan Araç Kontrolü (Anahtar)', 'keyboard', 'K')
 
 -- Motor durumu senkronizasyonu
 RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
