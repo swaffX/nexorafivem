@@ -224,24 +224,25 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 -- Aracı aktif hale getir ve sürülebilir yap
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleHasBeenOwnedByPlayer(vehicle, true)
-                SetVehicleUndriveable(vehicle, false)  -- ÖNEMLİ: Aracı sürülebilir yap
+                SetVehicleUndriveable(vehicle, false)
                 
-                print('[SWX-RemoteEngine] Önce motoru kapatıyorum...')
-                SetVehicleEngineOn(vehicle, false, true, true)
+                print('[SWX-RemoteEngine] Direkt açıyorum...')
                 
-                Wait(500)
-                print('[SWX-RemoteEngine] Şimdi açıyorum...')
-                
-                -- Marş sesiyle aç
+                -- 1. Deneme: Hemen aç
                 SetVehicleEngineOn(vehicle, true, false, false)
                 
-                Wait(1000)
-                print('[SWX-RemoteEngine] 1sn sonra motor durumu:', GetIsVehicleEngineRunning(vehicle))
+                Wait(300)
                 
-                -- Motor çalışmadıysa tekrar dene
+                -- 2. Deneme: Tekrar dene
+                SetVehicleEngineOn(vehicle, true, true, false)
+                
+                Wait(500)
+                print('[SWX-RemoteEngine] 800ms sonra motor durumu:', GetIsVehicleEngineRunning(vehicle))
+                
+                -- Hala çalışmadıysa
                 if not GetIsVehicleEngineRunning(vehicle) then
-                    print('[SWX-RemoteEngine] Çalışmadı, tekrar deniyorum...')
-                    SetVehicleEngineOn(vehicle, true, false, false)
+                    print('[SWX-RemoteEngine] Çalışmadı, native ile deniyorum...')
+                    Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, false)
                 end
             else
                 print('[SWX-RemoteEngine] Motor kapatılıyor...')
