@@ -244,8 +244,36 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
     print('[SWX-RemoteEngine] NetToVeh sonucu:', vehicle and 'VAR (' .. vehicle .. ')' or 'YOK/0')
     
     if vehicle and vehicle ~= 0 then
-        print('[SWX-RemoteEngine] SetVehicleEngineOn çağrılıyor...')
+        print('[SWX-RemoteEngine] Motor çalıştırma deneniyor...')
+        
+        -- Motor sağlığını kontrol et ve düzelt
+        local engineHealth = GetVehicleEngineHealth(vehicle)
+        print('[SWX-RemoteEngine] Motor sağlığı:', engineHealth)
+        
+        if engineHealth <= 0 then
+            SetVehicleEngineHealth(vehicle, 1000.0)
+            print('[SWX-RemoteEngine] Motor sağlığı düzeltildi')
+        end
+        
+        -- Alternatif 1: SetVehicleEngineOn
         SetVehicleEngineOn(vehicle, engineState, false, true)
+        
+        -- Alternatif 2: SetVehicleUndriveable ile birlikte
+        SetVehicleUndriveable(vehicle, not engineState)
+        
+        -- Alternatif 3: Motoru aktif et (biraz gecikmeli)
+        if engineState then
+            -- Motoru biraz ısıt
+            SetVehicleEngineHealth(vehicle, 1000.0)
+            -- Aktif hale getir
+            Citizen.CreateThread(function()
+                Wait(100)
+                SetVehicleEngineOn(vehicle, true, false, false)
+                Wait(100)
+                SetVehicleEngineOn(vehicle, true, false, true)
+            end)
+        end
+        
         print('[SWX-RemoteEngine] Motor durumu değiştirildi!')
         
         if engineState then
@@ -253,6 +281,8 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
         else
             QBCore.Functions.Notify(Config.Messages.engine_off, 'info', Config.NotifyDuration)
         end
+    else
+        print('[SWX-RemoteEngine] Araç bulunamadı, netId:', netId)
     end
 end)
 
