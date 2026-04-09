@@ -6,30 +6,26 @@ print('[SWX-RemoteEngine] Server script yükleniyor...')
 QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(source, cb)
     print('[SWX-RemoteEngine] Callback çağrıldı, source:', source)
     
-    -- Tüm oyuncuları kontrol et ve source'a göre bul
-    local allPlayers = QBCore.Functions.GetPlayers()
-    print('[SWX-RemoteEngine] Tüm oyuncular:', json.encode(allPlayers))
-    print('[SWX-RemoteEngine] Oyuncu sayısı:', #allPlayers)
+    -- Global QBCore'u dene (export yerine)
+    local GlobalQBCore = _G.QBCore
+    print('[SWX-RemoteEngine] Global QBCore:', GlobalQBCore and 'VAR' or 'YOK')
     
     local Player = nil
-    for _, playerId in ipairs(allPlayers) do
-        print('[SWX-RemoteEngine] Kontrol edilen playerId:', playerId, 'type:', type(playerId))
-        if tonumber(playerId) == tonumber(source) then
-            Player = QBCore.Functions.GetPlayer(playerId)
-            print('[SWX-RemoteEngine] Eşleşen playerId bulundu:', playerId, 'Player:', Player and 'VAR' or 'YOK')
-            break
-        end
+    if GlobalQBCore and GlobalQBCore.Functions then
+        Player = GlobalQBCore.Functions.GetPlayer(tonumber(source))
+        print('[SWX-RemoteEngine] Global QBCore denemesi:', Player and 'BULUNDU' or 'YOK')
+    end
+    
+    -- Global çalışmazsa export QBCore'u dene
+    if not Player then
+        Player = QBCore.Functions.GetPlayer(tonumber(source))
+        print('[SWX-RemoteEngine] Export QBCore denemesi:', Player and 'BULUNDU' or 'YOK')
     end
     
     if not Player then
         print('[SWX-RemoteEngine] Player bulunamadı! source:', source)
-        -- Son çare: source'dan doğrudan dene
-        Player = QBCore.Functions.GetPlayer(tonumber(source))
-        print('[SWX-RemoteEngine] Son çare denemesi:', Player and 'BULUNDU' or 'YOK')
-        if not Player then
-            cb({})
-            return
-        end
+        cb({})
+        return
     end
     
     local citizenid = Player.PlayerData.citizenid
