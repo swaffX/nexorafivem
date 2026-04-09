@@ -111,16 +111,16 @@ function EnableCruiseControl(vehicle, speed)
             -- Hız düşerse gaz ver
             if speedDiff > 0.5 then -- 0.5 m/s = ~1.8 km/h tolerans
                 local throttle = math.min(1.0, speedDiff / 5.0) -- Orantılı gaz
-                SetControlValue(0, 71, throttle) -- Throttle
+                SetControlNormal(0, 71, throttle) -- Throttle
             elseif speedDiff > 0 then
                 -- Küçük düzeltme
-                SetControlValue(0, 71, 0.3)
+                SetControlNormal(0, 71, 0.3)
             end
             
             -- Hız çok yüksekse (virajda kayma vb.)
             if currentSpeed > cruiseControl.targetSpeed * 1.1 then -- %10 tolerans
                 -- Araç kendi hızını düşürecek (fren gerekmez)
-                SetControlValue(0, 71, 0.0)
+                SetControlNormal(0, 71, 0.0)
             end
         end
     end)

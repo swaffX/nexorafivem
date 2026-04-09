@@ -508,17 +508,21 @@ RegisterNUICallback("SellectItem", function (data)
         if colorstyp == "PrimaryColor" then 
             if SellectMode == "ColorsC" then 
                 SellectItemPrice = Config.ColorsMenu["ColorsC"].price
+                ClearVehicleCustomPrimaryColour(playerVeh)
                 SetVehicleColours(playerVeh,Config["Colors"][tonumber(SellectItem)].colorindex,oldcolor[2])
             else 
                 SellectItemPrice = Config.ColorsMenu[SellectMode].price
+                ClearVehicleCustomPrimaryColour(playerVeh)
                 SetVehicleColours(playerVeh,Config[SellectMode][tonumber(SellectItem)].colorindex,oldcolor[2])
             end
         elseif colorstyp == "SecondaryColor" then
             if SellectMode == "ColorsC" then 
                 SellectItemPrice = Config.ColorsMenu["ColorsC"].price
+                ClearVehicleCustomSecondaryColour(playerVeh)
                 SetVehicleColours(playerVeh,oldcolorx[1] ,Config["Colors"][tonumber(SellectItem)].colorindex)
             else 
                 SellectItemPrice = Config.ColorsMenu[SellectMode].price
+                ClearVehicleCustomSecondaryColour(playerVeh)
                 SetVehicleColours(playerVeh,oldcolorx[1] ,Config[SellectMode][tonumber(SellectItem)].colorindex)
             end
         else
