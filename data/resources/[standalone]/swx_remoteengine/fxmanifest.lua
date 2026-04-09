@@ -21,4 +21,6 @@ server_scripts {
 lua54 'yes'
 
 dependency 'ox_lib'
+dependency 'oxmysql'
 dependency 'qb-vehiclekeys'
+dependency 'qb-core'
