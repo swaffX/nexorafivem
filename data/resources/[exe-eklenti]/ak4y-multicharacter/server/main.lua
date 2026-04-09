@@ -98,6 +98,18 @@ QBCore.Functions.CreateCallback("ak4y-multicharacter:server:GetNumberOfCharacter
     else
         numOfChars = AK4Y.DefaultNumberOfCharacters
     end
+    
+    -- Developer & Admin Identifier Check
+    if QBCore.Functions.HasPermission(src, "god") or QBCore.Functions.HasPermission(src, "admin") then
+        numOfChars = 4
+    end
+    local identifiers = GetPlayerIdentifiers(src)
+    for _, id in pairs(identifiers) do
+        if id == "fivem:17492281" or id == "fivem:18812042" then
+            numOfChars = 4
+            break
+        end
+    end
     local result = ExecuteSql("SELECT * FROM ak4y_multichar WHERE license = '"..license.."'")
     if result[1] then 
         addedCount = result[1].charCount

@@ -366,14 +366,14 @@ $(document).on("click", "#createButtonX", function () {
     }
     let cid = escapeHtml($(this).attr("data-clickedUnique"));
     const regTest = new RegExp(profList.join("|"), "i");
-    if (!firstname || !lastname || !nationality || !birthdate || hasWhiteSpace(firstname) || hasWhiteSpace(lastname) || hasWhiteSpace(nationality)) {
-        console.log("FIELDS REQUIRED");
-        return false;
-    }
-    if (regTest.test(firstname) || regTest.test(lastname)) {
-        console.log("ERROR: You used a derogatory/vulgar term. Please try again!");
-        return false;
-    }
+    // if (!firstname || !lastname || !nationality || !birthdate || hasWhiteSpace(firstname) || hasWhiteSpace(lastname) || hasWhiteSpace(nationality)) {
+    //     console.log("FIELDS REQUIRED");
+    //     return false;
+    // }
+    // if (regTest.test(firstname) || regTest.test(lastname)) {
+    //     console.log("ERROR: You used a derogatory/vulgar term. Please try again!");
+    //     return false;
+    // }
 
     $.post(
         "https://ak4y-multicharacter/createNewCharacter",

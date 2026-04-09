@@ -101,41 +101,34 @@ end
 RegisterNetEvent('ak4y-multicharacter:server:loadUserData', function(cData)
     local src = source
     local steamId = GetPlayerIdentifiers(source)[1]
-	local Player = QBCore.Functions.GetPlayer(src)
     if QBCore.Player.Login(src, cData) then
         repeat
             Wait(10)
         until hasDonePreloading[src]
+        local Player = QBCore.Functions.GetPlayer(src)
+        local position = Player and Player.PlayerData and Player.PlayerData.position or nil
+        local coords = {
+            x = AK4Y.DefaultSpawn.x,
+            y = AK4Y.DefaultSpawn.y,
+            z = AK4Y.DefaultSpawn.z,
+            w = 0.0
+        }
+        if position and position.x and position.y and position.z then
+            coords = {
+                x = position.x,
+                y = position.y,
+                z = position.z,
+                w = position.w or 0.0
+            }
+        end
         print('^2[qb-core]^7 '..GetPlayerName(src)..' (Citizen ID: '..cData..') has succesfully loaded!')
         TriggerEvent("ria-logs:server:CreateLog", "girislog", "", "girislog", "``" .. GetPlayerName(src) .. " (".. src ..")`` Sunucuya Giriş yaptı \n ``Citizen ID: ".. cData .." - ".. steamId .." ".. QBCore.Functions.GetIdentifier(src, 'license') .." ".. QBCore.Functions.GetIdentifier(src, 'discord') .."``")
         QBCore.Commands.Refresh(src)
-        
-        -- Son konum bilgisini cek
-        local result = ExecuteSql("SELECT position, charinfo FROM players WHERE citizenid = '"..cData.."'")
-        local position = nil
-        local charName = cData
-        if result and result[1] then
-            if result[1].charinfo then
-                local charinfo = json.decode(result[1].charinfo)
-                if charinfo and charinfo.firstname and charinfo.lastname then
-                    charName = charinfo.firstname .. " " .. charinfo.lastname
-                end
-            end
-            if result[1].position then
-                position = json.decode(result[1].position)
-                if position and position.x and position.y and position.z then
-                    print('[ak4y-multicharacter] DB Position for '..charName..': '..position.x..', '..position.y..', '..position.z)
-                    -- Eger position multicharacter kamera pozisyonuysa (-812, 182, 76), varsayilan spawna git
-                    if math.abs(position.x - (-812.0)) < 5 and math.abs(position.y - 182.0) < 5 then
-                        print('[ak4y-multicharacter] WARNING: Position is multicharacter camera location, using default spawn!')
-                        position = nil
-                    end
-                end
-            end
+        SetPlayerRoutingBucket(src, 0)
+        if AK4Y.UseQbApartments then
+            loadHouseData(src)
         end
-        
-        -- Spawn selector devre disi - direkt son konumda spawn
-        TriggerClientEvent('ak4y-multicharacter:client:spawnLastLocation', src, position)
+        TriggerClientEvent('ak4y-spawnselector:playerLoad', src, coords)
         TriggerEvent("qb-log:server:CreateLog", "joinleave", "Loaded", "green", "**".. GetPlayerName(src) .. "** ("..(QBCore.Functions.GetIdentifier(src, 'discord') or 'undefined') .." |  ||"  ..(QBCore.Functions.GetIdentifier(src, 'ip') or 'undefined') ..  "|| | " ..(QBCore.Functions.GetIdentifier(src, 'license') or 'undefined') .." | " ..cData.." | "..src..") loaded..")
     end
 end)

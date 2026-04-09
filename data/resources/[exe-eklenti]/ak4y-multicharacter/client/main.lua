@@ -55,7 +55,7 @@ end
 
 function openCharMenu(bool)
     QBCore.Functions.TriggerCallback("ak4y-multicharacter:server:GetNumberOfCharacters", function(result)
-        local defaultOpenCharSlot = AK4Y.DefaultOpenCharSlot + result.addedCount
+        local defaultOpenCharSlot = result.numOfChars
         if bool then 
             while not opened do 
                 SetNuiFocus(bool, bool)
@@ -113,74 +113,6 @@ end)
 RegisterNetEvent('ak4y-multicharacter:client:closeNUI', function()
     DeleteEntity(charPed)
     SetNuiFocus(false, false)
-end)
-
-RegisterNetEvent('ak4y-multicharacter:client:spawnLastLocation', function(position)
-    DeleteEntity(charPed)
-    SetNuiFocus(false, false)
-    DoScreenFadeOut(500)
-    Wait(1500)
-    
-    -- QBCore eventlerini tetikle
-    TriggerServerEvent('QBCore:Server:OnPlayerLoaded')
-    TriggerEvent('QBCore:Client:OnPlayerLoaded')
-    TriggerServerEvent('qb-houses:server:SetInsideMeta', 0, false)
-    TriggerServerEvent('qb-apartments:server:SetInsideMeta', 0, 0, false)
-    
-    Wait(1000)
-    
-    -- Karakteri görünür yap ve dondur
-    local ped = PlayerPedId()
-    SetEntityVisible(ped, true)
-    FreezeEntityPosition(ped, true)
-    SetEntityCollision(ped, false, false)
-    
-    -- Hedef pozisyonu belirle
-    local targetPos = nil
-    if position and position.x and position.y and position.z then
-        -- Multicharacter kamera pozisyonu kontrolü
-        if math.abs(position.x - (-812.0)) > 10 or math.abs(position.y - 182.0) > 10 then
-            targetPos = vector4(position.x, position.y, position.z, position.w or 0.0)
-            print('[ak4y-multicharacter] Son konuma spawn: '..targetPos.x..', '..targetPos.y..', '..targetPos.z)
-        else
-            print('[ak4y-multicharacter] WARNING: DB position is multicharacter camera, using default!')
-        end
-    end
-    
-    -- Eğer hala geçerli pozisyon yoksa varsayılan kullan
-    if not targetPos then
-        targetPos = vector4(AK4Y.DefaultSpawn.x, AK4Y.DefaultSpawn.y, AK4Y.DefaultSpawn.z, AK4Y.DefaultSpawn.w or 0.0)
-        print('[ak4y-multicharacter] Varsayılan konuma spawn: '..targetPos.x..', '..targetPos.y..', '..targetPos.z)
-    end
-    
-    -- AGRESİF SPAWN - Pozisyonu defalarca set et (QBCore override etmesin diye)
-    local spawnAttempts = 0
-    while spawnAttempts < 10 do
-        SetEntityCoords(ped, targetPos.x, targetPos.y, targetPos.z, false, false, false, false)
-        SetEntityHeading(ped, targetPos.w)
-        Wait(100)
-        local currentPos = GetEntityCoords(ped)
-        -- Eğer pozisyon değiştiyse (QBCore müdahale etmediyse) başarılı
-        if math.abs(currentPos.x - targetPos.x) < 2.0 and math.abs(currentPos.y - targetPos.y) < 2.0 then
-            print('[ak4y-multicharacter] Spawn başarılı! Deneme: '..(spawnAttempts + 1))
-            break
-        end
-        spawnAttempts = spawnAttempts + 1
-        print('[ak4y-multicharacter] Spawn deneme '..spawnAttempts..' - pozisyon reset ediliyor...')
-    end
-    
-    -- Zemine sabitle
-    Wait(200)
-    local groundFound, groundZ = GetGroundZFor_3dCoord(GetEntityCoords(ped).x, GetEntityCoords(ped).y, GetEntityCoords(ped).z + 10.0, false)
-    if groundFound then
-        SetEntityCoords(ped, GetEntityCoords(ped).x, GetEntityCoords(ped).y, groundZ + 1.0, false, false, false, false)
-    end
-    
-    Wait(500)
-    SetEntityCollision(ped, true, true)
-    FreezeEntityPosition(ped, false)
-    DoScreenFadeIn(250)
-    TriggerEvent('qb-weathersync:client:EnableSync')
 end)
 
 RegisterNetEvent('ak4y-multicharacter:client:chooseCharX', function()

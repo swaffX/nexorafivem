@@ -441,7 +441,7 @@ body {
 .buttonItem {
     cursor: pointer;
     position: relative;
-    width: 9.85vw;
+    width: 100%;
 }
 
 .buttonItem img {
@@ -459,9 +459,8 @@ body {
     border: 1px solid rgba(0, 0, 0, 0.17);
     box-shadow: 0px 0px 67px rgba(104, 242, 133, 0.52);
     top: 0.35vw;
-    left: 0.3vw;
-    width: 9vw;
-    height: 2.85vw;
+    left: 0.5vw;
+    width: 95%;
     text-align: center;
     align-items: center;
     vertical-align: center;
@@ -473,9 +472,8 @@ body {
 .buttonItem:hover > .inButtonText {
     top: 0vw;
     left: 0vw;
-    width: 9.6vw;
-    height: 3.55vw;
     line-height: 3.55vw;
+    width: 100%;
 }
 
 #deleteButton {
@@ -1035,7 +1033,7 @@ body {
     width: 100%;
     position: absolute;
     z-index: 182738912;
-    background-image: url("/html/images/loadingBg.png");
+    /*background-image: url("/html/images/loadingBg.png");*/
     background-repeat: no-repeat;
     background-size: cover;
     /* display: flex;
@@ -1155,15 +1153,6 @@ body {
     font-size: 0.8vw;
     margin-top: 0vw;
     margin-left: 0.5vw;
-}
-
-#buyCodeButton {
-    font-size: 0.8vw;
-    background-color: #2525256f;
-    padding-left: 1vw;
-    padding-right: 1vw;
-    cursor: pointer;
-    transition-duration: 0.4s;
 }
 
 #buyCodeButton:hover {
