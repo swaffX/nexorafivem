@@ -280,21 +280,34 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 
                 Wait(100)
                 
+                -- Aracı aktif hale getir
+                SetEntityAsMissionEntity(vehicle, true, true)
+                SetVehicleHasBeenOwnedByPlayer(vehicle, true)
+                
                 -- Motoru çalıştır (native doğrudan çağrı)
-                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, true)
-                print('[SWX-RemoteEngine] Native 1 çağrıldı')
+                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, false)
+                print('[SWX-RemoteEngine] Native 1 (false, false) çağrıldı')
                 
                 Wait(100)
                 
                 -- Tekrar dene (instantly = true)
                 Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, true, false)
-                print('[SWX-RemoteEngine] Native 2 çağrıldı')
+                print('[SWX-RemoteEngine] Native 2 (true, false) çağrıldı')
                 
-                Wait(200)
+                Wait(100)
                 
-                -- Son deneme (farklı parametreler)
-                SetVehicleEngineOn(vehicle, true, false, false)
-                print('[SWX-RemoteEngine] SetVehicleEngineOn (false, false) çağrıldı')
+                -- Son deneme (noInstant = true)
+                SetVehicleEngineOn(vehicle, true, false, true)
+                print('[SWX-RemoteEngine] SetVehicleEngineOn (false, true) çağrıldı')
+                
+                -- 500ms sonra tekrar kontrol et ve çalıştırmaya çalış
+                Citizen.SetTimeout(500, function()
+                    if not GetIsVehicleEngineRunning(vehicle) then
+                        print('[SWX-RemoteEngine] 500ms sonra hala çalışmadı, tekrar deneniyor...')
+                        SetVehicleEngineOn(vehicle, true, false, false)
+                        SetVehicleEngineOn(vehicle, true, true, false)
+                    end
+                end)
             else
                 -- Motoru kapat
                 SetVehicleEngineOn(vehicle, false, false, true)
