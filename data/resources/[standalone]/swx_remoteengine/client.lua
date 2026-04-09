@@ -214,10 +214,8 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
         
         -- Motoru çalıştır/kapat
         Citizen.CreateThread(function()
-            Wait(100)
-            
             if engineState then
-                -- Anahtarı set et
+                -- Anahtarı set et (önce)
                 TriggerEvent("vehiclekeys:client:SetOwner", GetVehicleNumberPlateText(vehicle))
                 
                 Wait(100)
@@ -226,18 +224,27 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleHasBeenOwnedByPlayer(vehicle, true)
                 
-                -- Motoru çalıştır
-                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, false, false)
-                Wait(100)
-                Citizen.InvokeNative(0x2497C4717C8B810E, vehicle, true, true, false)
-                Wait(100)
-                SetVehicleEngineOn(vehicle, true, false, true)
+                -- ÖNEMLİ: Önce motoru KAPAT (sıfırlamak için)
+                SetVehicleEngineOn(vehicle, false, true, true)
+                
+                Wait(500)
+                
+                -- Şimdi GERÇEK motor çalıştırma sesiyle birlikte aç
+                -- isInstantly = false (yavaşça, marş sesiyle)
+                -- disableAutoStart = false (otomatik start açık - sesler aktif)
+                SetVehicleEngineOn(vehicle, true, false, false)
+                
+                Wait(1000)
+                
+                -- Motorun gerçekten çalıştığını garantile
+                if not GetIsVehicleEngineRunning(vehicle) then
+                    SetVehicleEngineOn(vehicle, true, false, false)
+                end
                 
                 -- 500ms sonra tekrar kontrol et
                 Citizen.SetTimeout(500, function()
                     if not GetIsVehicleEngineRunning(vehicle) then
                         SetVehicleEngineOn(vehicle, true, false, false)
-                        SetVehicleEngineOn(vehicle, true, true, false)
                     end
                 end)
             else
