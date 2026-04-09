@@ -17,8 +17,11 @@ QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(s
     print('[SWX-RemoteEngine] Player bulundu, citizenid:', citizenid)
     
     -- Veritabanından oyuncunun araçlarını çek
+    print('[SWX-RemoteEngine] DB sorgusu başlatılıyor, citizenid:', citizenid)
     MySQL.query('SELECT vehicle, plate FROM player_vehicles WHERE citizenid = ?', {citizenid}, function(result)
-        print('[SWX-RemoteEngine] DB sorgusu tamamlandı, sonuç sayısı:', result and #result or 0)
+        print('[SWX-RemoteEngine] DB sorgusu tamamlandı, citizenid:', citizenid)
+        print('[SWX-RemoteEngine] Sonuç:', json.encode(result))
+        print('[SWX-RemoteEngine] Sonuç sayısı:', result and #result or 0)
         if result then
             cb(result)
         else
