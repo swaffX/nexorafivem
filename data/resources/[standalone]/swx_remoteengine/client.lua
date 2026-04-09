@@ -267,43 +267,28 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
         SetVehicleEngineOn(vehicle, engineState, false, true)
         print('[SWX-RemoteEngine] SetVehicleEngineOn çağrıldı')
         
-        -- Alternatif 2: Motoru çalıştırma (farklı parametrelerle)
+        -- Motoru çalıştır/kapat (vehiclekeys ile birlikte)
         Citizen.CreateThread(function()
-            Wait(50)
-            -- Motoru ısıt ve çalıştır
-            SetVehicleEngineHealth(vehicle, 1000.0)
-            SetVehiclePetrolTankHealth(vehicle, 1000.0)
+            Wait(100)
+            local ped = PlayerPedId()
             
-            -- Araç tipine göre motoru çalıştır
             if engineState then
-                -- Motoru çalıştır (isInstantStart = false, disableAutoStart = false)
-                SetVehicleEngineOn(vehicle, true, false, false)
-                Wait(200)
+                -- Önce anahtarı set et
+                local plate = GetVehicleNumberPlateText(vehicle)
+                TriggerEvent("vehiclekeys:client:SetOwner", plate)
+                print('[SWX-RemoteEngine] Anahtar set edildi:', plate)
+                
+                Wait(100)
+                
+                -- Motoru çalıştır
                 SetVehicleEngineOn(vehicle, true, false, true)
                 
-                -- Ek: Aracı sürülebilir yap
-                SetVehicleUndriveable(vehicle, false)
+                Wait(100)
                 
-                -- Ek: Motorun gerçekten çalıştığını kontrol et
-                local actualEngineState = GetIsVehicleEngineRunning(vehicle)
-                print('[SWX-RemoteEngine] Gerçek motor durumu:', actualEngineState)
+                -- Tekrar dene farklı parametrelerle
+                SetVehicleEngineOn(vehicle, true, true, false)
                 
-                if not actualEngineState then
-                    -- Son çare: Araca binip inerek motoru çalıştır
-                    print('[SWX-RemoteEngine] Motor çalışmadı, son çare deneniyor...')
-                    local ped = PlayerPedId()
-                    local veh = GetVehiclePedIsIn(ped, false)
-                    if veh == 0 then
-                        -- Araca bin
-                        TaskEnterVehicle(ped, vehicle, 5000, -1, 1.0, 1, 0)
-                        Wait(1000)
-                        -- Motoru çalıştır
-                        SetVehicleEngineOn(vehicle, true, false, true)
-                        Wait(500)
-                        -- Araçtan in
-                        TaskLeaveVehicle(ped, vehicle, 0)
-                    end
-                end
+                print('[SWX-RemoteEngine] Motor çalıştırma komutları gönderildi')
             else
                 -- Motoru kapat
                 SetVehicleEngineOn(vehicle, false, false, true)
