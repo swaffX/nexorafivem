@@ -81,12 +81,12 @@ end
 local function OpenRemoteEngineMenu()
     print('[SWX-RemoteEngine] OpenRemoteEngineMenu() çağrıldı')
     
+    -- ox_lib menüsü zaten açık mı kontrol et
     if MenuOpen then 
-        print('[SWX-RemoteEngine] MenuOpen true, menü zaten açık')
+        print('[SWX-RemoteEngine] Menü zaten açık, beklemede...')
         return 
     end
     
-    MenuOpen = true
     print('[SWX-RemoteEngine] Callback çağrılıyor...')
     
     QBCore.Functions.TriggerCallback('swx_remoteengine:GetPlayerVehicles', function(vehicles)
@@ -132,9 +132,11 @@ local function OpenRemoteEngineMenu()
         if not hasNearbyVehicle then
             print('[SWX-RemoteEngine] Menzilde uygun araç yok!')
             QBCore.Functions.Notify(Config.Messages.no_allowed_vehicle, 'error', Config.NotifyDuration)
-            MenuOpen = false
             return
         end
+        
+        -- Menü gösterilecek, MenuOpen'ı true yap
+        MenuOpen = true
         
         local options = {}
         
@@ -193,13 +195,15 @@ local function OpenRemoteEngineMenu()
         lib.registerContext({
             id = 'remote_engine_menu',
             title = Config.Messages.menu_title,
-            options = options
+            options = options,
+            onExit = function()
+                print('[SWX-RemoteEngine] Menü kapandı')
+                MenuOpen = false
+            end
         })
         print('[SWX-RemoteEngine] Menü kaydedildi, gösteriliyor...')
         lib.showContext('remote_engine_menu')
         print('[SWX-RemoteEngine] Menü gösterildi!')
-        
-        MenuOpen = false
     end)
 end
 
