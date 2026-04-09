@@ -221,9 +221,10 @@ RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
                 
                 Wait(100)
                 
-                -- Aracı aktif hale getir
+                -- Aracı aktif hale getir ve sürülebilir yap
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleHasBeenOwnedByPlayer(vehicle, true)
+                SetVehicleUndriveable(vehicle, false)  -- ÖNEMLİ: Aracı sürülebilir yap
                 
                 print('[SWX-RemoteEngine] Önce motoru kapatıyorum...')
                 SetVehicleEngineOn(vehicle, false, true, true)
