@@ -93,7 +93,7 @@ function EnableCruiseControl(vehicle, speed)
             end
             
             -- Araç havadaysa hız sabitlemeyi kapat
-            if IsVehicleInAir(currentVehicle) then
+            if IsEntityInAir(currentVehicle) then
                 DisableCruiseControl()
                 QBCore.Functions.Notify('Araç havada - Hız sabitleme kapandı', 'info', 3000)
                 break
@@ -163,7 +163,7 @@ CreateThread(function()
                 local vehicle = GetVehiclePedIsIn(ped, false)
                 if vehicle and vehicle ~= 0 then
                     -- Araç havadaysa veya tüm tekerlekler havadaysa
-                    if IsVehicleInAir(vehicle) then
+                    if IsEntityInAir(vehicle) then
                         DisableCruiseControl()
                         QBCore.Functions.Notify('Araç havada - Hız sabitleme kapandı', 'info', 3000)
                     end
