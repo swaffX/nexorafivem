@@ -1,14 +1,15 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'QB-Garages'
-version '1.0.0'
-author 'JDev'
+description 'QB-Garages - SWX Edition'
+version '2.0.0'
+author 'JDev / SWX'
 
 shared_scripts {
     'config.lua',
     '@qb-core/shared/locale.lua',
     'locales/en.lua',
+    '@ox_lib/init.lua'
 }
 
 client_scripts {
@@ -26,3 +27,5 @@ server_scripts {
 }
 
 lua54 'yes'
+
+dependency 'ox_lib'

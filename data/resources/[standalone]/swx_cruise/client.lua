@@ -104,23 +104,15 @@ function EnableCruiseControl(vehicle, speed)
                 -- Şimdilik sadece hedef hızı koruyoruz
             end
             
-            -- Hız sabitleme mantığı
+            -- Hız sabitleme mantığı - SetVehicleForwardSpeed kullan (daha güvenilir)
             local currentSpeed = GetEntitySpeed(currentVehicle)
             local speedDiff = cruiseControl.targetSpeed - currentSpeed
             
-            -- Hız düşerse gaz ver
+            -- Hız çok düşerse sabit hıza geri çek
             if speedDiff > 0.5 then -- 0.5 m/s = ~1.8 km/h tolerans
-                local throttle = math.min(1.0, speedDiff / 5.0) -- Orantılı gaz
-                SetControlNormal(0, 71, throttle) -- Throttle
-            elseif speedDiff > 0 then
-                -- Küçük düzeltme
-                SetControlNormal(0, 71, 0.3)
-            end
-            
-            -- Hız çok yüksekse (virajda kayma vb.)
-            if currentSpeed > cruiseControl.targetSpeed * 1.1 then -- %10 tolerans
-                -- Araç kendi hızını düşürecek (fren gerekmez)
-                SetControlNormal(0, 71, 0.0)
+                SetVehicleForwardSpeed(currentVehicle, cruiseControl.targetSpeed)
+            elseif speedDiff < -0.5 then -- Hız çok yüksekse
+                SetVehicleForwardSpeed(currentVehicle, cruiseControl.targetSpeed)
             end
         end
     end)

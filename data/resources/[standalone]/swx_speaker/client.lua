@@ -16,6 +16,9 @@ local baseVolume = Config.DefaultVolume -- Orijinal ses seviyesi
 local currentFilteredVolume = Config.DefaultVolume -- Filtreli ses seviyesi
 local isTransitioning = false -- Geçiş animasyonu aktif mi?
 
+-- Remote müzikleri takip için
+local remoteMusicTracks = {}
+
 -- Oyuncu spawn olduğunda geçmişi yükle
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent('swx_speaker:server:loadHistory')
@@ -282,7 +285,7 @@ function PlayMusic(url, title)
         local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
         TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
         
-        -- Pozisyon güncelleme thread'i
+        -- Pozisyon güncelleme thread'i - Daha sık güncelleme
         CreateThread(function()
             while isPlaying and currentMusicId do
                 -- Araç hala var mi kontrol et
@@ -300,7 +303,7 @@ function PlayMusic(url, title)
                     break
                 end
                 
-                Wait(500)
+                Wait(100) -- 500ms'den 100ms'ye düşür - daha akıcı takip
             end
         end)
         
@@ -1316,10 +1319,11 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
     end
     
     -- Eğer araç yoksa veya geçersizse, koordinatlardan ara
+    local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
+    
     if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) then
         -- Koordinatlara göre ses çal (3D positional)
         if data.coords then
-            local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
             exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, data.coords, false, {
                 isNetworked = true,
                 maxDistance = data.maxDistance or 60.0,
@@ -1336,7 +1340,6 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
     else
         -- Araç varsa, araca bağlı ses çal
         local coords = GetEntityCoords(vehicle)
-        local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
         exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, coords, false, {
             isNetworked = true,
             maxDistance = data.maxDistance or 60.0,
@@ -1347,8 +1350,39 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
             coneOuterGain = 1.0
         })
         
+        -- Remote müzik takip kaydı
+        remoteMusicTracks[musicId] = {
+            vehicleNetId = data.vehicleNetId,
+            playerId = data.playerId
+        }
+        
         print(string.format('[SWX Speaker] Diğer oyuncunun aracında müzik çalınıyor: Player=%s, Title=%s', 
             data.playerId, data.title or 'Bilinmeyen'))
+        
+        -- Remote müzik için de araç pozisyonunu takip et
+        CreateThread(function()
+            local trackMusicId = musicId
+            while remoteMusicTracks[trackMusicId] do
+                local track = remoteMusicTracks[trackMusicId]
+                local veh = NetworkGetEntityFromNetworkId(track.vehicleNetId)
+                
+                if veh and veh ~= 0 and DoesEntityExist(veh) then
+                    local newCoords = GetEntityCoords(veh)
+                    pcall(function()
+                        if exports.xsound:isPlaying(trackMusicId) then
+                            exports.xsound:Position(trackMusicId, newCoords)
+                        else
+                            remoteMusicTracks[trackMusicId] = nil
+                        end
+                    end)
+                else
+                    remoteMusicTracks[trackMusicId] = nil
+                    break
+                end
+                
+                Wait(100)
+            end
+        end)
     end
 end)
 
@@ -1358,8 +1392,17 @@ RegisterNetEvent('swx_speaker:client:stopMusic', function(data)
         return
     end
     
-    -- Remote müzik ID'sini bul ve durdur
-    local prefix = "speaker_remote_" .. data.playerId .. "_"
-    -- xsound tüm sesleri otomatik yönetir
+    -- Bu player'a ait tüm remote müzikleri bul ve temizle
+    for musicId, track in pairs(remoteMusicTracks) do
+        if track.playerId == data.playerId then
+            pcall(function()
+                if exports.xsound:isPlaying(musicId) then
+                    exports.xsound:Destroy(musicId)
+                end
+            end)
+            remoteMusicTracks[musicId] = nil
+        end
+    end
+    
     print('[SWX Speaker] Diğer oyuncunun müziği durduruldu: Player=' .. data.playerId)
 end)

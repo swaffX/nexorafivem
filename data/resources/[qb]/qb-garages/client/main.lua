@@ -73,76 +73,65 @@ function SetAsMissionEntity(vehicle)
     SetNetworkIdCanMigrate(id, true)
 end
 
---Menus
+--Menus - ox_lib Context Menu
 local function PublicGarage(garageName, type)
     local garage = Garages[garageName]
     local categories = garage.vehicleCategories
     local superCategory = GetSuperCategoryFromCategories(categories)
 
-    exports['qb-menu']:openMenu({
-        {
-            header = garage.label,
-            isMenuHeader = true,
-        },
-        {
-            header = Lang:t("menu.text.vehicles"),
-            txt = Lang:t("menu.text.vehicles"),
-            params = {
-                event = "qb-garages:client:GarageMenu",
-                args = {
-                    garageId = garageName,
-                    garage = garage,
-                    categories = categories,
-                    header =  Lang:t("menu.header."..garage.type.."_"..superCategory, {value = garage.label}),
-                    superCategory = superCategory,
-                    type = type
-                }
-            }
-        },
-        {
-            header = Lang:t("menu.leave.car"),
-            txt = "",
-            params = {
-                event = 'qb-menu:closeMenu'
-            }
-        },
+    lib.registerContext({
+        id = 'public_garage_' .. garageName,
+        title = garage.label,
+        options = {
+            {
+                title = Lang:t("menu.text.vehicles"),
+                description = Lang:t("menu.text.vehicles"),
+                icon = 'car',
+                onSelect = function()
+                    TriggerEvent("qb-garages:client:GarageMenu", {
+                        garageId = garageName,
+                        garage = garage,
+                        categories = categories,
+                        header = Lang:t("menu.header."..garage.type.."_"..superCategory, {value = garage.label}),
+                        superCategory = superCategory,
+                        type = type
+                    })
+                end
+            },
+        }
     })
+    lib.showContext('public_garage_' .. garageName)
 end
 
 local function MenuHouseGarage()
     local superCategory = GetSuperCategoryFromCategories(HouseGarageCategories)
-    exports['qb-menu']:openMenu({
-        {
-            header = Lang:t("menu.header.house_garage"),
-            isMenuHeader = true
-        },
-        {
-            header = Lang:t("menu.text.vehicles"),
-            txt = Lang:t("menu.text.vehicles"),
-            params = {
-                event = "qb-garages:client:GarageMenu",
-                args = {
-                    garageId = CurrentHouseGarage,
-                    categories = HouseGarageCategories,
-                    header =  HouseGarages[CurrentHouseGarage].label,
-                    garage = HouseGarages[CurrentHouseGarage],
-                    superCategory = superCategory,
-                    type = 'house'
-                }
-            }
-        },
-        {
-            header = Lang:t("menu.leave.car"),
-            txt = "",
-            params = {
-                event = "qb-menu:closeMenu"
-            }
-        },
+    
+    lib.registerContext({
+        id = 'house_garage_' .. CurrentHouseGarage,
+        title = Lang:t("menu.header.house_garage"),
+        options = {
+            {
+                title = Lang:t("menu.text.vehicles"),
+                description = Lang:t("menu.text.vehicles"),
+                icon = 'house',
+                onSelect = function()
+                    TriggerEvent("qb-garages:client:GarageMenu", {
+                        garageId = CurrentHouseGarage,
+                        categories = HouseGarageCategories,
+                        header = HouseGarages[CurrentHouseGarage].label,
+                        garage = HouseGarages[CurrentHouseGarage],
+                        superCategory = superCategory,
+                        type = 'house'
+                    })
+                end
+            },
+        }
     })
+    lib.showContext('house_garage_' .. CurrentHouseGarage)
 end
 
 local function ClearMenu()
-	TriggerEvent("qb-menu:closeMenu")
+    lib.closeContext()
 end
 
 local function OpenGarageVehicleMenu(garageId, garage, garageType, categories, header, superCategory)
@@ -334,6 +323,12 @@ function ParkVehicleSpawnerVehicle(veh, garageName, vehLocation, plate)
 end
 
 local function ParkVehicle(veh, garageName, vehLocation)
+    -- Park alanı kontrolü - sadece garaj alanındayken park edilebilir
+    if not CurrentGarage and not CurrentHouseGarage then
+        QBCore.Functions.Notify("Park alanı dışındasınız! Garaj alanına girin.", "error", 3500)
+        return
+    end
+    
     local plate = QBCore.Functions.GetPlate(veh)
     local garageName = garageName or (CurrentGarage or CurrentHouseGarage)
     local garage = Garages[garageName]
@@ -487,37 +482,28 @@ function JobMenuGarage(garageName)
         end
         return
     end
-    local vehicleMenu = {
-        {
-            header = jobGarage.label,
-            isMenuHeader = true
-        }
-    }
 
+    local options = {}
     local vehicles = jobGarage.vehicles[QBCore.Functions.GetPlayerData().job.grade.level]
     for veh, label in pairs(vehicles) do
-        vehicleMenu[#vehicleMenu+1] = {
-            header = label,
-            txt = "",
-            params = {
-                event = "qb-garages:client:TakeOutGarage",
-                args = {
+        table.insert(options, {
+            title = label,
+            icon = 'car',
+            onSelect = function()
+                TriggerEvent("qb-garages:client:TakeOutGarage", {
                     vehicleModel = veh,
                     garage = garage
-                }
-            }
-        }
+                })
+            end
+        })
     end
 
-    vehicleMenu[#vehicleMenu+1] = {
-        header = Lang:t('menu.leave.job'),
-        txt = "",
-        params = {
-            event = "qb-menu:client:closeMenu"
-        }
-
-    }
-    exports['qb-menu']:openMenu(vehicleMenu)
+    lib.registerContext({
+        id = 'job_garage_' .. garageName,
+        title = jobGarage.label,
+        options = options
+    })
+    lib.showContext('job_garage_' .. garageName)
 end
 
 function GetFreeParkingSpots(parkingSpots)
@@ -674,6 +660,9 @@ end
 
 -- Events
 
+-- Park alanı kontrolü için global değişken
+local isInParkingZone = false
+
 RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
     local type = data.type
     local garageId = data.garageId
@@ -681,30 +670,23 @@ RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
     local categories = data.categories and data.categories or {'car'}
     local header = data.header
     local superCategory = data.superCategory
-    local leave
-
-    leave = Lang:t("menu.leave."..superCategory)
 
     QBCore.Functions.TriggerCallback("qb-garage:server:GetGarageVehicles", function(result)
         if result == nil then
             QBCore.Functions.Notify(Lang:t("error.no_vehicles"), "error", 5000)
         else
-            local MenuGarageOptions = {
-                {
-                    header = header,
-                    isMenuHeader = true
-                },
-            }
+            local options = {}
             result = result and result or {}
+            
             for k, v in pairs(result) do
                 local enginePercent = Round(v.engine / 10, 0)
                 local bodyPercent = Round(v.body / 10, 0)
                 local currentFuel = v.fuel
                 local vehData = QBCore.Shared.Vehicles[v.vehicle]
-                local vname = 'Vehicle does not exist'
-                if vehData then
-                    vname = vehData.name
-                end
+                -- Eğer QBCore.Shared.Vehicles'te yoksa, model adını kullan
+                local vname = vehData and vehData.name or v.vehicle:upper()
+                local brand = vehData and vehData.brand or ""
+                local fullName = brand ~= "" and (brand .. " " .. vname) or vname
 
                 if v.state == 0 then
                     v.state = Lang:t("status.out")
@@ -714,51 +696,52 @@ RegisterNetEvent("qb-garages:client:GarageMenu", function(data)
                     v.state = Lang:t("status.impound")
                 end
 
-                if type == "depot" then
-                    MenuGarageOptions[#MenuGarageOptions+1] = {
-                        header = Lang:t('menu.header.depot', {value = vname, value2 = v.depotprice }),
-                        txt = Lang:t('menu.text.depot', {value = v.plate, value2 = currentFuel, value3 = enginePercent, value4 = bodyPercent}),
-                        params = {
-                            event = "qb-garages:client:TakeOutDepot",
-                            args = {
+                local option = {
+                    title = type == "depot" and 
+                        Lang:t('menu.header.depot', {value = fullName, value2 = v.depotprice }) or
+                        Lang:t('menu.header.garage', {value = fullName, value2 = v.plate}),
+                    description = Lang:t('menu.text.garage', {value = v.state, value2 = currentFuel, value3 = enginePercent, value4 = bodyPercent}),
+                    icon = 'car',
+                    disabled = v.state == Lang:t("status.out"), -- Dışarıda olan araçları disable et
+                    onSelect = function()
+                        if type == "depot" then
+                            TriggerEvent("qb-garages:client:TakeOutDepot", {
                                 vehicle = v,
                                 vehicleModel = v.vehicle,
                                 type = type,
                                 garage = garage,
-                            }
-                        }
-                    }
-                else
-                    MenuGarageOptions[#MenuGarageOptions+1] = {
-                        header = Lang:t('menu.header.garage', {value = vname, value2 = v.plate}),
-                        txt = Lang:t('menu.text.garage', {value = v.state, value2 = currentFuel, value3 = enginePercent, value4 = bodyPercent}),
-                        params = {
-                            event = "qb-garages:client:TakeOutGarage",
-                            args = {
+                            })
+                        else
+                            TriggerEvent("qb-garages:client:TakeOutGarage", {
                                 vehicle = v,
                                 vehicleModel = v.vehicle,
                                 type = type,
                                 garage = garage,
                                 superCategory = superCategory,
-                            }
-                        }
-                    }
-                end
+                            })
+                        end
+                    end
+                }
+                table.insert(options, option)
             end
 
-            MenuGarageOptions[#MenuGarageOptions+1] = {
-                header = leave,
-                txt = "",
-                params = {
-                    event = "qb-menu:closeMenu",
-                }
-            }
-            exports['qb-menu']:openMenu(MenuGarageOptions)
+            lib.registerContext({
+                id = 'garage_vehicles_' .. garageId,
+                title = header,
+                options = options
+            })
+            lib.showContext('garage_vehicles_' .. garageId)
         end
     end, garageId, type, superCategory)
 end)
 
 RegisterNetEvent('qb-garages:client:TakeOutGarage', function(data, cb)
+    -- Park alanı kontrolü - sadece garaj alanındayken araç alınabilir
+    if not CurrentGarage and not CurrentHouseGarage then
+        QBCore.Functions.Notify("Garaj alanı dışındasınız! Lütfen garaj alanına girin.", "error", 3500)
+        return
+    end
+    
     local garageType = data.type
     local vehicleModel = data.vehicleModel
     local vehicle = data.vehicle
@@ -799,6 +782,12 @@ RegisterNetEvent('qb-radialmenu:client:onRadialmenuOpen', function()
 end)
 
 RegisterNetEvent('qb-garages:client:OpenMenu', function()
+    -- Park alanı kontrolü
+    if not CurrentGarage and not CurrentHouseGarage then
+        QBCore.Functions.Notify("Garaj alanı dışındasınız! Lütfen garaj alanına girin.", "error", 3500)
+        return
+    end
+    
     if CurrentGarage then
         local garage = Garages[CurrentGarage]
         local type = garage.type
