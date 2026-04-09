@@ -130,7 +130,7 @@
                 },
                 "money": {
                     "hide": true,
-                    "disable": false,
+                    "disable": true,
                     "positions": { 
                         "old": {
                             "x": 0,
@@ -148,7 +148,7 @@
                 },
                 "bank": {
                     "hide": true,
-                    "disable": false,
+                    "disable": true,
                     "positions": { 
                         "old": {
                             "x": 0,

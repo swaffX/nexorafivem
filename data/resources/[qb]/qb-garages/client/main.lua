@@ -190,39 +190,33 @@ end
 
 -- Functions
 
-local function ApplyVehicleDamage(currentVehicle, veh)
-	local engine = veh.engine + 0.0
-	local body = veh.body + 0.0
-    local damage = veh.damage
-    if damage then
-        if damage.tyres then
-            for k, tyre in pairs(damage.tyres) do
-                if tyre.onRim then
-                    SetVehicleTyreBurst(currentVehicle, tonumber(k), tyre.onRim, 1000.0)
-                elseif tyre.burst then
-                    SetVehicleTyreBurst(currentVehicle, tonumber(k), tyre.onRim, 990.0)
-                end
-            end
-        end
-        if damage.windows then
-            for k, window in pairs(damage.windows) do
-                if window.smashed then
-                    SmashVehicleWindow(currentVehicle, tonumber(k))
-                end
-            end
-        end
-
-        if damage.doors then
-            for k, door in pairs(damage.doors) do
-                if door.damaged then
-                    SetVehicleDoorBroken(currentVehicle, tonumber(k), true)
-                end
-            end
-        end
+local function RepairVehicle(currentVehicle)
+    -- Aracı tamamen tamir et (tertemiz çıksın)
+    SetVehicleFixed(currentVehicle)
+    SetVehicleDeformationFixed(currentVehicle)
+    SetVehicleUndriveable(currentVehicle, false)
+    
+    -- Tüm tekerlekleri düzelt
+    for i = 0, 7 do
+        SetVehicleTyreFixed(currentVehicle, i)
     end
-
-    SetVehicleEngineHealth(currentVehicle, engine)
-    SetVehicleBodyHealth(currentVehicle, body)
+    
+    -- Tüm camları düzelt
+    for i = 0, 13 do
+        FixVehicleWindow(currentVehicle, i)
+    end
+    
+    -- Tüm kapıları düzelt
+    for i = 0, 5 do
+        SetVehicleDoorBroken(currentVehicle, i, false)
+    end
+    
+    -- Motor ve kaporta sağlığını 1000 yap
+    SetVehicleEngineHealth(currentVehicle, 1000.0)
+    SetVehicleBodyHealth(currentVehicle, 1000.0)
+    
+    -- Yakıt deposunu temizle (yangın riskini azalt)
+    SetVehiclePetrolTankHealth(currentVehicle, 1000.0)
 end
 
 local function GetCarDamage(vehicle)
@@ -692,7 +686,8 @@ function UpdateSpawnedVehicle(spawnedVehicle, vehicleInfo, heading, garage, prop
         end
         SetVehicleNumberPlateText(spawnedVehicle, vehicleInfo.plate)
         SetAsMissionEntity(spawnedVehicle)
-        ApplyVehicleDamage(spawnedVehicle, vehicleInfo)
+        -- Aracı tamir et - tertemiz çıksın
+        RepairVehicle(spawnedVehicle)
         TriggerServerEvent('qb-garage:server:updateVehicleState', 0, vehicleInfo.plate, vehicleInfo.garage)
         TriggerEvent("vehiclekeys:client:SetOwner", vehicleInfo.plate)
     end

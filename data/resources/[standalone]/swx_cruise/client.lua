@@ -92,6 +92,13 @@ function EnableCruiseControl(vehicle, speed)
                 break
             end
             
+            -- Araç havadaysa hız sabitlemeyi kapat
+            if IsVehicleInAir(currentVehicle) then
+                DisableCruiseControl()
+                QBCore.Functions.Notify('Araç havada - Hız sabitleme kapandı', 'info', 3000)
+                break
+            end
+            
             -- Aracı durdurma kontrolü
             if IsControlPressed(0, 71) then -- Throttle (W tuşu)
                 -- Gaz veriliyor, hız sabitlemeyi aşıp aşmadığını kontrol et
@@ -142,6 +149,27 @@ CreateThread(function()
         end
         
         wasInVehicle = inVehicle
+    end
+end)
+
+-- Araç havadaysa hız sabitlemeyi otomatik kapat (sürekli kontrol)
+CreateThread(function()
+    while true do
+        Wait(500) -- Her 500ms'de bir kontrol et
+        
+        if cruiseControl.enabled then
+            local ped = PlayerPedId()
+            if IsPedInAnyVehicle(ped, false) then
+                local vehicle = GetVehiclePedIsIn(ped, false)
+                if vehicle and vehicle ~= 0 then
+                    -- Araç havadaysa veya tüm tekerlekler havadaysa
+                    if IsVehicleInAir(vehicle) then
+                        DisableCruiseControl()
+                        QBCore.Functions.Notify('Araç havada - Hız sabitleme kapandı', 'info', 3000)
+                    end
+                end
+            end
+        end
     end
 end)
 
