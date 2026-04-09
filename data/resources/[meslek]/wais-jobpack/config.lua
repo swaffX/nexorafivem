@@ -1,4 +1,4 @@
-﻿Config = {}
+Config = {}
 Config.Framework = {
     ["Framework"] = "qbcore", -- esx, qbcore or qbox
     ["ResourceName"] = "qb-core", -- es_extended or qb-core or your resource name. If you using qbx you should write qb-core

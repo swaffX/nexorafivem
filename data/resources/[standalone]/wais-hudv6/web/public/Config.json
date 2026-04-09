@@ -1,6 +1,6 @@
 {
     "language": "tr",
-    "timerLocation": "en-US",
+    "timerLocation": "tr-TR",
     "disableMusicSystem": true,
     "YOUTUBE_API_KEY": "AIzaSyCj6M93YEZKPFVgcncUGy_NNPSh3SVNPjA",
 
@@ -129,7 +129,7 @@
                     }
                 },
                 "money": {
-                    "hide": false,
+                    "hide": true,
                     "disable": false,
                     "positions": { 
                         "old": {
@@ -147,7 +147,7 @@
                     }
                 },
                 "bank": {
-                    "hide": false,
+                    "hide": true,
                     "disable": false,
                     "positions": { 
                         "old": {

@@ -1340,24 +1340,24 @@ CreateThread(function()
             
             -- Update weapon ammo
             if Player.weapon.hash ~= -1569615261 then
-                Player.weapon.ammo = GetAmmoInPedWeapon(playerPed, Player.weapon.hash)
                 local _, clip = GetAmmoInClip(playerPed, Player.weapon.hash)
                 Player.weapon.clip = clip
             end
             
             -- Vehicle updates
-            if Player.vehicle.vehicle > 0 then
+            if Player.vehicle.vehicle > 0 and DoesEntityExist(Player.vehicle.vehicle) then
                 if not Player.vehicle.isBlacklisted then
                     sleepTime = Config.RefreshTimes.carhud[Player.customizations.performance]
                     
                     local speed = GetEntitySpeed(Player.vehicle.vehicle)
                     local fuel = Config.GetVehicleFuel(Player.vehicle.vehicle)
-                    local rpm = GetVehicleCurrentRpm(Player.vehicle.vehicle)
-                    local engineHealth = GetVehicleEngineHealth(Player.vehicle.vehicle)
-                    
+                    local rpm = 0
                     local gear = 0
                     local maxGear = 0
-                    local attitude = 0
+                    pcall(function()
+                        rpm = GetVehicleCurrentRpm(Player.vehicle.vehicle)
+                    end)
+                    local engineHealth = GetVehicleEngineHealth(Player.vehicle.vehicle)
                     local altitude = 0
                     local heading = 0
                     local depth = 0
@@ -1383,8 +1383,10 @@ CreateThread(function()
                         end
                         
                         if styleFeatures.gears then
-                            gear = GetVehicleCurrentGear(Player.vehicle.vehicle)
-                            maxGear = GetVehicleHighGear(Player.vehicle.vehicle)
+                            pcall(function()
+                                gear = GetVehicleCurrentGear(Player.vehicle.vehicle)
+                                maxGear = GetVehicleHighGear(Player.vehicle.vehicle)
+                            end)
                         end
                     end
                     
