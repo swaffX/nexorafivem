@@ -190,35 +190,6 @@ end
 
 -- Functions
 
-local function RepairVehicle(currentVehicle)
-    -- Aracı tamamen tamir et (tertemiz çıksın)
-    SetVehicleFixed(currentVehicle)
-    SetVehicleDeformationFixed(currentVehicle)
-    SetVehicleUndriveable(currentVehicle, false)
-    
-    -- Tüm tekerlekleri düzelt
-    for i = 0, 7 do
-        SetVehicleTyreFixed(currentVehicle, i)
-    end
-    
-    -- Tüm camları düzelt
-    for i = 0, 13 do
-        FixVehicleWindow(currentVehicle, i)
-    end
-    
-    -- Tüm kapıları düzelt
-    for i = 0, 5 do
-        SetVehicleDoorBroken(currentVehicle, i, false)
-    end
-    
-    -- Motor ve kaporta sağlığını 1000 yap
-    SetVehicleEngineHealth(currentVehicle, 1000.0)
-    SetVehicleBodyHealth(currentVehicle, 1000.0)
-    
-    -- Yakıt deposunu temizle (yangın riskini azalt)
-    SetVehiclePetrolTankHealth(currentVehicle, 1000.0)
-end
-
 local function GetCarDamage(vehicle)
     local damage = {windows = {}, tyres = {}, doors = {}}
     local tyreIndexes = {0,1,2,3,4,5,45,47}
@@ -686,8 +657,6 @@ function UpdateSpawnedVehicle(spawnedVehicle, vehicleInfo, heading, garage, prop
         end
         SetVehicleNumberPlateText(spawnedVehicle, vehicleInfo.plate)
         SetAsMissionEntity(spawnedVehicle)
-        -- Aracı tamir et - tertemiz çıksın
-        RepairVehicle(spawnedVehicle)
         TriggerServerEvent('qb-garage:server:updateVehicleState', 0, vehicleInfo.plate, vehicleInfo.garage)
         TriggerEvent("vehiclekeys:client:SetOwner", vehicleInfo.plate)
     end
