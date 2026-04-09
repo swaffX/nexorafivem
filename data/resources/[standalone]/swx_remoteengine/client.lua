@@ -43,9 +43,13 @@ end
 
 -- Araç motorunu kontrol et
 local function ToggleVehicleEngine(plate)
+    print('[SWX-RemoteEngine] ToggleVehicleEngine() başladı, plate:', plate)
+    
     local vehicle = FindVehicleByPlate(plate)
+    print('[SWX-RemoteEngine] Araç bulundu:', vehicle and 'EVET' or 'HAYIR')
     
     if not vehicle then
+        print('[SWX-RemoteEngine] Araç bulunamadı!')
         QBCore.Functions.Notify(Config.Messages.no_vehicle, 'error', Config.NotifyDuration)
         return
     end
@@ -55,26 +59,36 @@ local function ToggleVehicleEngine(plate)
     local playerCoords = GetEntityCoords(ped)
     local vehicleCoords = GetEntityCoords(vehicle)
     local distance = #(playerCoords - vehicleCoords)
+    print('[SWX-RemoteEngine] Mesafe:', distance)
     
     if distance > Config.KeyRange then
+        print('[SWX-RemoteEngine] Çok uzak!')
         QBCore.Functions.Notify(Config.Messages.too_far .. ' (' .. math.floor(distance) .. 'm)', 'error', Config.NotifyDuration)
         return
     end
     
     -- Anahtar kontrolü
-    if not HasVehicleKeys(plate) then
+    local hasKeys = HasVehicleKeys(plate)
+    print('[SWX-RemoteEngine] Anahtar var mı:', hasKeys and 'EVET' or 'HAYIR')
+    if not hasKeys then
+        print('[SWX-RemoteEngine] Anahtar yok!')
         QBCore.Functions.Notify(Config.Messages.no_keys, 'error', Config.NotifyDuration)
         return
     end
     
+    print('[SWX-RemoteEngine] Tüm kontroller başarılı, motor değiştiriliyor...')
     -- Animasyon oynat
     PlayKeyAnimation()
     
     -- Motor durumunu değiştir
     local engineState = GetIsVehicleEngineRunning(vehicle)
+    print('[SWX-RemoteEngine] Mevcut motor durumu:', engineState)
     
     -- Server'a bildir ve motoru çalıştır/stop et
-    TriggerServerEvent('swx_remoteengine:ToggleEngine', plate, VehToNet(vehicle), not engineState)
+    local netId = VehToNet(vehicle)
+    print('[SWX-RemoteEngine] NetID:', netId, 'Yeni durum:', not engineState)
+    TriggerServerEvent('swx_remoteengine:ToggleEngine', plate, netId, not engineState)
+    print('[SWX-RemoteEngine] Server event tetiklendi!')
 end
 
 -- F3 Menü - Araç Listesi
@@ -224,9 +238,15 @@ print('[SWX-RemoteEngine] Radial menü entegrasyonu hazır')
 
 -- Motor durumu senkronizasyonu
 RegisterNetEvent('swx_remoteengine:SyncEngine', function(netId, engineState)
+    print('[SWX-RemoteEngine] SyncEngine eventi çağrıldı, netId:', netId, 'state:', engineState)
+    
     local vehicle = NetToVeh(netId)
+    print('[SWX-RemoteEngine] NetToVeh sonucu:', vehicle and 'VAR (' .. vehicle .. ')' or 'YOK/0')
+    
     if vehicle and vehicle ~= 0 then
+        print('[SWX-RemoteEngine] SetVehicleEngineOn çağrılıyor...')
         SetVehicleEngineOn(vehicle, engineState, false, true)
+        print('[SWX-RemoteEngine] Motor durumu değiştirildi!')
         
         if engineState then
             QBCore.Functions.Notify(Config.Messages.engine_on, 'success', Config.NotifyDuration)

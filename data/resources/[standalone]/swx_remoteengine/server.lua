@@ -52,26 +52,40 @@ local AllowedVehicles = {
 
 -- Motor durumunu değiştir ve senkronize et
 RegisterNetEvent('swx_remoteengine:ToggleEngine', function(plate, netId, engineState)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    print('[SWX-RemoteEngine] Server ToggleEngine eventi çağrıldı, plate:', plate, 'netId:', netId, 'state:', engineState)
     
-    if not Player then return end
+    local src = source
+    print('[SWX-RemoteEngine] Source:', src)
+    
+    local Player = QBCore.Functions.GetPlayer(src)
+    print('[SWX-RemoteEngine] Player:', Player and 'BULUNDU' or 'YOK')
+    
+    if not Player then
+        print('[SWX-RemoteEngine] Player yok, işlem iptal')
+        return
+    end
     
     -- Anahtar kontrolü (server-side)
     local citizenid = Player.PlayerData.citizenid
+    print('[SWX-RemoteEngine] CitizenID:', citizenid)
     
     MySQL.query('SELECT vehicle FROM player_vehicles WHERE citizenid = ? AND plate = ?', {citizenid, plate}, function(result)
+        print('[SWX-RemoteEngine] DB sonucu:', json.encode(result))
         if result and result[1] then
             local vehicleModel = result[1].vehicle
+            print('[SWX-RemoteEngine] Araç modeli:', vehicleModel)
             
             -- Araç modeli izin verilen listede mi kontrol et
             if not AllowedVehicles[vehicleModel] then
+                print('[SWX-RemoteEngine] Model izin listesinde değil!')
                 TriggerClientEvent('QBCore:Notify', src, 'Bu araç uzaktan çalıştırma desteklemiyor!', 'error')
                 return
             end
             
+            print('[SWX-RemoteEngine] Tüm kontroller başarılı, SyncEngine tetikleniyor...')
             -- Tüm oyunculara motor durumunu senkronize et
             TriggerClientEvent('swx_remoteengine:SyncEngine', -1, netId, engineState)
+            print('[SWX-RemoteEngine] SyncEngine tetiklendi!')
             
             -- Log (opsiyonel)
             -- print('[' .. plate .. '] Motor ' .. (engineState and 'çalıştırıldı' or 'stop edildi') .. ' - Oyuncu: ' .. Player.PlayerData.name)
