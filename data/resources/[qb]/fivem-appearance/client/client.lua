@@ -420,51 +420,52 @@ RegisterNetEvent("fivem-appearance:client:OutfitManagementMenu", function(args)
     if args.type == "Gang" then
         bossMenuEvent = "qb-gangmenu:client:OpenMenu"
     end
-
-    lib.registerContext('outfit_management', {
-        title = '👔 | Manage ' .. args.type .. ' Outfits',
-        options = {
-            {
-                title = 'Kayıtlı Kıyafetlerin',
-                description = 'Şu anda kayıtlı kıyafetlerinizden herhangi birini seçin ' .. args.type,
-                icon = 'shirt',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:ChangeManagementOutfitMenu', {
-                        backEvent = args.backEvent,
-                        type = args.type,
-                    })
-                end
-            },
-            {
-                title = 'Save current Outfit',
-                description = 'Save your current outfit as ' .. args.type .. ' outfit',
-                icon = 'save',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:SaveManagementOutfit', args.type)
-                end
-            },
-            {
-                title = 'Delete Outfit',
-                description = 'Delete a saved ' .. args.type .. ' outfit',
-                icon = 'trash',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:DeleteManagementOutfitMenu', {
-                        backEvent = args.backEvent,
-                        type = args.type,
-                    })
-                end
-            },
-            {
-                title = 'Return',
-                icon = 'chevron-left',
-                onSelect = function()
-                    TriggerEvent(bossMenuEvent)
-                end
+    local menuItems = {
+        {
+            header = "👔 | Manage " .. args.type .. " Outfits",
+            isMenuHeader = true
+        },
+        {
+            header = "Kayıtlı Kıyafetlerin",
+            txt = "Şu anda kayıtlı kıyafetlerinizden herhangi birini seçin "  .. args.type .. "",
+            params = {
+                event = "fivem-appearance:client:ChangeManagementOutfitMenu",
+                args = {
+                    backEvent = args.backEvent,
+                    type = args.type,
+                }
+            }
+        },
+        {
+            header = "Save current Outfit",
+            txt = "Save your current outfit as " .. args.type .. " outfit",
+            params = {
+                event = "fivem-appearance:client:SaveManagementOutfit",
+                args = args.type
+            }
+        },
+        {
+            header = "Delete Outfit",
+            txt = "Delete a saved " .. args.type .. " outfit",
+            params = {
+                event = "fivem-appearance:client:DeleteManagementOutfitMenu",
+                args = {
+                    backEvent = args.backEvent,
+                    type = args.type,
+                }
+            }
+        },
+        {
+            header = "Return",
+            icon = "fa-solid fa-angle-left",
+            params = {
+                event = bossMenuEvent,
             }
         }
-    })
+    }
 
-    lib.showContext('outfit_management')
+    exports["qb-menu"]:openMenu(menuItems)
+
 end)
 
 local function getRankInputValues(rankList)
@@ -546,191 +547,159 @@ end)
 
 RegisterNetEvent("fivem-appearance:client:DeleteManagementOutfitMenu", function(args)
     QBCore.Functions.TriggerCallback('fivem-appearance:server:getManagementOutfits', function(result)
-        local options = {}
+        local outfitMenu = {}
         for i = 1, #result, 1 do
-            options[#options + 1] = {
-                title = 'Delete "' .. result[i].name .. '"',
-                description = 'Model: ' .. result[i].model .. ' - Gender: ' .. result[i].gender,
-                icon = 'trash',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:DeleteManagementOutfit', result[i].id)
-                end
+            outfitMenu[#outfitMenu + 1] = {
+                header = 'Delete "' .. result[i].name .. '"',
+                txt = "Model: " .. result[i].model .. " - Gender: " .. result[i].gender,
+                params = {
+                    event = 'fivem-appearance:client:DeleteManagementOutfit',
+                    args = result[i].id
+                }
             }
         end
-        options[#options + 1] = {
-            title = 'Return',
-            icon = 'chevron-left',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:OutfitManagementMenu', {
+        outfitMenu[#outfitMenu + 1] = {
+            header = "Return",
+            icon = "fa-solid fa-angle-left",
+            params = {
+                event = "fivem-appearance:client:OutfitManagementMenu",
+                args = {
                     backEvent = args.backEvent,
                     type = args.type,
-                })
-            end
+                }
+            }
         }
-
-        lib.registerContext('delete_management_outfit', {
-            title = 'Delete ' .. args.type .. ' Outfit',
-            options = options
-        })
-
-        lib.showContext('delete_management_outfit')
+        exports['qb-menu']:openMenu(outfitMenu)
     end, args.type)
 end)
 
 RegisterNetEvent("fivem-appearance:client:ChangeManagementOutfitMenu", function(args)
     QBCore.Functions.TriggerCallback('fivem-appearance:server:getManagementOutfits', function(result)
-        local options = {}
+        local outfitMenu = {}
         for i = 1, #result, 1 do
-            options[#options + 1] = {
-                title = result[i].name,
-                description = result[i].model,
-                icon = 'shirt',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:changeOutfit', {
+            outfitMenu[#outfitMenu + 1] = {
+                header = result[i].name,
+                txt = result[i].model,
+                params = {
+                    event = 'fivem-appearance:client:changeOutfit',
+                    args = {
                         type = args.type,
                         name = result[i].name,
                         model = result[i].model,
                         components = result[i].components,
                         props = result[i].props,
                         disableSave = true,
-                    })
-                end
+                    }
+                }
             }
         end
-        options[#options + 1] = {
-            title = 'Return',
-            icon = 'chevron-left',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:OutfitManagementMenu', {
+        outfitMenu[#outfitMenu + 1] = {
+            header = "Return",
+            icon = "fa-solid fa-angle-left",
+            params = {
+                event = "fivem-appearance:client:OutfitManagementMenu",
+                args = {
                     backEvent = args.backEvent,
                     type = args.type,
-                })
-            end
+                }
+            }
         }
-
-        lib.registerContext('change_management_outfit', {
-            title = 'Change ' .. args.type .. ' Outfit',
-            options = options
-        })
-
-        lib.showContext('change_management_outfit')
+        exports['qb-menu']:openMenu(outfitMenu)
     end, args.type, getGender())
 end)
 
 function OpenMenu(isPedMenu, backEvent, menuType, menuData)
-    local options = {}
-    
+    local menuItems = {}
+    local outfitMenuItems = {{
+        header = "Kayıtlı Kıyafetlerin",
+        txt = "Şu anda kayıtlı kıyafetlerinizden herhangi birini seçin",
+        params = {
+            event = "fivem-appearance:client:changeOutfitMenu",
+            args = {
+                isPedMenu = isPedMenu,
+                backEvent = backEvent
+            }
+        }
+    }, {
+        header = "Yeni Kıyafeti Kaydet",
+        txt = "Daha sonra kullanabileceğiniz yeni bir kıyafet kaydedin",
+        params = {
+            event = "fivem-appearance:client:saveOutfit"
+        }
+    }, {
+        header = "Kıyafet Sil",
+        txt = "Kıyafeti çöpe at gitsin :)",
+        params = {
+            event = "fivem-appearance:client:deleteOutfitMenu",
+            args = {
+                isPedMenu = isPedMenu,
+                backEvent = backEvent
+            }
+        }
+    }}
     if menuType == "default" then
         local header = "Kıyafet Satın Al - $" .. Config.ClothingCost
         if isPedMenu then
             header = "Kıyafet Değiştir"
         end
-        options[#options + 1] = {
-            title = header,
-            description = 'Giymek için geniş bir ürün yelpazesinden seçim yapın :)',
-            icon = 'shirt',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:openClothingShop', isPedMenu)
-            end
+        menuItems[#menuItems + 1] = {
+            header = "Kıyafet Mağazası Seçenekleri",
+            icon = "fas fa-shirt",
+            isMenuHeader = true -- Set to true to make a nonclickable title
         }
-        options[#options + 1] = {
-            title = 'Kayıtlı Kıyafetlerin',
-            description = 'Şu anda kayıtlı kıyafetlerinizden herhangi birini seçin',
-            icon = 'list',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:changeOutfitMenu', {
-                    isPedMenu = isPedMenu,
-                    backEvent = backEvent
-                })
-            end
+        menuItems[#menuItems + 1] = {
+            header = header,
+            txt = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
+            params = {
+                event = "fivem-appearance:client:openClothingShop",
+                args = isPedMenu
+            }
         }
-        options[#options + 1] = {
-            title = 'Yeni Kıyafeti Kaydet',
-            description = 'Daha sonra kullanabileceğiniz yeni bir kıyafet kaydedin',
-            icon = 'save',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:saveOutfit')
-            end
-        }
-        options[#options + 1] = {
-            title = 'Kıyafet Sil',
-            description = 'Kıyafeti çöpe at gitsin :)',
-            icon = 'trash',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:deleteOutfitMenu', {
-                    isPedMenu = isPedMenu,
-                    backEvent = backEvent
-                })
-            end
-        }
+        for i = 0, #outfitMenuItems, 1 do
+            menuItems[#menuItems + 1] = outfitMenuItems[i]
+        end
     elseif menuType == "outfit" then
-        options[#options + 1] = {
-            title = 'Kayıtlı Kıyafetlerin',
-            description = 'Şu anda kayıtlı kıyafetlerinizden herhangi birini seçin',
-            icon = 'list',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:changeOutfitMenu', {
-                    isPedMenu = isPedMenu,
-                    backEvent = backEvent
-                })
-            end
+        menuItems[#menuItems + 1] = {
+            header = "👔 | Kıyafet Seçenekleri",
+            isMenuHeader = true -- Set to true to make a nonclickable title
         }
-        options[#options + 1] = {
-            title = 'Yeni Kıyafeti Kaydet',
-            description = 'Daha sonra kullanabileceğiniz yeni bir kıyafet kaydedin',
-            icon = 'save',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:saveOutfit')
-            end
-        }
-        options[#options + 1] = {
-            title = 'Kıyafet Sil',
-            description = 'Kıyafeti çöpe at gitsin :)',
-            icon = 'trash',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:deleteOutfitMenu', {
-                    isPedMenu = isPedMenu,
-                    backEvent = backEvent
-                })
-            end
-        }
+        for i = 0, #outfitMenuItems, 1 do
+            menuItems[#menuItems + 1] = outfitMenuItems[i]
+        end
     elseif menuType == "job-outfit" then
-        options[#options + 1] = {
-            title = 'Sivil Kıyafet',
-            description = 'Kıyafetlerini koy',
-            icon = 'user',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:reloadSkin')
-            end
+        menuItems[#menuItems + 1] = {
+            header = "👔 | Kıyafet Seçenekleri",
+            isMenuHeader = true -- Set to true to make a nonclickable title
         }
-        options[#options + 1] = {
-            title = 'İş kıyafetleri',
-            description = 'İş kıyafetlerinizden herhangi birini seçin',
-            icon = 'briefcase',
-            onSelect = function()
-                TriggerEvent('fivem-appearance:client:openJobOutfitsListMenu', {
+        menuItems[#menuItems + 1] = {
+            header = "Sivil Kıyafet",
+            txt = "Kıyafetlerini koy",
+            params = {
+                event = "fivem-appearance:client:reloadSkin"
+            }
+        }
+        menuItems[#menuItems + 1] = {
+            header = "İş kıyafetleri",
+            txt = "İş kıyafetlerinizden herhangi birini seçin",
+            params = {
+                event = "fivem-appearance:client:openJobOutfitsListMenu",
+                args = {
                     backEvent = backEvent,
                     menuData = menuData
-                })
-            end
+                }
+            }
         }
     end
-
-    lib.registerContext('clothing_menu', {
-        title = '👔 | Kıyafet Seçenekleri',
-        options = options
-    })
-
-    lib.showContext('clothing_menu')
+    exports['qb-menu']:openMenu(menuItems)
 end
 
 RegisterNetEvent("fivem-appearance:client:openJobOutfitsListMenu", function(data)
-    local options = {{
-        title = '< Geri Dön',
-        icon = 'chevron-left',
-        onSelect = function()
-            TriggerEvent(data.backEvent, data.menuData)
-        end
+    local menu = {{
+        header = '< Geri Dön',
+        params = {
+            event = data.backEvent,
+            args = data.menuData
+        }
     }}
     local event = "qb-clothing:client:loadOutfit"
     if Config.BossManagedOutfits then
@@ -738,22 +707,16 @@ RegisterNetEvent("fivem-appearance:client:openJobOutfitsListMenu", function(data
     end
     if data.menuData then
         for _, v in pairs(data.menuData) do
-            options[#options + 1] = {
-                title = v.name,
-                icon = 'shirt',
-                onSelect = function()
-                    TriggerEvent(event, v)
-                end
+            menu[#menu + 1] = {
+                header = v.name,
+                params = {
+                    event = event,
+                    args = v
+                }
             }
         end
     end
-
-    lib.registerContext('job_outfits_list', {
-        title = 'İş Kıyafetleri',
-        options = options
-    })
-
-    lib.showContext('job_outfits_list')
+    exports['qb-menu']:openMenu(menu)
 end)
 
 RegisterNetEvent("fivem-appearance:client:openClothingShopMenu", function(isPedMenu)
@@ -777,35 +740,29 @@ end)
 
 RegisterNetEvent("fivem-appearance:client:changeOutfitMenu", function(data)
     QBCore.Functions.TriggerCallback('fivem-appearance:server:getOutfits', function(result)
-        local options = {{
-            title = '< Geri Dön',
-            icon = 'chevron-left',
-            onSelect = function()
-                TriggerEvent(data.backEvent, data.isPedMenu)
-            end
+        local outfitMenu = {{
+            header = '< Geri Dön',
+            params = {
+                event = data.backEvent,
+                args = data.isPedMenu
+            }
         }}
         for i = 1, #result, 1 do
-            options[#options + 1] = {
-                title = result[i].outfitname,
-                description = result[i].model,
-                icon = 'shirt',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:changeOutfit', {
+            outfitMenu[#outfitMenu + 1] = {
+                header = result[i].outfitname,
+                txt = result[i].model,
+                params = {
+                    event = 'fivem-appearance:client:changeOutfit',
+                    args = {
                         name = result[i].outfitname,
                         model = result[i].model,
                         components = result[i].components,
                         props = result[i].props
-                    })
-                end
+                    }
+                }
             }
         end
-
-        lib.registerContext('change_outfit', {
-            title = 'Kayıtlı Kıyafetlerin',
-            options = options
-        })
-
-        lib.showContext('change_outfit')
+        exports['qb-menu']:openMenu(outfitMenu)
     end)
 end)
 
@@ -853,30 +810,24 @@ end)
 
 RegisterNetEvent("fivem-appearance:client:deleteOutfitMenu", function(data)
     QBCore.Functions.TriggerCallback('fivem-appearance:server:getOutfits', function(result)
-        local options = {{
-            title = '< Geri Dön',
-            icon = 'chevron-left',
-            onSelect = function()
-                TriggerEvent(data.backEvent, data.isPedMenu)
-            end
+        local outfitMenu = {{
+            header = '< Geri Dön',
+            params = {
+                event = data.backEvent,
+                args = data.isPedMenu
+            }
         }}
         for i = 1, #result, 1 do
-            options[#options + 1] = {
-                title = 'Sil "' .. result[i].outfitname .. '"',
-                description = 'Bunu asla geri alamayacaksın!',
-                icon = 'trash',
-                onSelect = function()
-                    TriggerEvent('fivem-appearance:client:deleteOutfit', result[i].id)
-                end
+            outfitMenu[#outfitMenu + 1] = {
+                header = 'Sil "' .. result[i].outfitname .. '"',
+                txt = 'Bunu asla geri alamayacaksın!',
+                params = {
+                    event = 'fivem-appearance:client:deleteOutfit',
+                    args = result[i].id
+                }
             }
         end
-
-        lib.registerContext('delete_outfit', {
-            title = 'Kıyafet Sil',
-            options = options
-        })
-
-        lib.showContext('delete_outfit')
+        exports['qb-menu']:openMenu(outfitMenu)
     end)
 end)
 
