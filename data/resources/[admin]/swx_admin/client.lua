@@ -4,6 +4,11 @@
 local QBCore = nil
 local isOpen = false
 
+-- Loglama fonksiyonu
+local function Log(message)
+    print('[SWX Admin] ' .. message)
+end
+
 -- QBCore başlatma
 CreateThread(function()
     while QBCore == nil do
@@ -13,23 +18,10 @@ CreateThread(function()
     Log('QBCore başarıyla yüklendi')
 end)
 
--- Loglama fonksiyonu
-local function Log(message)
-    print('[SWX Admin] ' .. message)
-end
-
 -- NUI Callback'leri
 RegisterNUICallback('getPlayers', function(data, cb)
     Log('getPlayers callback tetiklendi')
-    
-    QBCore.Functions.TriggerCallback('swx_admin:server:getPlayers', function(players)
-        Log('getPlayers callback yanıt alındı - Oyuncu sayısı: ' .. tostring(#players))
-        SendNUIMessage({
-            action = 'updatePlayers',
-            players = players
-        })
-    end)
-    
+    TriggerServerEvent('swx_admin:server:getPlayers')
     cb({})
 end)
 

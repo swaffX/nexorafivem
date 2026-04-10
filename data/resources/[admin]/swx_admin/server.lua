@@ -25,17 +25,18 @@ local function IsAdmin(playerId)
 end
 
 -- Oyuncu listesini al
-QBCore.Functions.CreateCallback('swx_admin:server:getPlayers', function(source, cb)
+RegisterNetEvent('swx_admin:server:getPlayers')
+AddEventHandler('swx_admin:server:getPlayers', function()
     local src = source
     
-    Log('=== getPlayers callback BAŞLADI ===')
+    Log('=== getPlayers event BAŞLADI ===')
     Log('Source: ' .. tostring(src))
     Log('GetPlayerName: ' .. GetPlayerName(src))
     
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then
         Log('ERROR: Player bulunamadı')
-        cb({})
+        TriggerClientEvent('swx_admin:client:receivePlayers', src, {})
         return
     end
     
@@ -43,7 +44,7 @@ QBCore.Functions.CreateCallback('swx_admin:server:getPlayers', function(source, 
     
     if not IsAdmin(src) then
         Log('getPlayers - Yetki reddedildi - Group: ' .. tostring(Player.PlayerData.group))
-        cb({})
+        TriggerClientEvent('swx_admin:client:receivePlayers', src, {})
         return
     end
     
@@ -75,7 +76,7 @@ QBCore.Functions.CreateCallback('swx_admin:server:getPlayers', function(source, 
     end
     
     Log('Oyuncu listesi gönderiliyor - Source: ' .. tostring(src) .. ', Oyuncu sayısı: ' .. tostring(#players))
-    cb(players)
+    TriggerClientEvent('swx_admin:client:receivePlayers', src, players)
 end)
 
 -- Oyuncuya ışınla
