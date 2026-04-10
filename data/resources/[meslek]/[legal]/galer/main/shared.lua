@@ -276,10 +276,10 @@ Config.Locations = {
     { 
         job = 'all', -- job
         type = 'car',
-        coords = vector3(-56.61, -1099.26, 26.86),
+        coords = vector3(-56.67, -1098.76, 26.42),
         hash = "a_m_o_soucent_01",
-        heading = 26.2,
-        marker = "VEHICLESHOP",
+        heading = 14.2,
+        marker = "Galeriye Hoşgeldiniz!~n~Aradığınız ve size uygun~n~tüm araçlar burada",
         blip = {
             ["active"] = true,
             ["name"] = "Galeri",
