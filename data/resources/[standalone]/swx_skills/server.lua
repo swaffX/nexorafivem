@@ -51,6 +51,29 @@ QBCore.Functions.CreateCallback('swx_skills:getSkills', function(source, cb)
     end
 end)
 
+-- Stat bonus uygula
+local function ApplyStatBonus(source, skillName, level)
+    local skillConfig = Config.Skills[skillName]
+    if not skillConfig or not skillConfig.statBonus then return end
+    
+    local bonusType = skillConfig.statBonus.type
+    local bonusAmount = skillConfig.statBonus.amountPerLevel * level
+    
+    local Player = QBCore.Functions.GetPlayer(source)
+    if not Player then return end
+    
+    if not Player.PlayerData.metadata['skills'] then
+        Player.PlayerData.metadata['skills'] = {}
+    end
+    
+    local currentStats = Player.PlayerData.metadata['skills']
+    currentStats[bonusType] = (currentStats[bonusType] or 0) + bonusAmount
+    
+    pcall(function()
+        Player.Functions.SetMetaData('skills', currentStats)
+    end)
+end
+
 -- XP ekle
 RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     local src = source
@@ -91,31 +114,6 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     -- Client'a güncel skill verilerini gönder
     TriggerClientEvent('swx_skills:updateSkill', src, skillName, currentLevel, currentXP, requiredXP)
 end)
-
--- Stat bonus uygula
-local function ApplyStatBonus(source, skillName, level)
-    local skillConfig = Config.Skills[skillName]
-    if not skillConfig or not skillConfig.statBonus then return end
-    
-    local bonusType = skillConfig.statBonus.type
-    local bonusAmount = skillConfig.statBonus.amountPerLevel * level
-    
-    -- Stat bonus uygulama (QB-Core metadata kullanarak)
-    local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return end
-    
-    -- Metadata skills tablosunu başlat
-    if not Player.PlayerData.metadata['skills'] then
-        Player.PlayerData.metadata['skills'] = {}
-    end
-    
-    local currentStats = Player.PlayerData.metadata['skills']
-    currentStats[bonusType] = (currentStats[bonusType] or 0) + bonusAmount
-    
-    pcall(function()
-        Player.Functions.SetMetaData('skills', currentStats)
-    end)
-end
 
 -- Oyuncu yüklendiğinde skillerini yükle
 RegisterNetEvent('QBCore:Server:PlayerLoaded', function(Player)

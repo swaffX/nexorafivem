@@ -358,68 +358,9 @@ function PlayMusic(url, title)
             local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
             TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
             
-            -- Pozisyon güncelleme KALDIRILDI - 3D ses yerine global ses kullan
-            -- Araç hareketiyle müzik kesilmesini önlemek için position yerine play kullanıyoruz
-            -- Global ses her yerden duyulur, pozisyon takibi gerekmez
-            print('[SWX Speaker] Global ses modu - araç hareketi müziği etkilemez')
-            
-            -- Müzik durma kontrolü (heartbeat) - YouTube timeout sorunu için
-            CreateThread(function()
-                local checkInterval = 5000  -- 5 saniyede bir kontrol et
-                local lastPlayState = true
-                local consecutiveStoppedCount = 0
-                local maxConsecutiveStopped = 3  -- 3 kez üst üste durduysa bildir
-                local currentUrl = url  -- Şarkı URL'sini sakla
-                local currentTitle = title  -- Şarkı başlığını sakla
-                
-                Wait(5000)  -- İlk 5 saniye bekle (müzik yüklenmesi için)
-                
-                while isPlaying and currentMusicId do
-                    Wait(checkInterval)
-                    
-                    if not isPlaying or not currentMusicId then
-                        break
-                    end
-                    
-                    -- xSound çalıyor mu kontrol et
-                    local isSoundPlaying = exports.xsound:isPlaying(currentMusicId)
-                    
-                    if isSoundPlaying then
-                        consecutiveStoppedCount = 0
-                        lastPlayState = true
-                    else
-                        consecutiveStoppedCount = consecutiveStoppedCount + 1
-                        print('[SWX Speaker] Müzik durma algılandı! (' .. consecutiveStoppedCount .. '/' .. maxConsecutiveStopped .. ')')
-                        
-                        if consecutiveStoppedCount >= maxConsecutiveStopped then
-                            -- Müzik durdu
-                            if lastPlayState then
-                                if Config.AutoRestartOnStop and currentUrl then
-                                    -- Otomatik yeniden başlat
-                                    QBCore.Functions.Notify('Müzik durdu, otomatik yeniden başlatılıyor...', 'info', 3000)
-                                    print('[SWX Speaker] Otomatik yeniden başlatma başlıyor...')
-                                    
-                                    Wait(Config.AutoRestartDelay or 2000)
-                                    
-                                    -- Eski müziği temizle
-                                    if currentMusicId then
-                                        exports.xsound:Destroy(currentMusicId)
-                                        currentMusicId = nil
-                                    end
-                                    
-                                    -- Yeniden başlat
-                                    PlayMusic(currentUrl, currentTitle)
-                                    QBCore.Functions.Notify('Müzik yeniden başlatıldı!', 'success')
-                                else
-                                    -- Sadece bildir
-                                    QBCore.Functions.Notify('Müzik durdu! Yeniden başlatmak için menüyü açın.', 'error', 5000)
-                                end
-                                lastPlayState = false
-                            end
-                        end
-                    end
-                end
-            end)
+            -- Not: PlayUrlPos 3D pozisyonel ses için isPlaying() güvenilir çalışmıyor,
+            -- bu yüzden heartbeat kontrolü kaldırıldı. destroyOnFinish=false olduğu için
+            -- müzik manuel durdurulana ya da araçtan inilene kadar çalar.
             
             QBCore.Functions.Notify('Müzik çalıyor!', 'success')
             print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')

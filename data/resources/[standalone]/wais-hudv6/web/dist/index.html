@@ -25,7 +25,11 @@
         </div>
         <div class="cp-title" id="cp-title">Bilinmiyor</div>
         <div class="cp-status" id="cp-status">Çalıyor</div>
-        <div class="cp-progress-bar"><div class="cp-progress-fill" id="cp-progress-fill"></div></div>
+        <div class="cp-time-row">
+          <span class="cp-time-label" id="cp-time-current">00:00</span>
+          <div class="cp-progress-bar"><div class="cp-progress-fill" id="cp-progress-fill"></div></div>
+          <span class="cp-time-label" id="cp-time-total">--:--</span>
+        </div>
       </div>
       <div class="cp-controls">
         <div class="cp-btn">
@@ -47,35 +51,46 @@
       var cpTitle = document.getElementById('cp-title');
       var cpStatus = document.getElementById('cp-status');
       var cpFill = document.getElementById('cp-progress-fill');
+      var cpTimeCurrent = document.getElementById('cp-time-current');
+      var cpTimeTotal = document.getElementById('cp-time-total');
       var iconPause = document.getElementById('cp-icon-pause');
       var iconPlay = document.getElementById('cp-icon-play');
-      var progressInterval = null;
-      var progressValue = 0;
 
-      function setPaused(p) {
-        if (p) {
-          iconPause.style.display = 'none';
-          iconPlay.style.display = '';
-        } else {
-          iconPause.style.display = '';
-          iconPlay.style.display = 'none';
-        }
+      var timerInterval = null;
+      var elapsedSeconds = 0;
+      var pausedAt = 0;
+
+      function fmt(s) {
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
       }
 
-      function startProgress() {
-        if (progressInterval) clearInterval(progressInterval);
-        progressValue = 0;
-        cpFill.style.width = '0%';
-        progressInterval = setInterval(function() {
-          progressValue += 0.055;
-          if (progressValue > 100) progressValue = 0;
-          cpFill.style.width = progressValue + '%';
+      function setPaused(p) {
+        iconPause.style.display = p ? 'none' : '';
+        iconPlay.style.display = p ? '' : 'none';
+      }
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(function() {
+          elapsedSeconds++;
+          cpTimeCurrent.textContent = fmt(elapsedSeconds);
+          var pct = Math.min((elapsedSeconds / 240) * 100, 100);
+          cpFill.style.width = pct + '%';
         }, 1000);
       }
 
-      function stopProgress() {
-        if (progressInterval) clearInterval(progressInterval);
-        progressInterval = null;
+      function stopTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      function resetTimer() {
+        stopTimer();
+        elapsedSeconds = 0;
+        cpTimeCurrent.textContent = '00:00';
+        cpFill.style.width = '0%';
       }
 
       window.addEventListener('message', function(event) {
@@ -84,19 +99,21 @@
 
         if (data.state === 'stopped') {
           widget.classList.remove('cp-show');
-          stopProgress();
+          resetTimer();
         } else if (data.state === 'paused') {
           widget.classList.add('cp-show');
           if (data.title) cpTitle.textContent = data.title;
           cpStatus.textContent = 'Duraklatıldı';
           setPaused(true);
-          stopProgress();
+          stopTimer();
         } else {
+          var isNewSong = data.title && cpTitle.textContent !== data.title;
+          if (isNewSong) resetTimer();
           widget.classList.add('cp-show');
-          if (data.title) cpTitle.textContent = data.title;
+          cpTitle.textContent = data.title || cpTitle.textContent;
           cpStatus.textContent = 'Çalıyor';
           setPaused(false);
-          startProgress();
+          startTimer();
         }
       });
     })();

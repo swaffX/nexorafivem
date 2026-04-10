@@ -3662,7 +3662,7 @@ body {
 #carplay-widget {
     position: fixed;
     left: 10px;
-    bottom: 245px;
+    bottom: 310px;
     width: 262px;
     background: rgba(18, 18, 22, 0.82);
     border-radius: 12px;
@@ -3734,9 +3734,26 @@ body {
     color: rgba(255, 255, 255, 0.40);
 }
 
-.cp-progress-bar {
+.cp-time-row {
     margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     width: 100%;
+}
+
+.cp-time-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.40);
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+}
+
+.cp-progress-bar {
+    flex: 1;
     height: 2px;
     background: rgba(255, 255, 255, 0.10);
     border-radius: 1px;
