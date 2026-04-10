@@ -323,11 +323,11 @@ function PlayMusic(url, title)
             exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
                 isNetworked = true,
                 maxDistance = currentDistance,
-                rolloffFactor = 0.8,        -- Düşük = daha uzak mesafede duyulur
-                refDistance = 5.0,          -- Referans mesafe (5 metre)
-                coneInnerAngle = 360,       -- 360 derece = her yönde eşit ses
+                rolloffFactor = 0.6,
+                refDistance = 20.0,         -- Pozisyon güncelleme gecikmesini örtmek için geniş referans mesafe
+                coneInnerAngle = 360,
                 coneOuterAngle = 360,
-                coneOuterGain = 1.0         -- Dışarıda da tam ses
+                coneOuterGain = 1.0
             })
             
             -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
@@ -362,7 +362,7 @@ function PlayMusic(url, title)
             local trackedId = currentMusicId
             CreateThread(function()
                 while isPlaying and currentMusicId == trackedId do
-                    Wait(250)
+                    Wait(100)  -- Daha sık güncelleme = daha az konum sapması = daha az ses titremesi
                     local ped = PlayerPedId()
                     local veh = GetVehiclePedIsIn(ped, false)
                     if veh ~= 0 and DoesEntityExist(veh) then
