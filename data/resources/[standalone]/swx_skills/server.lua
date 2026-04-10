@@ -1,8 +1,30 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local ox = exports['oxmysql']
 
--- Database tablosu oluştur (oxmysql bağlantısı hazır olunca)
-MySQL.ready(function()
-    MySQL.query.await([[CREATE TABLE IF NOT EXISTS `player_skills` (
+-- oxmysql promise wrapper'ları
+local function dbQuery(sql, params)
+    local p = promise.new()
+    ox:query(sql, params or {}, function(r) p:resolve(r) end)
+    return Citizen.Await(p)
+end
+
+local function dbInsert(sql, params)
+    local p = promise.new()
+    ox:insert(sql, params or {}, function(r) p:resolve(r) end)
+    return Citizen.Await(p)
+end
+
+local function dbUpdate(sql, params)
+    local p = promise.new()
+    ox:update(sql, params or {}, function(r) p:resolve(r) end)
+    return Citizen.Await(p)
+end
+
+-- Database tablosu oluştur
+CreateThread(function()
+    while GetResourceState('oxmysql') ~= 'started' do Wait(100) end
+    Wait(500)
+    dbQuery([[CREATE TABLE IF NOT EXISTS `player_skills` (
         `citizenid` VARCHAR(50) PRIMARY KEY,
         `stamina` INT DEFAULT 1,
         `stamina_xp` INT DEFAULT 0,
@@ -19,32 +41,11 @@ QBCore.Functions.CreateCallback('swx_skills:getSkills', function(source, cb)
     
     local citizenid = Player.PlayerData.citizenid
     
-    local success, result = pcall(function()
-        return MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
-    end)
-    
-    if not success then
-        print('[SWX Skills] ERROR: Database query failed for citizenid: ' .. citizenid)
-        cb(nil)
-        return
-    end
+    local result = dbQuery('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
     
     if not result or not result[1] then
-        -- Yeni kayıt oluştur
-        local insertSuccess = pcall(function()
-            MySQL.insert.await('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
-        end)
-        
-        if not insertSuccess then
-            print('[SWX Skills] ERROR: Failed to insert new skill record for citizenid: ' .. citizenid)
-            cb(nil)
-            return
-        end
-        
-        cb({
-            stamina = 1, stamina_xp = 0,
-            driving = 1, driving_xp = 0
-        })
+        dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
+        cb({ stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0 })
     else
         cb(result[1])
     end
@@ -61,8 +62,7 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     
     if not skillConfig then return end
     
-    -- Mevcut skill verilerini al
-    local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
+    local result = dbQuery('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
     
     local currentLevel = 1
     local currentXP = 0
@@ -71,32 +71,21 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
         currentLevel = result[1][skillName] or 1
         currentXP = result[1][skillName .. '_xp'] or 0
     else
-        MySQL.insert.await('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
+        dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
     end
     
-    -- XP ekle
     currentXP = currentXP + amount
-    
-    -- Level hesapla
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, currentLevel - 1))
     
     if currentXP >= requiredXP and currentLevel < skillConfig.maxLevel then
-        -- Level atla
         currentLevel = currentLevel + 1
         currentXP = currentXP - requiredXP
-        
-        -- Stat bonus uygula
         ApplyStatBonus(src, skillName, currentLevel)
-        
-        -- Client'a bildir
         TriggerClientEvent('swx_skills:levelUp', src, skillName, currentLevel)
-        
-        -- Bildirim gönder
         QBCore.Functions.Notify(src, skillConfig.label .. ' level ' .. currentLevel .. ' oldu!', 'success', 5000)
     end
     
-    -- Database güncelle (await ile)
-    MySQL.update.await('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?', 
+    dbUpdate('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?',
         {currentLevel, currentXP, citizenid})
     
     -- Client'a güncel skill verilerini gönder
@@ -133,19 +122,14 @@ RegisterNetEvent('QBCore:Server:PlayerLoaded', function(Player)
     local src = Player.PlayerData.source
     local citizenid = Player.PlayerData.citizenid
     
-    -- Skill verilerini al
-    local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
+    local result = dbQuery('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
     
     local skills = {}
     if result and result[1] then
         skills = result[1]
     else
-        -- Yeni kayıt
-        MySQL.insert.await('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
-        skills = {
-            stamina = 1, stamina_xp = 0,
-            driving = 1, driving_xp = 0
-        }
+        dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
+        skills = { stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0 }
     end
     
     -- Client'a gönder
@@ -168,8 +152,7 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {{name = 'skill', hel
         
         if not skillConfig then return end
         
-        -- Mevcut skill verilerini al
-        local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
+        local result = dbQuery('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
         
         local currentLevel = 1
         local currentXP = 0
@@ -178,32 +161,21 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {{name = 'skill', hel
             currentLevel = result[1][skillName] or 1
             currentXP = result[1][skillName .. '_xp'] or 0
         else
-            MySQL.insert.await('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
+            dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
         end
         
-        -- XP ekle
         currentXP = currentXP + amount
-        
-        -- Level hesapla
         local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, currentLevel - 1))
         
         if currentXP >= requiredXP and currentLevel < skillConfig.maxLevel then
-            -- Level atla
             currentLevel = currentLevel + 1
             currentXP = currentXP - requiredXP
-            
-            -- Stat bonus uygula
             ApplyStatBonus(src, skillName, currentLevel)
-            
-            -- Client'a bildir
             TriggerClientEvent('swx_skills:levelUp', src, skillName, currentLevel)
-            
-            -- Bildirim gönder
             QBCore.Functions.Notify(src, skillConfig.label .. ' level ' .. currentLevel .. ' oldu!', 'success', 5000)
         end
         
-        -- Database güncelle
-        MySQL.update('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?', 
+        dbUpdate('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?',
             {currentLevel, currentXP, citizenid})
         
         -- Client'a güncel skill verilerini gönder
