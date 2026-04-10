@@ -14,6 +14,7 @@ end)
 -- Skill güncelleme
 RegisterNetEvent('swx_skills:updateSkill', function(skillName, level, xp, requiredXP)
     if not playerSkills[skillName] then return end
+    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
     
     playerSkills[skillName] = level
     playerSkills[skillName .. '_xp'] = xp
@@ -31,9 +32,10 @@ end)
 
 -- Level atlayınca skill bar göster
 RegisterNetEvent('swx_skills:levelUp', function(skillName, level)
-    local skillConfig = Config.Skills[skillName]
-    if not skillConfig then return end
+    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
+    if not Config.ShowSkillBarDuration then return end
     
+    local skillConfig = Config.Skills[skillName]
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
     
     SendNUIMessage({
@@ -56,6 +58,8 @@ end)
 
 -- XP kazanma kontrolü
 local function CheckXPGain(skillName, activity)
+    if not Config or not Config.XPActivities or not Config.XPActivities[skillName] then return end
+    
     local activityConfig = Config.XPActivities[skillName]
     if not activityConfig or not activityConfig[activity] then return end
     
@@ -134,6 +138,11 @@ end)
 
 -- Tüm skill barlarını göster (test komutu için)
 RegisterCommand('showskills', function()
+    if not Config or not Config.Skills then 
+        print('[SWX Skills] Config yüklenmedi!')
+        return 
+    end
+    
     local skills = {}
     
     for skillName, skillData in pairs(Config.Skills) do
