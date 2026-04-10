@@ -10,5 +10,78 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- CarPlay Widget -->
+    <div id="carplay-widget">
+      <div class="cp-thumb">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-3c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z" stroke="#5ac8fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="cp-info">
+        <div class="cp-label">
+          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#5ac8fa"/></svg>
+          CARPLAY
+        </div>
+        <div class="cp-title" id="cp-title">Bilinmiyor</div>
+        <div class="cp-status" id="cp-status">Çalıyor</div>
+        <div class="cp-progress-bar"><div class="cp-progress-fill" id="cp-progress-fill"></div></div>
+      </div>
+      <div class="cp-controls">
+        <div class="cp-btn">&#9664;&#9664;</div>
+        <div class="cp-btn cp-btn-main" id="cp-playpause-btn">&#9646;&#9646;</div>
+        <div class="cp-btn">&#9654;&#9654;</div>
+      </div>
+    </div>
+
+    <script>
+    (function() {
+      var widget = document.getElementById('carplay-widget');
+      var cpTitle = document.getElementById('cp-title');
+      var cpStatus = document.getElementById('cp-status');
+      var cpPlayPause = document.getElementById('cp-playpause-btn');
+      var cpFill = document.getElementById('cp-progress-fill');
+      var progressInterval = null;
+      var progressValue = 0;
+
+      function startProgress() {
+        if (progressInterval) clearInterval(progressInterval);
+        progressValue = 0;
+        cpFill.style.width = '0%';
+        progressInterval = setInterval(function() {
+          progressValue += 0.05;
+          if (progressValue > 100) progressValue = 0;
+          cpFill.style.width = progressValue + '%';
+        }, 1000);
+      }
+
+      function stopProgress() {
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = null;
+      }
+
+      window.addEventListener('message', function(event) {
+        var data = event.data;
+        if (!data || data.type !== 'CARPLAY_UPDATE') return;
+
+        if (data.state === 'stopped') {
+          widget.classList.remove('cp-show');
+          stopProgress();
+        } else if (data.state === 'paused') {
+          widget.classList.add('cp-show');
+          if (data.title) cpTitle.textContent = data.title;
+          cpStatus.textContent = 'Duraklatıldı';
+          cpPlayPause.innerHTML = '&#9654;';
+          stopProgress();
+        } else {
+          widget.classList.add('cp-show');
+          if (data.title) cpTitle.textContent = data.title;
+          cpStatus.textContent = 'Çalıyor';
+          cpPlayPause.innerHTML = '&#9646;&#9646;';
+          startProgress();
+        }
+      });
+    })();
+    </script>
   </body>
 </html>

@@ -3658,6 +3658,131 @@ body {
     position: absolute;
 }
 
+/* ===================== CarPlay Widget ===================== */
+#carplay-widget {
+    position: fixed;
+    left: 12px;
+    bottom: 215px;
+    width: 268px;
+    background: rgba(22, 22, 28, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    z-index: 999999;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.65);
+}
+
+#carplay-widget.cp-show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cp-thumb {
+    width: 40px;
+    height: 40px;
+    background: rgba(90, 200, 250, 0.12);
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(90, 200, 250, 0.18);
+}
+
+.cp-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.cp-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    color: #5ac8fa;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 1px;
+}
+
+.cp-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.cp-status {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.cp-progress-bar {
+    margin-top: 6px;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+.cp-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5ac8fa, #4a9eff);
+    border-radius: 1px;
+    transition: width 1s linear;
+}
+
+.cp-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.cp-btn {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: default;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.cp-btn-main {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.07);
+}
+/* =================== End CarPlay Widget =================== */
+
 .v3-container > svg:last-of-type {
     width: 100%;
     height: 100%;

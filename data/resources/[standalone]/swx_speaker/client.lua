@@ -2,6 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local currentMusicId = nil
 local isPlaying = false
 local isPaused = false -- Yeni: Pause durumu
+local currentSongTitle = nil
 local currentVolume = Config.DefaultVolume
 local currentDistance = Config.MaxDistance
 local playlist = {}
@@ -334,6 +335,8 @@ function PlayMusic(url, title)
             
             isPlaying = true
             isPaused = false
+            currentSongTitle = title
+            TriggerEvent('swx_carplay:start', title)
             
             -- Geçmişe ekle (local) - FiveM uyumlu timestamp
             local timestamp = GetGameTimer()
@@ -475,12 +478,14 @@ function TogglePause()
         exports.xsound:Resume(currentMusicId)
         isPaused = false
         isPlaying = true
+        TriggerEvent('swx_carplay:resume', currentSongTitle)
         QBCore.Functions.Notify('Müzik devam ediyor', 'success')
     else
         -- Çalıyor, duraklat
         exports.xsound:Pause(currentMusicId)
         isPaused = true
         isPlaying = false
+        TriggerEvent('swx_carplay:pause', currentSongTitle)
         QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
     end
 end
@@ -604,6 +609,8 @@ function ManageQueueMenu()
                         currentMusicId = nil
                         isPlaying = false
                         isPaused = false
+                        currentSongTitle = nil
+                        TriggerEvent('swx_carplay:stop')
                         QBCore.Functions.Notify('Müzik durduruldu', 'error')
                     end
                 end
@@ -881,6 +888,8 @@ CreateThread(function()
                     currentMusicId = nil
                     isPlaying = false
                     isPaused = false
+                    currentSongTitle = nil
+                    TriggerEvent('swx_carplay:stop')
                 end
             end
             
