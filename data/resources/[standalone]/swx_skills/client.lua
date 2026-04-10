@@ -133,12 +133,13 @@ CreateThread(function()
     while true do
         Wait(1000)
         local ped = PlayerPedId()
-        local inVehicle = IsPedInAnyVehicle(ped, false)
+        local vehicle = GetVehiclePedIsIn(ped, false)
+        local inVehicle = vehicle ~= 0
 
         if IsPedSwimming(ped) then
             CheckXPGain('stamina', 'swimming')
-        elseif IsPedOnAnyBike(ped) and GetEntitySpeed(ped) * 3.6 > 5 then
-            -- Motorsiklet/bisiklet: hareket ederken stamina kazan
+        elseif inVehicle and GetVehicleClass(vehicle) == 13 and GetEntitySpeed(vehicle) * 3.6 > 5 then
+            -- Sadece bisiklet (class 13), motorsiklet (class 8) değil
             CheckXPGain('stamina', 'cycling')
         elseif not inVehicle and IsPedSprinting(ped) then
             -- Araçta değilken sprint
