@@ -1,96 +1,82 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
 
 :root {
-    /* Cyberpunk Color Theme - Bold neon accents on deep dark background */
-    --primary: #00f0ff;
-    --on-primary: #0a0a0f;
-    --primary-container: #00a8b3;
-    --on-primary-container: #ffffff;
-    --secondary: #ff00ff;
-    --on-secondary: #0a0a0f;
-    --secondary-container: #b300b3;
-    --on-secondary-container: #ffffff;
-    --tertiary: #8a2be2;
+    /* Luxury Refined Theme - Elegant dark with gold accents */
+    --primary: #c9a227;
+    --on-primary: #1a1a1a;
+    --primary-container: #e8c547;
+    --on-primary-container: #1a1a1a;
+    --secondary: #8b7355;
+    --on-secondary: #ffffff;
+    --secondary-container: #a68b5b;
+    --on-secondary-container: #1a1a1a;
+    --tertiary: #4a4a5a;
     --on-tertiary: #ffffff;
-    --tertiary-container: #6a1bb2;
+    --tertiary-container: #5a5a6a;
     --on-tertiary-container: #ffffff;
-    --surface: #0a0a0f;
-    --on-surface: #e0e0e0;
-    --surface-container-lowest: #050508;
-    --surface-container-low: #0f0f15;
-    --surface-container: #1a1a25;
-    --surface-container-high: #252535;
-    --surface-container-highest: #303045;
-    --error: #ff3366;
-    --on-error: #ffffff;
-    --error-container: #cc1a3d;
+    --surface: #0d0d0d;
+    --on-surface: #d4d4d4;
+    --surface-container-lowest: #080808;
+    --surface-container-low: #121212;
+    --surface-container: #1a1a1a;
+    --surface-container-high: #252525;
+    --surface-container-highest: #303030;
+    --error: #dc6a6a;
+    --on-error: #1a1a1a;
+    --error-container: #b85c5c;
     --on-error-container: #ffffff;
-    --outline: #404050;
-    --outline-variant: #2a2a35;
-    --success: #00ff88;
-    --on-success: #0a0a0f;
-    --success-container: #00cc6a;
+    --outline: #404040;
+    --outline-variant: #2a2a2a;
+    --success: #7cb342;
+    --on-success: #1a1a1a;
+    --success-container: #6a9e36;
     --on-success-container: #ffffff;
-    --warning: #ffaa00;
-    --on-warning: #0a0a0f;
-    --warning-container: #cc8800;
+    --warning: #ffb74d;
+    --on-warning: #1a1a1a;
+    --warning-container: #e69a3f;
     --on-warning-container: #ffffff;
-    --info: #00aaff;
-    --on-info: #0a0a0f;
-    --info-container: #0088cc;
+    --info: #64b5f6;
+    --on-info: #1a1a1a;
+    --info-container: #4a9de6;
     --on-info-container: #ffffff;
-    --scrim: rgba(0, 0, 0, 0.8);
-    --shadow: rgba(0, 0, 0, 0.4);
+    --scrim: rgba(0, 0, 0, 0.7);
+    --shadow: rgba(0, 0, 0, 0.5);
 
-    /* Neon glow colors */
-    --neon-cyan: #00f0ff;
-    --neon-magenta: #ff00ff;
-    --neon-purple: #8a2be2;
+    /* Gold accent colors */
+    --gold-light: #ffd700;
+    --gold-medium: #c9a227;
+    --gold-dark: #8b7355;
 
     /* Shape values */
-    --radius-small: 4px;
-    --radius-medium: 8px;
-    --radius-large: 12px;
+    --radius-small: 2px;
+    --radius-medium: 4px;
+    --radius-large: 6px;
 
-    /* Typography - Distinctive fonts */
-    --font-display: "Orbitron", sans-serif;
-    --font-primary: "Space Grotesk", sans-serif;
+    /* Typography - Elegant refined fonts */
+    --font-display: "Playfair Display", serif;
+    --font-primary: "Inter", sans-serif;
     --font-weight-regular: 400;
     --font-weight-medium: 500;
-    --font-weight-bold: 700;
-    --font-weight-black: 900;
+    --font-weight-bold: 600;
+    --font-weight-black: 700;
 
     /* Elevation */
-    --elevation-1: 0px 2px 8px rgba(0, 240, 255, 0.15);
-    --elevation-2: 0px 4px 16px rgba(0, 240, 255, 0.2);
-    --elevation-3: 0px 8px 32px rgba(0, 240, 255, 0.25);
+    --elevation-1: 0px 2px 8px rgba(0, 0, 0, 0.4);
+    --elevation-2: 0px 4px 16px rgba(0, 0, 0, 0.5);
+    --elevation-3: 0px 8px 32px rgba(0, 0, 0, 0.6);
 
     /* Tooltip */
-    --v-popper-theme-background-color: rgba(26, 26, 37, 0.95);
+    --v-popper-theme-background-color: rgba(26, 26, 26, 0.98);
     --v-popper-theme-text-color: var(--on-surface);
     --v-popper-theme-border-radius: var(--radius-medium);
-    --v-popper-theme-padding: 16px;
-    --v-popper-theme-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --v-popper-theme-padding: 12px;
+    --v-popper-theme-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 body {
     margin: 0;
-    background: #0a0a0f;
+    background: transparent;
     overflow: hidden;
-}
-
-/* Subtle background - no overwhelming effects */
-#app::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 70%),
-        radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.02) 0%, transparent 60%);
-    z-index: -1;
 }
 
 div {
@@ -143,20 +129,18 @@ div {
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    scale: 0.75;
+    scale: 0.55;
 
-    /* Reduced glass morphism - less overwhelming */
-    background: rgba(26, 26, 37, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(64, 64, 80, 0.3);
+    /* Elegant refined design - minimal and clean */
+    background: rgba(13, 13, 13, 0.95);
+    border: 1px solid rgba(201, 162, 39, 0.15);
     border-radius: var(--radius-large);
     box-shadow:
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(201, 162, 39, 0.05);
 }
 
-/* Diagonal decorative line - reduced opacity */
+/* Gold accent line */
 .inventory-section::before {
     content: '';
     position: absolute;
@@ -164,8 +148,8 @@ div {
     left: 0;
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    opacity: 0.2;
+    background: linear-gradient(90deg, transparent, var(--gold-medium), transparent);
+    opacity: 0.3;
 }
 
 .player-inventory-section {
@@ -189,19 +173,16 @@ div {
     box-sizing: border-box;
     width: 40%;
     height: 13%;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-medium);
     color: var(--on-surface);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    background: rgba(26, 26, 37, 0.4);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 240, 255, 0.15);
+    background: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(201, 162, 39, 0.1);
     border-radius: var(--radius-medium);
-    box-shadow:
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    padding: 12px 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    padding: 10px 14px;
     margin-bottom: 4vw;
     order: 2;
     position: relative;
@@ -215,8 +196,8 @@ div {
     left: 0;
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    opacity: 0.15;
+    background: linear-gradient(90deg, transparent, var(--gold-medium), transparent);
+    opacity: 0.2;
 }
 
 .player-name {
@@ -227,10 +208,9 @@ div {
     margin: 0;
     padding: 0;
     font-family: var(--font-display);
-    font-size: 1.1em;
-    color: var(--neon-cyan);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 1em;
+    color: var(--gold-medium);
+    letter-spacing: 0.5px;
 }
 
 .player-id {
@@ -239,9 +219,9 @@ div {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: var(--on-surface);
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .player-job {
@@ -249,10 +229,9 @@ div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.85em;
-    color: var(--neon-magenta);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 0.8em;
+    color: var(--gold-dark);
+    letter-spacing: 0.3px;
 }
 
 .inventory-grid {
@@ -293,27 +272,16 @@ div {
     width: calc(20% - 2px);
     height: 10vh;
     border-radius: var(--radius-small);
-    background: rgba(42, 42, 53, 0.4);
-    border: 1px solid rgba(64, 64, 80, 0.3);
+    background: rgba(26, 26, 26, 0.5);
+    border: 1px solid rgba(64, 64, 64, 0.2);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.03),
-        0 2px 8px rgba(0, 0, 0, 0.2);
+        inset 0 1px 0 rgba(255, 255, 255, 0.02),
+        0 1px 3px rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: slotReveal 0.4s ease-out backwards;
+    transition: all 0.2s ease;
 }
 
-/* Staggered animation delay - handled via inline style in HTML */
-@keyframes slotReveal {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+/* Remove staggered animation for cleaner design */
 
 .item-slot-img {
     display: flex;
@@ -359,61 +327,48 @@ div {
 }
 
 .item-slot:hover {
-    border-color: var(--neon-cyan);
-    background: rgba(0, 240, 255, 0.08);
-    transform: scale(1.05);
+    border-color: var(--gold-medium);
+    background: rgba(201, 162, 39, 0.08);
+    transform: scale(1.03);
     box-shadow:
-        0 0 12px rgba(0, 240, 255, 0.3),
-        0 0 24px rgba(0, 240, 255, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        0 0 8px rgba(201, 162, 39, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .item-slot:empty {
-    border: 1px solid rgba(64, 64, 80, 0.2);
-    background: rgba(26, 26, 37, 0.2);
+    border: 1px solid rgba(40, 40, 40, 0.15);
+    background: rgba(18, 18, 18, 0.3);
 }
 
-/* Item Kalite Rarity Border Renkleri - Reduced Glow */
+/* Item Kalite Rarity Border Renkleri - Luxury Gold Theme */
 .item-slot.rarity-common {
-    border-color: rgba(158, 158, 158, 0.4);
-    box-shadow: 0 0 4px rgba(158, 158, 158, 0.2), inset 0 0 3px rgba(0, 0, 0, 0.2);
+    border-color: rgba(158, 158, 158, 0.3);
+    box-shadow: 0 0 2px rgba(158, 158, 158, 0.1), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-slot.rarity-uncommon {
     border-color: var(--success);
-    box-shadow: 0 0 6px rgba(0, 255, 136, 0.3), inset 0 0 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 3px rgba(124, 179, 66, 0.2), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-slot.rarity-rare {
     border-color: var(--info);
-    box-shadow: 0 0 8px rgba(0, 170, 255, 0.35), inset 0 0 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 4px rgba(100, 181, 246, 0.25), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-slot.rarity-epic {
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 10px rgba(138, 43, 226, 0.4), inset 0 0 3px rgba(0, 0, 0, 0.2);
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 5px rgba(139, 115, 85, 0.3), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-slot.rarity-legendary {
-    border-color: var(--warning);
-    box-shadow: 0 0 12px rgba(255, 170, 0, 0.45), inset 0 0 3px rgba(0, 0, 0, 0.2);
-    animation: legendary-glow 2s ease-in-out infinite;
+    border-color: var(--gold-medium);
+    box-shadow: 0 0 6px rgba(201, 162, 39, 0.35), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-slot.rarity-mythic {
-    border-color: var(--error);
-    box-shadow: 0 0 14px rgba(255, 51, 102, 0.5), inset 0 0 3px rgba(0, 0, 0, 0.2);
-    animation: mythic-glow 1.5s ease-in-out infinite;
-}
-
-@keyframes legendary-glow {
-    0%, 100% { box-shadow: 0 0 12px rgba(255, 170, 0, 0.45), inset 0 0 3px rgba(0, 0, 0, 0.2); }
-    50% { box-shadow: 0 0 18px rgba(255, 170, 0, 0.6), inset 0 0 5px rgba(255, 170, 0, 0.15); }
-}
-
-@keyframes mythic-glow {
-    0%, 100% { box-shadow: 0 0 14px rgba(255, 51, 102, 0.5), inset 0 0 3px rgba(0, 0, 0, 0.2); }
-    50% { box-shadow: 0 0 22px rgba(255, 51, 102, 0.65), inset 0 0 6px rgba(255, 51, 102, 0.2); }
+    border-color: var(--gold-light);
+    box-shadow: 0 0 7px rgba(255, 215, 0, 0.4), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .item-price {
@@ -494,24 +449,23 @@ div {
 .weight-bar-fill {
     height: 8px;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-    box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-medium));
+    box-shadow: 0 0 4px rgba(201, 162, 39, 0.2);
 }
 
 .weight-bar-fill.low {
-    background: linear-gradient(90deg, var(--success), var(--neon-cyan));
-    box-shadow: 0 0 6px rgba(0, 255, 136, 0.3);
+    background: linear-gradient(90deg, var(--success), var(--gold-dark));
+    box-shadow: 0 0 3px rgba(124, 179, 66, 0.2);
 }
 
 .weight-bar-fill.medium {
-    background: linear-gradient(90deg, var(--warning), var(--neon-purple));
-    box-shadow: 0 0 7px rgba(255, 170, 0, 0.3);
+    background: linear-gradient(90deg, var(--warning), var(--gold-medium));
+    box-shadow: 0 0 4px rgba(255, 183, 77, 0.2);
 }
 
 .weight-bar-fill.high {
-    background: linear-gradient(90deg, var(--error), var(--neon-magenta));
-    box-shadow: 0 0 8px rgba(255, 51, 102, 0.4);
-    animation: weightPulse 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--error), var(--gold-light));
+    box-shadow: 0 0 5px rgba(220, 106, 106, 0.25);
 }
 
 .weight-bar-vertical-container {
