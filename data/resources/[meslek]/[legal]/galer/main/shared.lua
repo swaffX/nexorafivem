@@ -241,12 +241,12 @@ CustomizePlate = function()
 end
 
 Config.Locations = {
-    { 
-        job = 'police', -- job 
+    {
+        job = 'police', -- job
         type = 'armor', -- car type
-        coords = vector3(440.72, -1013.17, 27.62),
+        coords = vector3(439.55, -1011.4, 28.54),
         hash = "a_m_o_soucent_01",
-        heading = 162.28,
+        heading = 174.33,
         marker = "POLICE SHOP",
         blip = {
             ["active"] = true,
