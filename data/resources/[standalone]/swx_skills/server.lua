@@ -8,14 +8,6 @@ CreateThread(function()
         `stamina_xp` INT DEFAULT 0,
         `driving` INT DEFAULT 1,
         `driving_xp` INT DEFAULT 0,
-        `strength` INT DEFAULT 1,
-        `strength_xp` INT DEFAULT 0,
-        `shooting` INT DEFAULT 1,
-        `shooting_xp` INT DEFAULT 0,
-        `luck` INT DEFAULT 1,
-        `luck_xp` INT DEFAULT 0,
-        `fishing` INT DEFAULT 1,
-        `fishing_xp` INT DEFAULT 0,
         `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )]])
 end)
@@ -51,11 +43,7 @@ QBCore.Functions.CreateCallback('swx_skills:getSkills', function(source, cb)
         
         cb({
             stamina = 1, stamina_xp = 0,
-            driving = 1, driving_xp = 0,
-            strength = 1, strength_xp = 0,
-            shooting = 1, shooting_xp = 0,
-            luck = 1, luck_xp = 0,
-            fishing = 1, fishing_xp = 0
+            driving = 1, driving_xp = 0
         })
     else
         cb(result[1])
@@ -71,12 +59,7 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     local citizenid = Player.PlayerData.citizenid
     local skillConfig = Config.Skills[skillName]
     
-    if not skillConfig then 
-        print('[SWX Skills] ERROR: Invalid skill name: ' .. skillName)
-        return 
-    end
-    
-    print('[SWX Skills] Player ' .. src .. ' gained ' .. amount .. ' XP in ' .. skillName)
+    if not skillConfig then return end
     
     -- Mevcut skill verilerini al
     local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
@@ -102,8 +85,6 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
         currentLevel = currentLevel + 1
         currentXP = currentXP - requiredXP
         
-        print('[SWX Skills] Player ' .. src .. ' LEVELED UP: ' .. skillName .. ' to level ' .. currentLevel)
-        
         -- Stat bonus uygula
         ApplyStatBonus(src, skillName, currentLevel)
         
@@ -117,8 +98,6 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     -- Database güncelle (await ile)
     MySQL.update.await('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?', 
         {currentLevel, currentXP, citizenid})
-    
-    print('[SWX Skills] Sending updateSkill to client: ' .. skillName .. ' Level: ' .. currentLevel .. ' XP: ' .. currentXP .. '/' .. requiredXP)
     
     -- Client'a güncel skill verilerini gönder
     TriggerClientEvent('swx_skills:updateSkill', src, skillName, currentLevel, currentXP, requiredXP)
@@ -144,16 +123,9 @@ local function ApplyStatBonus(source, skillName, level)
     local currentStats = Player.PlayerData.metadata['skills']
     currentStats[bonusType] = (currentStats[bonusType] or 0) + bonusAmount
     
-    -- pcall ile güvenli güncelleme
-    local success = pcall(function()
+    pcall(function()
         Player.Functions.SetMetaData('skills', currentStats)
     end)
-    
-    if success then
-        print('[SWX Skills] Player ' .. source .. ' gained stat bonus: ' .. bonusType .. ' +' .. bonusAmount)
-    else
-        print('[SWX Skills] ERROR: Failed to apply stat bonus for player ' .. source)
-    end
 end
 
 -- Oyuncu yüklendiğinde skillerini yükle
@@ -172,11 +144,7 @@ RegisterNetEvent('QBCore:Server:PlayerLoaded', function(Player)
         MySQL.insert.await('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
         skills = {
             stamina = 1, stamina_xp = 0,
-            driving = 1, driving_xp = 0,
-            strength = 1, strength_xp = 0,
-            shooting = 1, shooting_xp = 0,
-            luck = 1, luck_xp = 0,
-            fishing = 1, fishing_xp = 0
+            driving = 1, driving_xp = 0
         }
     end
     
@@ -243,8 +211,7 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {{name = 'skill', hel
         
         QBCore.Functions.Notify(source, skillName .. ' skilline ' .. amount .. ' XP eklendi!', 'success', 3000)
     else
-        QBCore.Functions.Notify(source, 'Geçersiz skill adı! Kullanılabilir skiller: stamina, driving, strength, shooting, luck, fishing', 'error', 5000)
+        QBCore.Functions.Notify(source, 'Geçersiz skill! Kullanılabilir: stamina, driving', 'error', 5000)
     end
 end, 'admin')
 
-print('[SWX Skills] Server yüklendi!')

@@ -9,17 +9,11 @@ local accumulatedXP = {} -- Her skill için biriktirilen XP
 -- Skill verilerini yükle
 RegisterNetEvent('swx_skills:loadSkills', function(skills)
     playerSkills = skills
-    print('[SWX Skills] Skill verileri yüklendi')
 end)
 
 -- Skill güncelleme
 RegisterNetEvent('swx_skills:updateSkill', function(skillName, level, xp, requiredXP)
-    print('[SWX Skills] updateSkill received: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. xp)
-    
-    if not Config or not Config.Skills or not Config.Skills[skillName] then 
-        print('[SWX Skills] ERROR: Config not loaded for ' .. skillName)
-        return 
-    end
+    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
     
     -- playerSkills'i başlat (eğer boşsa)
     if not playerSkills then
@@ -28,8 +22,6 @@ RegisterNetEvent('swx_skills:updateSkill', function(skillName, level, xp, requir
     
     playerSkills[skillName] = level
     playerSkills[skillName .. '_xp'] = xp
-    
-    print('[SWX Skills] playerSkills updated: ' .. skillName .. ' = ' .. level .. ' (XP: ' .. xp .. ')')
     
     -- UI güncelle
     SendNUIMessage({
@@ -78,8 +70,6 @@ local function ShowSkillBarUpdate(skillName)
     local currentXP = playerSkills[skillName .. '_xp'] or 0
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
     
-    print('[SWX Skills] Showing bar: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. currentXP .. '/' .. requiredXP)
-    
     SendNUIMessage({
         type = 'showSkillBar',
         skill = skillName,
@@ -117,8 +107,6 @@ local function CheckXPGain(skillName, activity)
             accumulatedXP[skillName] = 0
         end
         accumulatedXP[skillName] = accumulatedXP[skillName] + xpAmount
-        
-        print('[SWX Skills] XP Gained: ' .. skillName .. ' + ' .. xpAmount .. ' (' .. activity .. ') | Accumulated: ' .. accumulatedXP[skillName])
         
         -- Threshold'a ulaştıysa server'a gönder ve bar göster
         if accumulatedXP[skillName] >= (Config.XPThreshold or 10) then
@@ -224,7 +212,6 @@ local function LoadSkills()
     QBCore.Functions.TriggerCallback('swx_skills:getSkills', function(skills)
         if skills then
             playerSkills = skills
-            print('[SWX Skills] Skill verileri yüklendi')
         end
     end)
 end
@@ -242,4 +229,3 @@ AddEventHandler('onResourceStart', function(resourceName)
     end
 end)
 
-print('[SWX Skills] Client yüklendi!')
