@@ -1,49 +1,10 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Envanter durumu
-local InventoryOpen = false
-local CurrentWeight = 0
-local MaxWeight = Config.MaxInventoryWeight
+-- Kıyafet durumu
+local CurrentClothing = {}
 
--- UI Aç/Kapat
-function ToggleInventory()
-    if InventoryOpen then
-        CloseInventory()
-    else
-        OpenInventory()
-    end
-end
-
-function OpenInventory()
-    InventoryOpen = true
-    
-    -- Mevcut kıyafetleri al
-    local clothing = exports['swx_clothing'].GetCurrentClothing()
-    
-    -- Envanter verilerini al
-    local PlayerData = QBCore.Functions.GetPlayerData()
-    local items = PlayerData.items or {}
-    
-    -- UI Göster
-    SendNUIMessage({
-        type = 'open',
-        inventory = items,
-        clothing = clothing,
-        weight = CurrentWeight,
-        maxWeight = MaxWeight
-    })
-    
-    SetNuiFocus(true, true)
-    
-    -- Animasyon
-    TaskPlayAnim(PlayerPedId(), 'pickup_object', 'pickup_low', 8.0, -8.0, 1000, 0, 0, false, false, false)
-end
-
-function CloseInventory()
-    InventoryOpen = false
-    SetNuiFocus(false, false)
-    SendNUIMessage({type = 'close'})
-end
+-- qb-inventory'nin NUI callbacklerini dinle
+-- Bu script qb-inventory'nin HTML/CSS/JS dosyalarını modifiye eder
 
 -- Kıyafet çıkar ve envantere koy
 RegisterNUICallback('removeClothing', function(data, cb)

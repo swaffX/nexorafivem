@@ -19,6 +19,17 @@
         <div id="app">
             <div class="inventory-container" v-if="isInventoryOpen" @mousemove="drag" @mouseup="endDrag" @mousedown="containerMouseDownAction">
                 <div class="inventory-section player-inventory-section" :class="{ 'centered-inventory-section': shouldCenterInventory }">
+                    <!-- Eşya Arama Başlığı -->
+                    <div class="search-header">
+                        <h3><i class="fas fa-search"></i> Eşya Arama</h3>
+                        <div class="sort-controls">
+                            <button @click="sortItems('az')" title="A-Z"><i class="fas fa-arrow-down-a-z"></i></button>
+                            <button @click="sortItems('za')" title="Z-A"><i class="fas fa-arrow-down-z-a"></i></button>
+                            <button @click="sortItems('amount')" title="Miktar"><i class="fas fa-sort-amount-down"></i></button>
+                            <button @click="toggleClothing" title="Kıyafet"><i class="fas fa-tshirt"></i></button>
+                        </div>
+                    </div>
+                    
                     <div class="inventory-header">
                         <div class="weight-bar-vertical-container">
                             <div class="weight-bar-label weight-bar-label-max">{{ (maxWeight / 1000).toFixed(1) }} kg</div>
@@ -27,6 +38,67 @@
                             </div>
                             <div class="weight-bar-label weight-bar-label-current">{{ (playerWeight / 1000).toFixed(1) }} kg</div>
                         </div>
+                        
+                        <!-- Kıyafet Slotları -->
+                        <div class="clothing-slots" v-if="showClothingSlots">
+                            <div class="clothing-slot" data-slot="head" @click="equipClothing('head')">
+                                <i class="fas fa-hat-cowboy"></i>
+                                <span>Kafa</span>
+                                <div class="clothing-item" v-if="clothing.head">
+                                    <img :src="'images/' + clothing.head.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="torso" @click="equipClothing('torso')">
+                                <i class="fas fa-shirt"></i>
+                                <span>Üst Giyim</span>
+                                <div class="clothing-item" v-if="clothing.torso">
+                                    <img :src="'images/' + clothing.torso.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="undershirt" @click="equipClothing('undershirt')">
+                                <i class="fas fa-vest"></i>
+                                <span>İç Giyim</span>
+                                <div class="clothing-item" v-if="clothing.undershirt">
+                                    <img :src="'images/' + clothing.undershirt.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="legs" @click="equipClothing('legs')">
+                                <i class="fas fa-socks"></i>
+                                <span>Alt Giyim</span>
+                                <div class="clothing-item" v-if="clothing.legs">
+                                    <img :src="'images/' + clothing.legs.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="shoes" @click="equipClothing('shoes')">
+                                <i class="fas fa-shoe-prints"></i>
+                                <span>Ayakkabı</span>
+                                <div class="clothing-item" v-if="clothing.shoes">
+                                    <img :src="'images/' + clothing.shoes.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="bag" @click="equipClothing('bag')">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Çanta</span>
+                                <div class="clothing-item" v-if="clothing.bag">
+                                    <img :src="'images/' + clothing.bag.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="belt" @click="equipClothing('belt')">
+                                <i class="fas fa-ring"></i>
+                                <span>Bel</span>
+                                <div class="clothing-item" v-if="clothing.belt">
+                                    <img :src="'images/' + clothing.belt.image" />
+                                </div>
+                            </div>
+                            <div class="clothing-slot" data-slot="back" @click="equipClothing('back')">
+                                <i class="fas fa-backpack"></i>
+                                <span>Sırt</span>
+                                <div class="clothing-item" v-if="clothing.back">
+                                    <img :src="'images/' + clothing.back.image" />
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="labels-container">
                             <div class="player-info">
                                 <div class="player-name">{{ playerName }}</div>

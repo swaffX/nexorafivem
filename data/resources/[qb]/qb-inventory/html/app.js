@@ -107,6 +107,18 @@ const InventoryContainer = Vue.createApp({
                 ghostElement: null,
                 dragStartInventoryType: "player",
                 transferAmount: null,
+                // Clothing System
+                showClothingSlots: true,
+                clothing: {
+                    head: null,
+                    torso: null,
+                    undershirt: null,
+                    legs: null,
+                    shoes: null,
+                    bag: null,
+                    belt: null,
+                    back: null
+                },
             };
         },
         openInventory(data) {
@@ -917,6 +929,93 @@ const InventoryContainer = Vue.createApp({
                 .catch((error) => {
                     console.error("Error posting inventory data:", error);
                 });
+        },
+        // Kıyafet Sistemi Fonksiyonları
+        toggleClothing() {
+            this.showClothingSlots = !this.showClothingSlots;
+        },
+        sortItems(sortType) {
+            // Eşya sıralama fonksiyonu
+            const items = Object.values(this.playerInventory);
+            
+            if (sortType === 'az') {
+                items.sort((a, b) => a.label.localeCompare(b.label));
+            } else if (sortType === 'za') {
+                items.sort((a, b) => b.label.localeCompare(a.label));
+            } else if (sortType === 'amount') {
+                items.sort((a, b) => b.amount - a.amount);
+            }
+            
+            // Sıralanmış itemleri yeniden slotlara yerleştir
+            this.playerInventory = {};
+            items.forEach((item, index) => {
+                this.playerInventory[index + 1] = item;
+            });
+            
+            // Lua'ya bildir
+            axios.post("https://qb-inventory/SortItems", JSON.stringify({
+                sortType: sortType,
+                inventory: this.playerInventory
+            }));
+        },
+        equipClothing(slot) {
+            // Kıyafet giy/çıkar
+            const currentClothing = this.clothing[slot];
+            
+            if (currentClothing) {
+                // Kıyafeti çıkar
+                axios.post("https://qb-inventory/RemoveClothing", JSON.stringify({
+                    slot: slot,
+                    clothing: currentClothing
+                })).then(() => {
+                    this.clothing[slot] = null;
+                });
+            } else {
+                // Envanterde kıyafet ara
+                const clothingItem = this.findClothingItem(slot);
+                if (clothingItem) {
+                    axios.post("https://qb-inventory/WearClothing", JSON.stringify({
+                        slot: slot,
+                        item: clothingItem
+                    })).then(() => {
+                        this.clothing[slot] = clothingItem;
+                    });
+                }
+            }
+        },
+        findClothingItem(slot) {
+            // Envanterde belirli slottaki kıyafeti bul
+            const clothingTypes = {
+                head: ['hat', 'helmet', 'cap'],
+                torso: ['shirt', 'jacket', 'torso'],
+                undershirt: ['tshirt', 'undershirt'],
+                legs: ['pants', 'legs', 'trousers'],
+                shoes: ['shoes', 'boots', 'footwear'],
+                bag: ['bag', 'backpack'],
+                belt: ['belt', 'accessory'],
+                back: ['back', 'backpack']
+            };
+            
+            const types = clothingTypes[slot] || [];
+            
+            for (const key in this.playerInventory) {
+                const item = this.playerInventory[key];
+                if (item && item.name) {
+                    const itemName = item.name.toLowerCase();
+                    for (const type of types) {
+                        if (itemName.includes(type)) {
+                            return item;
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+        updateClothing(data) {
+            // Server'dan gelen kıyafet verilerini güncelle
+            if (data.clothing) {
+                this.clothing = { ...this.clothing, ...data.clothing };
+            }
         },
     },
     mounted() {

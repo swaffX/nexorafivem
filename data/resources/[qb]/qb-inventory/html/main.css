@@ -947,3 +947,112 @@ input[type=number]::-moz-selection {
     margin: 4px;
     padding: 0;
 }
+
+/* Eşya Arama Başlığı */
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.search-header h3 {
+    margin: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.sort-controls button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.sort-controls button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Kıyafet Slotları Grid */
+.clothing-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.clothing-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-height: 70px;
+    position: relative;
+}
+
+.clothing-slot:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.clothing-slot i {
+    font-size: 20px;
+    color: #00d4ff;
+    margin-bottom: 4px;
+}
+
+.clothing-slot span {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.clothing-slot .clothing-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 6px;
+}
+
+.clothing-slot .clothing-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.clothing-slot.has-item {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
