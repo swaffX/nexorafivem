@@ -17,12 +17,7 @@ Config.Messages = {
         icon = 'briefcase',
         duration = 8000
     },
-    {
-        title = 'Yardım Menüsü',
-        description = 'Yardıma ihtiyacın olursa /yardım komutunu kullanabilirsin.',
-        icon = 'help-circle',
-        duration = 6000
-    },
+    -- YARDIM MENÜSÜ KALDIRILDI - /yardım komutu kullanılmıyor
     {
         title = 'Bol Şans!',
         description = 'Nexora Roleplay ailesine hoş geldin. İyi eğlenceler!',
@@ -32,11 +27,12 @@ Config.Messages = {
 }
 
 -- Başlangıç itemleri (qb-inventory için)
+-- NOT: phone yerine white_phone (beyaz telefon), bandaj kaldırıldı, su eklendi
 Config.StarterItems = {
-    {name = 'phone', amount = 1},
-    {name = 'water', amount = 2},
-    {name = 'sandwich', amount = 2},
-    {name = 'bandage', amount = 3},
+    {name = 'white_phone', amount = 1},  -- Beyaz telefon (phone yerine)
+    {name = 'water', amount = 2},        -- Su (içecek)
+    {name = 'sandwich', amount = 2},     -- Sandviç (yiyecek)
+    -- {name = 'bandage', amount = 3},   -- BANDAJ KALDIRILDI
 }
 
 -- Başlangıç parası

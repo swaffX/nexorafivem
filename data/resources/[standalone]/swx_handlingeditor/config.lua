@@ -1,8 +1,13 @@
 Config = {}
 
 -- Admin yetkisi (qb-core grup veya ACE permission)
-Config.AdminGroups = { ['admin'] = true, ['god'] = true, ['mod'] = true }
-Config.AcePermission = 'command.handling'
+-- NOT: Şu an herkes kullanabilsin diye yorum satırı yapıldı
+-- Config.AdminGroups = { ['admin'] = true, ['god'] = true, ['mod'] = true }
+-- Config.AcePermission = 'command.handling'
+
+-- Geçici: Herkes kullanabilir (geliştirme aşamasında)
+Config.AdminGroups = nil
+Config.AcePermission = nil
 
 -- Handling kayıt yöntemi: 'json' (dosya) veya 'mysql' (veritabanı)
 Config.Storage = 'json'

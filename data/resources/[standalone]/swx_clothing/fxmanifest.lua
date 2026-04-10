@@ -18,7 +18,7 @@ server_scripts {
 }
 
 client_scripts {
-    'client.lua',
+    'client_new.lua',
     'clothing.lua'
 }
 

@@ -1,10 +1,15 @@
 local currentFov = nil
 local defaultFov = 50 -- GTA varsayılan FOV
 
--- FOV ayarlama fonksiyonu
+-- FOV ayarlama fonksiyonu (Native hash kullanarak)
+local function SetGameplayCamFovFixed(fov)
+    -- SetGameplayCamFov native hash: 0xD3F6CE0E5D7A82B1
+    Citizen.InvokeNative(0xD3F6CE0E5D7A82B1, fov)
+end
+
 local function SetVehicleFov(fov)
     if fov and fov >= 30 and fov <= 120 then
-        SetGameplayCamFov(fov)
+        SetGameplayCamFovFixed(fov)
         currentFov = fov
         print('[SWX-FOV] FOV ayarlandı:', fov)
     end
@@ -30,12 +35,12 @@ Citizen.CreateThread(function()
                 SetVehicleFov(Config.OnFootFov)
             elseif not Config.OnFootFov and currentFov ~= defaultFov then
                 -- Varsayılana döndür
-                SetGameplayCamFov(defaultFov)
+                SetGameplayCamFovFixed(defaultFov)
                 currentFov = defaultFov
             end
         elseif currentFov and currentFov ~= defaultFov then
             -- Araçtan çıkınca eski haline döndür
-            SetGameplayCamFov(defaultFov)
+            SetGameplayCamFovFixed(defaultFov)
             currentFov = defaultFov
         end
     end
