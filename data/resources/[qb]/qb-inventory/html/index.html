@@ -37,7 +37,10 @@
                     </div>
                     <div class="inventory-grid">
                         <div class="item-grid">
-                            <div v-for="slot in totalSlots" :key="slot" class="item-slot" :data-slot="slot" :class="{ 'invalid-slot-highlight': errorSlot === slot }" @dblclick="getItemInSlot(slot, 'player') && useItem(getItemInSlot(slot, 'player'))" @mousedown="event => handleMouseDown(event, slot, 'player')">
+                            <div v-for="slot in totalSlots" :key="slot" class="item-slot" :data-slot="slot" :class="[
+                                { 'invalid-slot-highlight': errorSlot === slot },
+                                getItemInSlot(slot, 'player') && getItemInSlot(slot, 'player').info && getItemInSlot(slot, 'player').info.rarity ? 'rarity-' + getItemInSlot(slot, 'player').info.rarity : 'rarity-common'
+                            ]" @dblclick="getItemInSlot(slot, 'player') && useItem(getItemInSlot(slot, 'player'))" @mousedown="event => handleMouseDown(event, slot, 'player')">
                                 <div class="item-slot-key" v-if="slot <= 4">
                                     <p>{{ slot }}</p>
                                 </div>
@@ -84,7 +87,9 @@
 
                     <div class="inventory-grid">
                         <div class="item-grid">
-                            <div v-for="slot in otherInventorySlots" :key="slot" class="item-slot" :data-slot="slot" @mousedown="event => handleMouseDown(event, slot, 'other')" @dragover.prevent>
+                            <div v-for="slot in otherInventorySlots" :key="slot" class="item-slot" :data-slot="slot" :class="[
+                                getItemInSlot(slot, 'other') && getItemInSlot(slot, 'other').info && getItemInSlot(slot, 'other').info.rarity ? 'rarity-' + getItemInSlot(slot, 'other').info.rarity : 'rarity-common'
+                            ]" @mousedown="event => handleMouseDown(event, slot, 'other')" @dragover.prevent>
                                 <div class="item-slot-img" v-if="getItemInSlot(slot, 'other')" v-tooltip.right-end="{content: generateTooltipContent(getItemInSlot(slot, 'other')), html: true}">
                                     <img :src="'images/' + getItemInSlot(slot, 'other').image" alt="" />
                                 </div>
@@ -117,7 +122,9 @@
             </div>
             <div class="hotbar-container" v-if="showHotbar">
                 <div class="hotbar">
-                    <div v-for="slot in 5" :key="slot" class="item-slot">
+                    <div v-for="slot in 5" :key="slot" class="item-slot" :class="[
+                        getHotbarItemInSlot(slot) && getHotbarItemInSlot(slot).info && getHotbarItemInSlot(slot).info.rarity ? 'rarity-' + getHotbarItemInSlot(slot).info.rarity : 'rarity-common'
+                    ]">
                         <div class="item-slot-key">
                             <p>{{ slot }}</p>
                         </div>

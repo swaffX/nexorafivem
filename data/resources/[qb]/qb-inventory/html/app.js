@@ -877,23 +877,68 @@ const InventoryContainer = Vue.createApp({
             if (!item) {
                 return "";
             }
-            let content = `<div class="custom-tooltip"><div class="tooltip-header">${item.label}</div><hr class="tooltip-divider">`;
-            const description = item.info && item.info.description ? item.info.description.replace(/\n/g, "<br>") : item.description ? item.description.replace(/\n/g, "<br>") : "No description available.";
+            // Rarity renkleri
+            const rarityColors = {
+                'common': '#9e9e9e',
+                'uncommon': '#4caf50',
+                'rare': '#2196f3',
+                'epic': '#9c27b0',
+                'legendary': '#ff9800',
+                'mythic': '#f44336'
+            };
+            const rarityNames = {
+                'common': 'Normal',
+                'uncommon': 'Nadir',
+                'rare': 'Eşsiz',
+                'epic': 'Destansı',
+                'legendary': 'Efsanevi',
+                'mythic': 'Mistik'
+            };
+            const rarity = item.info && item.info.rarity ? item.info.rarity : 'common';
+            const rarityColor = rarityColors[rarity] || rarityColors['common'];
+            const rarityName = rarityNames[rarity] || rarityNames['common'];
+            let content = `<div class="custom-tooltip">`;
+            content += `<div class="tooltip-rarity" style="color: ${rarityColor}; font-weight: bold; text-transform: uppercase; font-size: 0.9em; margin-bottom: 4px;">${rarityName}</div>`;
+            content += `<div class="tooltip-header">${item.label}</div><hr class="tooltip-divider">`;
+            const description = item.info && item.info.description ? item.info.description.replace(/\n/g, "<br>") : item.description ? item.description.replace(/\n/g, "<br>") : "Açıklama bulunmuyor.";
             if (item.info && Object.keys(item.info).length > 0 && item.info.display !== false) {
                 for (const [key, value] of Object.entries(item.info)) {
-                    if (key !== "description" && key !== "display") {
+                    if (key !== "description" && key !== "display" && key !== "rarity") {
                         let valueStr = value;
                         if (key === "attachments") {
-                            valueStr = Object.keys(value).length > 0 ? "true" : "false";
+                            valueStr = Object.keys(value).length > 0 ? "Var" : "Yok";
                         }
-                        content += `<div class="tooltip-info"><span class="tooltip-info-key">${this.formatKey(key)}:</span> ${valueStr}</div>`;
+                        const turkishKey = this.translateKey(key);
+                        content += `<div class="tooltip-info"><span class="tooltip-info-key">${turkishKey}:</span> ${valueStr}</div>`;
                     }
                 }
             }
             content += `<div class="tooltip-description">${description}</div>`;
-            content += `<div class="tooltip-weight"><i class="fas fa-weight-hanging"></i> ${item.weight !== undefined && item.weight !== null ? (item.weight / 1000).toFixed(1) : "N/A"}kg</div>`;
+            content += `<div class="tooltip-weight"><i class="fas fa-weight-hanging"></i> ${item.weight !== undefined && item.weight !== null ? (item.weight / 1000).toFixed(1) : "0.0"}kg</div>`;
             content += `</div>`;
             return content;
+        },
+        translateKey(key) {
+            const translations = {
+                'quality': 'Kalite',
+                'durability': 'Dayanıklılık',
+                'attachments': 'Eklentiler',
+                'ammo': 'Mermi',
+                'serial': 'Seri No',
+                'citizenid': 'Vatandaş ID',
+                'phone': 'Telefon',
+                'firstname': 'Ad',
+                'lastname': 'Soyad',
+                'birthdate': 'Doğum Tarihi',
+                'gender': 'Cinsiyet',
+                'nationality': 'Milliyet',
+                'uses': 'Kullanım',
+                'owner': 'Sahip',
+                'plate': 'Plaka',
+                'engine': 'Motor',
+                'body': 'Kasa'
+            };
+            return translations[key] || key.charAt(0).toUpperCase() + key.slice(1);
         },
         formatKey(key) {
             return key.replace(/_/g, " ").charAt(0).toUpperCase() + key.slice(1);
