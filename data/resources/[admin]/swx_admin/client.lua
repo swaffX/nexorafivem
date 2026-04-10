@@ -1,7 +1,17 @@
 -- SWX Admin Panel Client Script
 -- J tuşuna basınca admin paneli açılır
 
+local QBCore = nil
 local isOpen = false
+
+-- QBCore başlatma
+CreateThread(function()
+    while QBCore == nil do
+        QBCore = exports['qb-core']:GetCoreObject()
+        Wait(100)
+    end
+    Log('QBCore başarıyla yüklendi')
+end)
 
 -- Loglama fonksiyonu
 local function Log(message)
@@ -11,7 +21,15 @@ end
 -- NUI Callback'leri
 RegisterNUICallback('getPlayers', function(data, cb)
     Log('getPlayers callback tetiklendi')
-    TriggerServerEvent('swx_admin:server:getPlayers')
+    
+    QBCore.Functions.TriggerCallback('swx_admin:server:getPlayers', function(players)
+        Log('getPlayers callback yanıt alındı - Oyuncu sayısı: ' .. tostring(#players))
+        SendNUIMessage({
+            action = 'updatePlayers',
+            players = players
+        })
+    end)
+    
     cb({})
 end)
 
@@ -66,6 +84,8 @@ local function ToggleAdminPanel()
             action = 'hide'
         })
         Log('Panel kapatıldı - NUI focus devre dışı')
+        Wait(100)
+        SetNuiFocus(false, false)
     end
 end
 
