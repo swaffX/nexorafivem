@@ -64,9 +64,9 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
     
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
-    // Format XP numbers with commas
-    const currentXPFormatted = Math.floor(xp).toLocaleString();
-    const requiredXPFormatted = requiredXP.toLocaleString();
+    // Format XP numbers with dots (10.000 / 65.000)
+    const currentXPFormatted = Math.floor(xp).toLocaleString('de-DE');
+    const requiredXPFormatted = requiredXP.toLocaleString('de-DE');
     
     skillBar.innerHTML = `
         <div class="skill-name" style="color: ${config.color}">${config.label.toUpperCase()}</div>
@@ -91,9 +91,9 @@ function updateSkillBar(skillName, level, xp, requiredXP, config) {
     
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
-    // Format XP numbers with commas
-    const currentXPFormatted = Math.floor(xp).toLocaleString();
-    const requiredXPFormatted = requiredXP.toLocaleString();
+    // Format XP numbers with dots (10.000 / 65.000)
+    const currentXPFormatted = Math.floor(xp).toLocaleString('de-DE');
+    const requiredXPFormatted = requiredXP.toLocaleString('de-DE');
     
     skillBar.querySelector('.skill-name').textContent = config.label.toUpperCase();
     skillBar.querySelector('.skill-name').style.color = config.color;
