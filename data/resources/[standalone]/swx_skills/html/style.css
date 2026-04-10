@@ -12,33 +12,32 @@ body {
 
 #skill-container {
     position: fixed;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     z-index: 1000;
-    max-width: 600px;
-    width: 90%;
+    width: 400px;
+    max-width: 90%;
 }
 
 #skill-bars {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .skill-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(15, 23, 42, 0.95);
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background: rgba(20, 25, 35, 0.95);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 @keyframes slideUp {
@@ -52,72 +51,71 @@ body {
     }
 }
 
-.skill-icon {
-    font-size: 20px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.skill-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.skill-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
 .skill-name {
     color: #fff;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
 }
 
-.skill-level {
+.skill-levels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 0 5px;
+}
+
+.skill-level-current {
     color: #fff;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.15);
+}
+
+.skill-level-next {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.skill-progress-wrapper {
+    width: 100%;
+    position: relative;
 }
 
 .skill-progress {
     width: 100%;
-    height: 6px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 3px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .skill-progress-bar {
     height: 100%;
-    border-radius: 3px;
-    transition: width 0.4s ease-out;
-    box-shadow: 0 0 10px currentColor;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.skill-xp-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
 }
 
 .level-up-animation {
-    animation: levelUpFlash 0.6s ease-in-out;
+    animation: levelUpFlash 0.8s ease-in-out;
 }
 
 @keyframes levelUpFlash {
     0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 10px currentColor;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
     50% {
-        transform: scale(1.02);
-        box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+        box-shadow: 0 4px 25px currentColor, 0 0 40px currentColor;
     }
 }
 

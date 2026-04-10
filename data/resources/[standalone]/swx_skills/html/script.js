@@ -62,19 +62,22 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
     
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
+    // Format XP numbers with commas
+    const currentXPFormatted = Math.floor(xp).toLocaleString();
+    const requiredXPFormatted = requiredXP.toLocaleString();
+    
     skillBar.innerHTML = `
-        <div class="skill-icon" style="color: ${config.color}">
-            <i class="${config.icon}"></i>
+        <div class="skill-name" style="color: ${config.color}">${config.label.toUpperCase()}</div>
+        <div class="skill-levels">
+            <div class="skill-level-current">${level}</div>
+            <div class="skill-level-next">${level + 1}</div>
         </div>
-        <div class="skill-info">
-            <div class="skill-header">
-                <div class="skill-name">${config.label}</div>
-                <div class="skill-level" style="background: ${config.color}40">LVL ${level}</div>
-            </div>
+        <div class="skill-progress-wrapper">
             <div class="skill-progress">
-                <div class="skill-progress-bar" style="width: ${progressPercent}%; background: ${config.color}; color: ${config.color}"></div>
+                <div class="skill-progress-bar" style="width: ${progressPercent}%; background: ${config.color}"></div>
             </div>
         </div>
+        <div class="skill-xp-text">${currentXPFormatted} / ${requiredXPFormatted}</div>
     `;
     
     return skillBar;
@@ -86,19 +89,23 @@ function updateSkillBar(skillName, level, xp, requiredXP, config) {
     
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
-    skillBar.querySelector('.skill-name').textContent = config.label;
-    skillBar.querySelector('.skill-level').textContent = `LVL ${level}`;
-    skillBar.querySelector('.skill-level').style.background = `${config.color}40`;
+    // Format XP numbers with commas
+    const currentXPFormatted = Math.floor(xp).toLocaleString();
+    const requiredXPFormatted = requiredXP.toLocaleString();
+    
+    skillBar.querySelector('.skill-name').textContent = config.label.toUpperCase();
+    skillBar.querySelector('.skill-name').style.color = config.color;
+    skillBar.querySelector('.skill-level-current').textContent = level;
+    skillBar.querySelector('.skill-level-next').textContent = level + 1;
     skillBar.querySelector('.skill-progress-bar').style.width = `${progressPercent}%`;
     skillBar.querySelector('.skill-progress-bar').style.background = config.color;
-    skillBar.querySelector('.skill-progress-bar').style.color = config.color;
+    skillBar.querySelector('.skill-xp-text').textContent = `${currentXPFormatted} / ${requiredXPFormatted}`;
     
     // Level atladıysa animasyon ekle
-    const progressBar = skillBar.querySelector('.skill-progress-bar');
-    progressBar.classList.add('level-up-animation');
+    skillBar.classList.add('level-up-animation');
     setTimeout(() => {
-        progressBar.classList.remove('level-up-animation');
-    }, 600);
+        skillBar.classList.remove('level-up-animation');
+    }, 800);
 }
 
 function showAllSkills(skills) {
