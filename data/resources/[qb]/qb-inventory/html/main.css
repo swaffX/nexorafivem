@@ -92,15 +92,12 @@ div {
 .inventory-section {
     position: absolute;
     top: 50vh;
-    width: 29vw;
+    width: 35vw; /* 29vw -> 35vw genişletildi */
     height: 68.16vh;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    scale: 0.75;
-
-    
-    
+    scale: 0.85; /* 0.75 -> 0.85 büyütüldü */
 }
 
 .player-inventory-section {
@@ -260,7 +257,7 @@ div {
     background-color: rgba(40, 40, 40, 0.2);
 }
 
-.item-slot:empty {;
+.item-slot:empty {
     border: 1px solid rgba(80, 80, 80, 0.3);
     background-color: #75757565;
 }
@@ -1064,22 +1061,27 @@ input[type=number]::-moz-selection {
     color: #00d4ff;
 }
 
-/* Inventory container düzenlemesi - kıyafet slotları sağda */
-.inventory-section {
-    display: flex;
-    flex-direction: column !important;
-}
-
 /* Ana içerik alanı - envanter + kıyafet yan yana */
 .inventory-main-content {
-    display: flex;
+    display: flex !important;
     flex-direction: row !important;
-    gap: 10px;
+    gap: 8px;
     align-items: flex-start;
+    width: 100%;
+    height: 100%;
 }
 
 /* Envanter grid esnek genişlik */
 .inventory-main-content .inventory-grid {
     flex: 1;
     min-width: 0;
+    width: calc(100% - 80px);
+}
+
+/* Kıyafet slotları sabit genişlik */
+.inventory-main-content .clothing-slots {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+    flex-shrink: 0;
 }
