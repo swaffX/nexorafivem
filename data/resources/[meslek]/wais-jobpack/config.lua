@@ -26,7 +26,7 @@ Config.JobCentre = {
     },
     ["interaction_ped"] = {
         ["model"] = "cs_bankman",
-        ["coords"] = vec4(-269.17, -955.43, 31.22, 208.33)
+        ["coords"] = vec4(-262.28, -963.15, 31.22, 150.59)
     },
 }
 
