@@ -61,11 +61,11 @@ Config.Jobs = {
         },
         ["CameraOffsets"] = { x = 0.75, y = -0.75, z = 0.5, zRot = 0.5, fov = 30.0 },
         ["reward"] = {
-            ["min"] = 200,
-            ["max"] = 320
+            ["min"] = 840,
+            ["max"] = 1350
         },
         ["timer"] = {
-            ["extra_time"] = 2 * 60 * 1000,
+            ["extra_time"] = 3 * 60 * 1000,
             ["delivery_time"] = 5 * 60 * 1000,
             ["deducted_per_min"] = 40,
         },
@@ -203,11 +203,11 @@ Config.Jobs = {
             }
         },
         ["delivery_reward"] = {
-            ["min"] = 130,
-            ["max"] = 180
+            ["min"] = 540,
+            ["max"] = 780
         },
         ["timer"] = {
-            ["extra_time"] = 2 * 60 * 1000,
+            ["extra_time"] = 3 * 60 * 1000,
             ["delivery_time"] = 6 * 60 * 1000,
             ["deducted_per_min"] = 20,
         },
@@ -318,8 +318,8 @@ Config.Jobs = {
             }
         },
         ["reward"] = {
-            ["min"] = 120,
-            ["max"] = 200
+            ["min"] = 540,
+            ["max"] = 900
         },
         ["randomPedTime"] = math.random(5, 7),
         ["prop"] = {
@@ -431,12 +431,12 @@ Config.Jobs = {
         ["cargo_list"] = {
             [1] = {
                 ["menuTitle"] = "Napkin loading",
-                ["reward"] = 220,
+                ["reward"] = 750,
                 ["area"] = vec3(1157.48, -3280.74, 5.90),
                 ["radius"] = 45.0,
                 ["forkliftCoords"] = vec4(1157.37, -3294.78, 5.90, 3.18),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 6 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -504,12 +504,12 @@ Config.Jobs = {
             },
             [2] = {
                 ["menuTitle"] = "Tyre loading",
-                ["reward"] = 220,
+                ["reward"] = 750,
                 ["area"] = vec3(1255.13, -3258.02, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1264.60, -3243.45, 5.90, 177.19),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -577,12 +577,12 @@ Config.Jobs = {
             },
             [3] = {
                 ["menuTitle"] = "Fish  loading",
-                ["reward"] = 220,
+                ["reward"] = 750,
                 ["area"] = vec3(1256.33, -3192.25, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1245.74, -3193.01, 6.03, 266.85),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -650,12 +650,12 @@ Config.Jobs = {
             },
             [4] = {
                 ["menuTitle"] = "Cement loading",
-                ["reward"] = 220,
+                ["reward"] = 750,
                 ["area"] = vec3(1215.10, -3218.25, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1226.12, -3210.17, 5.86, 90.20),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -723,12 +723,12 @@ Config.Jobs = {
             },
             [5] = {
                 ["menuTitle"] = "Flour loading",
-                ["reward"] = 280,
+                ["reward"] = 750,
                 ["area"] = vec3(1257.45, -3290.61, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1244.69, -3303.57, 6.03, 271.64),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -796,12 +796,12 @@ Config.Jobs = {
             },
             [6] = {
                 ["menuTitle"] = "Christmas decorations loading",
-                ["reward"] = 280,
+                ["reward"] = 750,
                 ["area"] = vec3(1254.63, -3229.64, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1264.84, -3219.89, 5.90, 93.96),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -869,12 +869,12 @@ Config.Jobs = {
             },
             [7] = {
                 ["menuTitle"] = "Fish loading",
-                ["reward"] = 280,
+                ["reward"] = 750,
                 ["area"] = vec3(1218.85, -3218.34, 5.80),
                 ["radius"] = 55.0,
                 ["forkliftCoords"] = vec4(1229.73, -3225.53, 5.85, 89.04),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -942,12 +942,12 @@ Config.Jobs = {
             },
             [8] = {
                 ["menuTitle"] = "Spare tire loading",
-                ["reward"] = 280,
+                ["reward"] = 750,
                 ["area"] = vec3(1183.78, -3198.86, 6.03),
                 ["radius"] = 40.0,
                 ["forkliftCoords"] = vec4(1179.46, -3205.24, 5.48, 0.11),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -1015,12 +1015,12 @@ Config.Jobs = {
             },
             [9] = {
                 ["menuTitle"] = "Flour loading - 2",
-                ["reward"] = 280,
+                ["reward"] = 750,
                 ["area"] = vec3(1166.41, -3292.30, 5.90),
                 ["radius"] = 40.0,
                 ["forkliftCoords"] = vec4(1174.11, -3304.43, 5.35, 359.51),
                 ["timer"] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
                     ["deducted_per_min"] = 20,
                 },
@@ -1209,7 +1209,7 @@ Config.Jobs = {
         },
         ["gardens"] = {
             [1] = {
-                ["reward"] = 250,
+                ["reward"] = 750,
                 ["zoneRadius"] = 40.0,
                 ["coords"] = vec3(1237.36, -596.55, 74.05),
                 ["useMarker"] = true,
@@ -1322,7 +1322,7 @@ Config.Jobs = {
                 }
             },
             [2] = {
-                ["reward"] = 250,
+                ["reward"] = 750,
                 ["zoneRadius"] = 40.0,
                 ["coords"] = vec3(1262.7561035156, -653.85491943359, 72.583862304688),
                 ["useMarker"] = true,
@@ -1443,7 +1443,7 @@ Config.Jobs = {
                 }
             },
             [3] = {
-                ["reward"] = 250,
+                ["reward"] = 750,
                 ["zoneRadius"] = 40.0,
                 ["coords"] = vec3(1254.8176269531, -478.33847045898, 75.431518554688),
                 ["useMarker"] = true,
@@ -1568,7 +1568,7 @@ Config.Jobs = {
                 }
             },
             [4] = {
-                ["reward"] = 250,
+                ["reward"] = 750,
                 ["zoneRadius"] = 40.0,
                 ["coords"] = vec3(1230.6856689453, -722.17584228516, 65.20361328125),
                 ["useMarker"] = true,
@@ -1689,7 +1689,7 @@ Config.Jobs = {
                 }
             },
             [5] = {
-                ["reward"] = 400,
+                ["reward"] = 1200,
                 ["zoneRadius"] = 45.0,
                 ["coords"] = vec3(-1940.96, 161.26, 92.50),
                 ["useMarker"] = true,
@@ -1919,7 +1919,7 @@ Config.Jobs = {
                 }
             },
             [7] = {
-                ["reward"] = 250,
+                ["reward"] = 750,
                 ["zoneRadius"] = 20.0,
                 ["coords"] = vec3(1014.48, -428.93, 64.95),
                 ["useMarker"] = true,
@@ -2131,8 +2131,8 @@ Config.Jobs = {
         },
         ["job_list"] = {
             [1] = {
-                ["reward"] = 500,
-                ["extra_time"] = 2 * 60 * 1000,
+                ["reward"] = 1500,
+                ["extra_time"] = 3 * 60 * 1000,
                 ["delivery_time"] = 10 * 60 * 1000,
                 ["deducted_per_min"] = 50,
                 ["delivery_coords"] = vec4(-599.68, 5301.81, 69.35, 269.93),
@@ -2156,7 +2156,7 @@ Config.Jobs = {
                 },
             },
             [2] = {
-                ["reward"] = 700,
+                ["reward"] = 1800,
                 ["extra_time"] = 4 * 60 * 1000,
                 ["delivery_time"] = 12 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -2181,7 +2181,7 @@ Config.Jobs = {
                 },
             },
             [3] = {
-                ["reward"] = 800,
+                ["reward"] = 8550,
                 ["extra_time"] = 4 * 60 * 1000,
                 ["delivery_time"] = 12 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -2206,7 +2206,7 @@ Config.Jobs = {
                 },
             },
             [4] = {
-                ["reward"] = 1000,
+                ["reward"] = 3000,
                 ["extra_time"] = 4 * 60 * 1000,
                 ["delivery_time"] = 12 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -2231,7 +2231,7 @@ Config.Jobs = {
                 },
             },
             [5] = {
-                ["reward"] = 800,
+                ["reward"] = 2850,
                 ["extra_time"] = 3 * 60 * 1000,
                 ["delivery_time"] = 10 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -2366,15 +2366,15 @@ Config.Jobs = {
             },
         },
         ["randomEvents"] = {
-            ["event_timer"] = math.random(3, 7),
+            ["event_timer"] = math.random(2, 4),
             ["events"] = {
                 [1] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "fuel_help",
                     ["label"] = "Refuelling",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Refuelling - Call",
                         ["sprite"] = 280,
@@ -2400,12 +2400,12 @@ Config.Jobs = {
                     },
                 },
                 [2] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "fuel_help",
                     ["label"] = "Refuelling",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Refuelling - Call",
                         ["sprite"] = 280,
@@ -2431,12 +2431,12 @@ Config.Jobs = {
                     },
                 },
                 [3] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "fuel_help",
                     ["label"] = "Refuelling",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Refuelling - Call",
                         ["sprite"] = 280,
@@ -2462,12 +2462,12 @@ Config.Jobs = {
                     },
                 },
                 [4] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "fuel_help",
                     ["label"] = "Refuelling",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Refuelling - Call",
                         ["sprite"] = 280,
@@ -2493,12 +2493,12 @@ Config.Jobs = {
                     },
                 },
                 [5] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "fuel_help",
                     ["label"] = "Refuelling",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Refuelling - Call",
                         ["sprite"] = 280,
@@ -2529,12 +2529,12 @@ Config.Jobs = {
                 -----------------------------------------------------------------------------------------
 
                 [6] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 10 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "change_wheel",
                     ["label"] = "Change Wheel",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Wheel Change - Call",
                         ["sprite"] = 280,
@@ -2559,12 +2559,12 @@ Config.Jobs = {
                     },
                 },
                 [7] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 12 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "change_wheel",
                     ["label"] = "Change Wheel",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Wheel Change - Call",
                         ["sprite"] = 280,
@@ -2589,12 +2589,12 @@ Config.Jobs = {
                     },
                 },
                 [8] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 12 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "change_wheel",
                     ["label"] = "Change Wheel",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Wheel Change - Call",
                         ["sprite"] = 280,
@@ -2619,12 +2619,12 @@ Config.Jobs = {
                     },
                 },
                 [9] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 12 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "change_wheel",
                     ["label"] = "Change Wheel",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Wheel Change - Call",
                         ["sprite"] = 280,
@@ -2649,12 +2649,12 @@ Config.Jobs = {
                     },
                 },
                 [10] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 12 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "change_wheel",
                     ["label"] = "Change Wheel",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Wheel Change - Call",
                         ["sprite"] = 280,
@@ -2684,12 +2684,12 @@ Config.Jobs = {
                 -----------------------------------------------------------------------------------------
 
                 [11] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2703,12 +2703,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [12] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2722,12 +2722,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [13] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2741,12 +2741,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [14] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2760,12 +2760,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [15] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2779,12 +2779,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [16] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2798,12 +2798,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [17] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2817,12 +2817,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [18] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2836,12 +2836,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [19] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2855,12 +2855,12 @@ Config.Jobs = {
                     ["delivery_coords"] = vec3(2422.18, 3131.47, 48.19),
                 },
                 [20] = {
-                    ["extra_time"] = 2 * 60 * 1000,
+                    ["extra_time"] = 3 * 60 * 1000,
                     ["mission_time"] = 8 * 60 * 1000,
                     ["deducted_per_min"] = 50,
                     ["type"] = "towing",
                     ["label"] = "Vehicle must be towed",
-                    ["reward"] = 200,
+                    ["reward"] = 600,
                     ["blips"] = {
                         ["label"] = "Vehicle Towing - Call",
                         ["sprite"] = 280,
@@ -2942,9 +2942,9 @@ Config.Jobs = {
         },
         ["lines"] = {
             ["number_33"] = {
-                ["reward"] = 300,
-                ["extra_time"] = 2 * 60 * 1000,
-                ["mission_time"] = 7 * 60 * 1000,
+                ["reward"] = 900,
+                ["extra_time"] = 3 * 60 * 1000,
+                ["mission_time"] = 6 * 60 * 1000,
                 ["deducted_per_min"] = 50,
                 ["label"] = "Textile City",
                 ["blips"] = {
@@ -2993,7 +2993,7 @@ Config.Jobs = {
                 }
             },
             ["number_19S"] = {
-                ["reward"] = 300,
+                ["reward"] = 900,
                 ["extra_time"] = 2 * 60 * 1000,
                 ["mission_time"] = 10 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -3044,7 +3044,7 @@ Config.Jobs = {
                 }
             },
             ["number_6C"] = {
-                ["reward"] = 400,
+                ["reward"] = 1200,
                 ["extra_time"] = 2 * 60 * 1000,
                 ["mission_time"] = 8 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -3095,7 +3095,7 @@ Config.Jobs = {
                 }
             },
             ["number_522"] = {
-                ["reward"] = 400,
+                ["reward"] = 1200,
                 ["extra_time"] = 2 * 60 * 1000,
                 ["mission_time"] = 11 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -3153,7 +3153,7 @@ Config.Jobs = {
                 }
             },
             ["number_11"] = {
-                ["reward"] = 600,
+                ["reward"] = 1800,
                 ["extra_time"] = 2 * 60 * 1000,
                 ["mission_time"] = 11 * 60 * 1000,
                 ["deducted_per_min"] = 50,
@@ -3501,7 +3501,7 @@ Config.Jobs = {
                     }
                 },
                 [11] = {
-                    ["reward"] = 1500,
+                    ["reward"] = 1800,
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 7 * 60 * 1000,
                     ["split_reward_members"] = false,

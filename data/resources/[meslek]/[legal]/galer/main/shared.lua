@@ -42,11 +42,6 @@ Config.Vehicles = {
             {model='rancherxl',  label='Rancher XL',    price=18000,   category='jeep'},
             {model='mesa3',      label='Mesa',          price=35000,   category='jeep'},
             
-            -- [ORTA SEVİYE SEDANLAR]
-            {model='fugitive',   label='Fugitive',      price=18000,   category='luxury'},
-            {model='glendale',   label='Glendale',      price=14000,   category='luxury'},
-            {model='premier',    label='Premier',       price=16000,   category='luxury'},
-            
             -- [SPOR ARABALAR]
             {model='buffalo4',   label='Buffalo STX',   price=42000,   category='sport'},
             {model='drafter',    label='Drafter',       price=55000,   category='sport'},
@@ -56,21 +51,21 @@ Config.Vehicles = {
             {model='blade',      label='Blade',         price=24000,   category='trunk'},
             
             -- [DONATE ARAÇLAR]
-            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='donate'},
-            {model='r820',       label='Audi R8 2020',  price=100000,  category='donate'},
-            {model='redeye',     label='Dodge Challenger', price=80000, category='donate'},
-            {model='fordmustang', label='Ford Mustang 2019', price=95000, category='donate'},
-            {model='r35',        label='Nissan GT-R R35 Nismo', price=90000, category='donate'},
-            {model='subarubrz',  label='Subaru BRZ 2013', price=55000, category='donate'},
-            {model='porsche911', label='Porsche 911 Turbo S', price=120000, category='donate'},
+            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='luxury'},
+            {model='r820',       label='Audi R8 2020',  price=100000,  category='luxury'},
+            {model='redeye',     label='Dodge Challenger', price=80000, category='luxury'},
+            {model='fordmustang', label='Ford Mustang 2019', price=95000, category='luxury'},
+            {model='r35',        label='Nissan GT-R R35 Nismo', price=90000, category='luxury'},
+            {model='subarubrz',  label='Subaru BRZ 2013', price=55000, category='luxury'},
+            {model='porsche911', label='Porsche 911 Turbo S', price=120000, category='luxury'},
 
             -- [LÜKS ARABALAR]
             {model='zentorno',   label='Zentorno',      price=145000,  category='sport'},
             
             -- [MOTOSİKLETLER]
-            {model='bati',       label='Bati',          price=22000,   category='moto'},
-            {model='sanchez',    label='Sanchez',       price=9500,    category='moto'},
-            {model='avarus',     label='Avarus',        price=15000,   category='moto'},
+            {model='bati',       label='Bati',          price=22000,   category='MOTORCYCLES'},
+            {model='sanchez',    label='Sanchez',       price=9500,    category='MOTORCYCLES'},
+            {model='avarus',     label='Avarus',        price=15000,   category='MOTORCYCLES'},
             
             -- [MUSCLE/CLASSIC]
             {model='buccaneer',  label='Buccaneer',     price=16500,   category='trunk'},
@@ -117,14 +112,12 @@ Config.Vehicles = {
 
     Category = {
         ['car'] = {
-            {name="luxury",    trunk='25'},
-            {name='jeep',      trunk='50'},
-            {name='sport',     trunk='7.5'},
-            {name='trunk',     trunk='75'},
-            {name='sedan',     trunk='15'},
-            {name='universal', trunk='5'},
-            {name='moto',      trunk='5'},
-            {name='donate',    trunk='10'},
+            {name='jeep',        trunk='50'},
+            {name='sport',       trunk='7.5'},
+            {name='trunk',       trunk='75'},
+            {name='sedan',       trunk='15'},
+            {name='MOTORCYCLES', trunk='5'},
+            {name='donate',      trunk='10'},
         },
 
         ['boat'] = {
