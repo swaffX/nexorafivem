@@ -100,7 +100,7 @@ function OpenSpeakerMenu()
                 options = {
                     {
                         title = 'Hoparlör tak',
-                        description = 'Araca hoparlör takmak için car_speaker itemine sahip olmalısın.',
+                        description = 'Araca hoparlör takmak için car_speaker itemine sahip olmalısın. Digital Den\'den ($500) alabilirsin.',
                         icon = 'wrench',
                         onSelect = function()
                             InstallSpeakerDialog(plate)
