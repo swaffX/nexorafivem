@@ -57,6 +57,34 @@ RegisterNetEvent('swx_skills:levelUp', function(skillName, level)
     end)
 end)
 
+-- Skill bar güncelleme göster
+local function ShowSkillBarUpdate(skillName)
+    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
+    if not playerSkills[skillName] then return end
+    
+    local skillConfig = Config.Skills[skillName]
+    local level = playerSkills[skillName] or 1
+    local xp = playerSkills[skillName .. '_xp'] or 0
+    local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
+    
+    SendNUIMessage({
+        type = 'showSkillBar',
+        skill = skillName,
+        level = level,
+        xp = xp,
+        requiredXP = requiredXP,
+        config = skillConfig
+    })
+    
+    -- 3 saniye sonra gizle
+    SetTimeout(3000, function()
+        SendNUIMessage({
+            type = 'hideSkillBar',
+            skill = skillName
+        })
+    end)
+end
+
 -- XP kazanma kontrolü
 local function CheckXPGain(skillName, activity)
     if not Config or not Config.XPActivities or not Config.XPActivities[skillName] then return end
@@ -88,34 +116,6 @@ local function CheckXPGain(skillName, activity)
             ShowSkillBarUpdate(skillName)
         end
     end
-end
-
--- Skill bar güncelleme göster
-local function ShowSkillBarUpdate(skillName)
-    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
-    if not playerSkills[skillName] then return end
-    
-    local skillConfig = Config.Skills[skillName]
-    local level = playerSkills[skillName] or 1
-    local xp = playerSkills[skillName .. '_xp'] or 0
-    local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
-    
-    SendNUIMessage({
-        type = 'showSkillBar',
-        skill = skillName,
-        level = level,
-        xp = xp,
-        requiredXP = requiredXP,
-        config = skillConfig
-    })
-    
-    -- 3 saniye sonra gizle
-    SetTimeout(3000, function()
-        SendNUIMessage({
-            type = 'hideSkillBar',
-            skill = skillName
-        })
-    end)
 end
 
 -- Koşma kontrolü (stamina XP)
