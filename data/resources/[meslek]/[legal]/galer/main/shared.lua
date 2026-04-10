@@ -51,13 +51,13 @@ Config.Vehicles = {
             {model='blade',      label='Blade',         price=24000,   category='trunk'},
             
             -- [DONATE ARAÇLAR]
-            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='luxury'},
-            {model='r820',       label='Audi R8 2020',  price=100000,  category='luxury'},
-            {model='redeye',     label='Dodge Challenger', price=80000, category='luxury'},
-            {model='fordmustang', label='Ford Mustang 2019', price=95000, category='luxury'},
-            {model='r35',        label='Nissan GT-R R35 Nismo', price=90000, category='luxury'},
-            {model='subarubrz',  label='Subaru BRZ 2013', price=55000, category='luxury'},
-            {model='porsche911', label='Porsche 911 Turbo S', price=120000, category='luxury'},
+            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='donate'},
+            {model='r820',       label='Audi R8 2020',  price=100000,  category='donate'},
+            {model='redeye',     label='Dodge Challenger', price=80000, category='donate'},
+            {model='fordmustang', label='Ford Mustang 2019', price=95000, category='donate'},
+            {model='r35',        label='Nissan GT-R R35 Nismo', price=90000, category='donate'},
+            {model='subarubrz',  label='Subaru BRZ 2013', price=55000, category='donate'},
+            {model='porsche911', label='Porsche 911 Turbo S', price=120000, category='donate'},
 
             -- [LÜKS ARABALAR]
             {model='zentorno',   label='Zentorno',      price=145000,  category='sport'},
@@ -112,12 +112,12 @@ Config.Vehicles = {
 
     Category = {
         ['car'] = {
+            {name='donate',      trunk='10'},
             {name='jeep',        trunk='50'},
             {name='sport',       trunk='7.5'},
             {name='trunk',       trunk='75'},
             {name='sedan',       trunk='15'},
             {name='MOTORCYCLES', trunk='5'},
-            {name='donate',      trunk='10'},
         },
 
         ['boat'] = {
