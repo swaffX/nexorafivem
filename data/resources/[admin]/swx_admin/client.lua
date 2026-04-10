@@ -1,5 +1,7 @@
 -- SWX Admin Panel - Client Side
 
+QBCore = exports['qb-core']:GetCoreObject()
+
 local isOpen = false
 
 -- J tuşu ile paneli aç/kapat
