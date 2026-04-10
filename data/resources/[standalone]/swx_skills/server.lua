@@ -71,7 +71,12 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     local citizenid = Player.PlayerData.citizenid
     local skillConfig = Config.Skills[skillName]
     
-    if not skillConfig then return end
+    if not skillConfig then 
+        print('[SWX Skills] ERROR: Invalid skill name: ' .. skillName)
+        return 
+    end
+    
+    print('[SWX Skills] Player ' .. src .. ' gained ' .. amount .. ' XP in ' .. skillName)
     
     -- Mevcut skill verilerini al
     local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
@@ -96,6 +101,8 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
         -- Level atla
         currentLevel = currentLevel + 1
         currentXP = currentXP - requiredXP
+        
+        print('[SWX Skills] Player ' .. src .. ' LEVELED UP: ' .. skillName .. ' to level ' .. currentLevel)
         
         -- Stat bonus uygula
         ApplyStatBonus(src, skillName, currentLevel)

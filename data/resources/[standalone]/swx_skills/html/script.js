@@ -63,14 +63,16 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
     skillBar.innerHTML = `
-        <div class="skill-icon" style="background: ${config.color}20; color: ${config.color}">
+        <div class="skill-icon" style="color: ${config.color}">
             <i class="${config.icon}"></i>
         </div>
         <div class="skill-info">
-            <div class="skill-name">${config.label}</div>
-            <div class="skill-level">Level ${level}</div>
+            <div class="skill-header">
+                <div class="skill-name">${config.label}</div>
+                <div class="skill-level" style="background: ${config.color}40">LVL ${level}</div>
+            </div>
             <div class="skill-progress">
-                <div class="skill-progress-bar" style="width: ${progressPercent}%; background: ${config.color}"></div>
+                <div class="skill-progress-bar" style="width: ${progressPercent}%; background: ${config.color}; color: ${config.color}"></div>
             </div>
         </div>
     `;
@@ -85,15 +87,18 @@ function updateSkillBar(skillName, level, xp, requiredXP, config) {
     const progressPercent = Math.min((xp / requiredXP) * 100, 100);
     
     skillBar.querySelector('.skill-name').textContent = config.label;
-    skillBar.querySelector('.skill-level').textContent = `Level ${level}`;
+    skillBar.querySelector('.skill-level').textContent = `LVL ${level}`;
+    skillBar.querySelector('.skill-level').style.background = `${config.color}40`;
     skillBar.querySelector('.skill-progress-bar').style.width = `${progressPercent}%`;
+    skillBar.querySelector('.skill-progress-bar').style.background = config.color;
+    skillBar.querySelector('.skill-progress-bar').style.color = config.color;
     
     // Level atladıysa animasyon ekle
     const progressBar = skillBar.querySelector('.skill-progress-bar');
     progressBar.classList.add('level-up-animation');
     setTimeout(() => {
         progressBar.classList.remove('level-up-animation');
-    }, 500);
+    }, 600);
 }
 
 function showAllSkills(skills) {

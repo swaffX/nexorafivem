@@ -7,36 +7,38 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
+    background: transparent;
 }
 
 #skill-container {
     position: fixed;
-    bottom: 50px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     z-index: 1000;
+    max-width: 600px;
+    width: 90%;
 }
 
 #skill-bars {
     display: flex;
-    flex-direction: row;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .skill-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px 15px;
-    border-radius: 10px;
-    min-width: 250px;
-    animation: slideUp 0.5s ease-out;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.95);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
@@ -51,56 +53,71 @@ body {
 }
 
 .skill-icon {
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .skill-info {
     flex: 1;
+    min-width: 0;
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
 }
 
 .skill-name {
-    color: white;
-    font-size: 14px;
+    color: #fff;
+    font-size: 13px;
     font-weight: 600;
-    margin-bottom: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .skill-level {
     color: #fff;
-    font-size: 12px;
-    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .skill-progress {
     width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
     overflow: hidden;
 }
 
 .skill-progress-bar {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease-out;
+    border-radius: 3px;
+    transition: width 0.4s ease-out;
+    box-shadow: 0 0 10px currentColor;
 }
 
 .level-up-animation {
-    animation: pulse 0.5s ease-in-out;
+    animation: levelUpFlash 0.6s ease-in-out;
 }
 
-@keyframes pulse {
+@keyframes levelUpFlash {
     0%, 100% {
         transform: scale(1);
+        box-shadow: 0 0 10px currentColor;
     }
     50% {
-        transform: scale(1.1);
+        transform: scale(1.02);
+        box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
     }
 }
 

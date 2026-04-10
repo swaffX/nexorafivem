@@ -69,6 +69,7 @@ local function CheckXPGain(skillName, activity)
     -- 1 saniye bekleme süresi
     if currentTime - lastXPTime >= 1000 then
         lastXPTime = currentTime
+        print('[SWX Skills] XP Gained: ' .. skillName .. ' + ' .. xpAmount .. ' (' .. activity .. ')')
         TriggerServerEvent('swx_skills:addXP', skillName, xpAmount)
     end
 end
