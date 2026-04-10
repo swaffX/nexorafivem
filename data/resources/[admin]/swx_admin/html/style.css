@@ -36,8 +36,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(26, 22, 18, 0.95);
-    backdrop-filter: blur(20px);
+    background: transparent;
     opacity: 0;
     transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -168,22 +167,56 @@ body {
 .search-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
     margin-bottom: 24px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px var(--shadow-subtle),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.search-bar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-brown));
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .search-bar:focus-within {
     border-color: var(--accent-gold);
-    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+    box-shadow: 
+        0 8px 24px var(--shadow-subtle),
+        0 0 0 4px rgba(212, 168, 83, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.search-bar:focus-within::before {
+    opacity: 1;
 }
 
 .search-icon {
-    color: var(--text-muted);
+    width: 24px;
+    height: 24px;
+    color: var(--accent-gold);
+    transition: all 0.3s ease;
+}
+
+.search-bar:focus-within .search-icon {
+    transform: scale(1.1);
+    color: var(--accent-gold-light);
 }
 
 .search-input {
@@ -191,12 +224,20 @@ body {
     background: transparent;
     border: none;
     outline: none;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
     color: var(--text-primary);
+    letter-spacing: 0.01em;
 }
 
 .search-input::placeholder {
     color: var(--text-muted);
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.search-bar:focus-within .search-input::placeholder {
+    color: var(--text-secondary);
 }
 
 .player-list {
