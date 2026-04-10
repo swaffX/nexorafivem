@@ -169,18 +169,20 @@ end
 
 -- GUI Aç
 function OpenRentGUI()
-    if GUIOpen then return end
+    if GUIOpen then
+        -- Eğer zaten açıksa kapatıp tekrar aç
+        CloseRentGUI()
+        Citizen.Wait(100)
+    end
+
     GUIOpen = true
-    
-    -- Hoşgeldin baloncuğu göster
-    ShowWelcomeBubble()
-    
+
     -- UI Aç
     SendNUIMessage({
         action = 'open',
         vehicles = Config.RentVehicles
     })
-    
+
     SetNuiFocus(true, true)
 end
 
@@ -236,20 +238,29 @@ local function SpawnRentedVehicle(vehicleData)
 
     -- Oyuncuyu aracın içine koy (SÜRÜCÜ KOLTUĞU)
     SetPedIntoVehicle(PlayerPedId(), vehicle, -1)
-    
+
     -- Yakıt
     SetVehicleFuelLevel(vehicle, 100.0)
-    
-    -- Kilit açık
-    SetVehicleDoorsLocked(vehicle, 1)
-    
+
+    -- Kilit AÇIK (her zaman erişilebilir)
+    SetVehicleDoorsLocked(vehicle, 1) -- 1 = unlocked
+    SetVehicleDoorsLockedForAllPlayers(vehicle, false)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+
     -- Temizlik
     SetModelAsNoLongerNeeded(vehicleData.model)
-    
+
     -- Kayıt
     CurrentRentedVehicle = vehicle
     RentStartTime = GetGameTimer()
-    
+
+    -- ANAHTAR VER (vehicle keys)
+    local plate = GetVehicleNumberPlateText(vehicle)
+    if plate then
+        plate = Trim(plate)
+        Config.GiveCarKeys(plate)
+    end
+
     return true
 end
 
@@ -366,16 +377,11 @@ end)
 AddEventHandler('onClientResourceStop', function(resourceName)
     if resourceName == GetCurrentResourceName() then
         DeleteNPC()
+        -- Kiralık araç varsa sil
         if CurrentRentedVehicle and DoesEntityExist(CurrentRentedVehicle) then
             DeleteEntity(CurrentRentedVehicle)
         end
     end
-end)
-
--- NUI Callback - Kapat
-RegisterNUICallback('close', function(data, cb)
-    CloseRentGUI()
-    cb({})
 end)
 
 -- NUI Callback - Bildirim göster
@@ -403,28 +409,45 @@ RegisterNUICallback('playSound', function(data, cb)
 end)
 
 -- Server olayları
+-- Süre dolunca veya çıkış yapınca araç ve anahtar sil
 RegisterNetEvent('swx_rentacar:rentalExpired', function()
     if CurrentRentedVehicle and DoesEntityExist(CurrentRentedVehicle) then
-        -- Araç sil
+        -- ANAHTARI SİL
+        local plate = GetVehicleNumberPlateText(CurrentRentedVehicle)
+        if plate then
+            plate = Trim(plate)
+            Config.RemoveCarKeys(plate)
+        end
+
+        -- ARACI SİL
         DeleteEntity(CurrentRentedVehicle)
         CurrentRentedVehicle = nil
         RentStartTime = nil
-        
+
         lib.notify({
-            title = 'Kiralama Süresi Doldu',
-            description = 'Kiralama süreniz dolduğu için araç geri alındı.',
+            title = 'Kiralama Bitti',
+            description = 'Kiralama süreniz doldu veya çıkış yaptınız. Araç geri alındı.',
             type = 'warning'
         })
     end
 end)
 
+-- Araç iade edilince araç ve anahtar sil
 RegisterNetEvent('swx_rentacar:returnVehicle', function()
     if CurrentRentedVehicle and DoesEntityExist(CurrentRentedVehicle) then
-        -- Araç sil
+        -- ANAHTARI SİL
+        local plate = GetVehicleNumberPlateText(CurrentRentedVehicle)
+        if plate then
+            plate = Trim(plate)
+            Config.RemoveCarKeys(plate)
+        end
+
+        -- ARACI SİL
         DeleteEntity(CurrentRentedVehicle)
-        CurrentRentedVehicle = nil
-        RentStartTime = nil
     end
+
+    CurrentRentedVehicle = nil
+    RentStartTime = nil
 end)
 
 -- Komut (opsiyonel)

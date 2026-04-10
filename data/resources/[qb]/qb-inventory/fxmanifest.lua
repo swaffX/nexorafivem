@@ -16,12 +16,10 @@ client_scripts {
     'client/main.lua',
     'client/drops.lua',
     'client/vehicles.lua',
-    'client/hud_bridge.lua', -- WAIS-HUD bridge
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'server/log_fix.lua', -- Log hatası düzeltmesi
     'server/main.lua',
     'server/functions.lua',
     'server/commands.lua',

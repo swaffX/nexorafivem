@@ -62,15 +62,8 @@ QBCore.Functions.CreateCallback('swx_rentacar:rentVehicle', function(source, cb,
         if id then
             rentalData.id = id
             ActiveRentals[src] = rentalData
-            
-            -- Bildirim
-            TriggerClientEvent('ox_lib:notify', src, {
-                title = 'Araç Kiralandı!',
-                description = vehicleData.label .. ' ' .. price .. '$ karşılığında kiralandı!',
-                type = 'success',
-                duration = 5000
-            })
-            
+
+            -- NOT: Bildirim client.lua'da gösteriliyor (çift bildirim önlemek için)
             cb(true, 'Kiralama başarılı!')
         else
             -- Para iade
@@ -100,29 +93,29 @@ CreateThread(function()
     end)
 end)
 
--- Kiralama süresi kontrolü
+-- Kiralama süresi kontrolü - 24 saat sonra geri al
 CreateThread(function()
     while true do
         Wait(60000) -- Her dakika kontrol et
-        
+
         local currentTime = os.time()
-        
+
         for src, rentalData in pairs(ActiveRentals) do
-            -- Süresi dolmuş mu kontrol et
+            -- Süresi dolmuş mu kontrol et (24 saat = 86400 saniye)
             if rentalData.expireTime and currentTime > rentalData.expireTime then
                 local Player = QBCore.Functions.GetPlayer(src)
-                
+
                 if Player then
                     TriggerClientEvent('ox_lib:notify', src, {
                         title = 'Kiralama Süresi Doldu',
-                        description = 'Kiralama süreniz doldu. Araç geri alındı.',
+                        description = '24 saatlik kiralama süreniz doldu. Araç geri alındı.',
                         type = 'warning'
                     })
                 end
-                
-                -- Araç sil (client tarafında yapılacak)
+
+                -- Araç ve anahtarı sil (client tarafında)
                 TriggerClientEvent('swx_rentacar:rentalExpired', src)
-                
+
                 -- Kayıttan sil
                 ActiveRentals[src] = nil
             end
@@ -130,28 +123,28 @@ CreateThread(function()
     end
 end)
 
--- Oyuncu çıkış yaptığında
+-- Oyuncu çıkış yaptığında - araç ve anahtar sil
 RegisterNetEvent('QBCore:Server:OnPlayerUnload', function(src)
     if ActiveRentals[src] then
-        -- Araç sil (client tarafında yapılacak)
+        -- Araç ve anahtarı sil (client tarafında)
         TriggerClientEvent('swx_rentacar:rentalExpired', src)
         ActiveRentals[src] = nil
     end
 end)
 
--- Araç iade (opsiyonel)
+-- Araç iade - araç ve anahtar silinir
 RegisterCommand('araciade', function(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    
+
     if not Player then return end
-    
+
     if ActiveRentals[src] then
-        -- İade işlemi
+        -- Araç ve anahtarı sil
         ActiveRentals[src] = nil
-        
+
         TriggerClientEvent('swx_rentacar:returnVehicle', src)
-        
+
         TriggerClientEvent('ox_lib:notify', src, {
             title = 'Araç İade Edildi',
             description = 'Kiralık araç başarıyla iade edildi!',

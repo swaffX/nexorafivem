@@ -260,7 +260,7 @@ div {
     background-color: rgba(40, 40, 40, 0.2);
 }
 
-.item-slot:empty {
+.item-slot:empty {;
     border: 1px solid rgba(80, 80, 80, 0.3);
     background-color: #75757565;
 }

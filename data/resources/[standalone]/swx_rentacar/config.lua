@@ -39,7 +39,7 @@ Config.WelcomeMessage = {
 -- Kiralama süresi (dakika) - 0 = sınırsız (manuel iade)
 Config.RentDuration = 0
 
--- Maksimum kiralama süresi (saat) - otomatik iade için
+-- Maksimum kiralama süresi (saat) - 24 saat sonra otomatik geri al
 Config.MaxRentHours = 24
 
 -- Ödeme hesabı (cash veya bank)
@@ -60,3 +60,15 @@ Config.DrawTextDistance = 5.0
 
 -- Debug mod
 Config.Debug = false
+
+-- Araç Anahtarı Verme Fonksiyonu
+Config.GiveCarKeys = function(plate)
+    -- qb-vehiclekeys veya ps-vehiclekeys için
+    TriggerEvent('vehiclekeys:client:SetOwner', plate)
+end
+
+-- Araç Anahtarını Silme Fonksiyonu (çıkış yapınca / süre dolunca)
+Config.RemoveCarKeys = function(plate)
+    -- qb-vehiclekeys için anahtarı sil
+    TriggerEvent('vehiclekeys:client:RemoveOwner', plate)
+end

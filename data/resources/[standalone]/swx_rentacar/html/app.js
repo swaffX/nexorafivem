@@ -42,16 +42,20 @@ createApp({
             this.isRenting = false;
         },
 
-        closeGUI() {
+        async closeGUI() {
             this.isOpen = false;
-            // Lua'ya bildir
-            fetch(`https://${GetParentResourceName()}/close`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8'
-                },
-                body: JSON.stringify({})
-            });
+            // Lua'ya bildir ve callback bekle
+            try {
+                await fetch(`https://${GetParentResourceName()}/close`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    body: JSON.stringify({})
+                });
+            } catch (e) {
+                console.error('Close error:', e);
+            }
         },
 
         selectVehicle(vehicle) {
