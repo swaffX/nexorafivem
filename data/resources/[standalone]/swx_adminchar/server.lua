@@ -94,8 +94,23 @@ QBCore.Commands.Add("listchars", "Tüm Karakterleri Listele", {{name = "name", h
     end
     query = query .. " LIMIT 50"
     
-    local results = MySQL.query.await(query, {})
-    if results and #results > 0 then
+    local success, results = pcall(function()
+        return MySQL.query.await(query, {})
+    end)
+    
+    if not success then
+        print("^1[SWX-AdminChar] Veritabanı sorgu hatası: " .. tostring(results) .. "^7")
+        TriggerClientEvent('QBCore:Notify', src, "Veritabanı hatası!", "error")
+        return
+    end
+    
+    if not results or type(results) ~= "table" then
+        print("^1[SWX-AdminChar] Veritabanı boş veya hatalı sonuç^7")
+        TriggerClientEvent('QBCore:Notify', src, "Karakter bulunamadı! (Veritabanı boş olabilir)", "error")
+        return
+    end
+    
+    if #results > 0 then
         print("^2[SWX-AdminChar] Karakter Listesi:^7")
         for _, player in ipairs(results) do
             local charinfo = json.decode(player.charinfo) or {}
@@ -112,7 +127,7 @@ QBCore.Commands.Add("listchars", "Tüm Karakterleri Listele", {{name = "name", h
         end
         TriggerClientEvent('QBCore:Notify', src, #results .. " karakter listelendi (console'da görüntüleyin)", "success")
     else
-        TriggerClientEvent('QBCore:Notify', src, "Karakter bulunamadı!", "error")
+        TriggerClientEvent('QBCore:Notify', src, "Karakter bulunamadı! (Veritabanı boş olabilir)", "error")
     end
 end, "admin")
 
