@@ -120,5 +120,40 @@ QBCore.Commands.Add("listchars", "Tüm Karakterleri Listele", {{name = "name", h
     end)
 end, "admin")
 
+-- Admin: Tüm karakterleri sil (DİKKAT: GERİ DÖNÜŞÜZ)
+QBCore.Commands.Add("delallchars", "Tüm Karakterleri Sil (DİKKAT: Geri Dönüşsüz)", {}, true, function(source, args)
+    local src = source
+    
+    -- Önce kaç karakter olduğunu say
+    MySQL.query('SELECT COUNT(*) as count FROM players', {}, function(countResult)
+        local charCount = countResult[1].count
+        
+        if charCount == 0 then
+            TriggerClientEvent('QBCore:Notify', src, "Silinecek karakter bulunamadı!", "error")
+            return
+        end
+        
+        -- İlişkili tabloları temizle
+        MySQL.query('DELETE FROM player_vehicles')
+        MySQL.query('DELETE FROM player_houses')
+        MySQL.query('DELETE FROM player_outfits')
+        MySQL.query('DELETE FROM player_contacts')
+        MySQL.query('DELETE FROM playerskins')
+        MySQL.query('DELETE FROM stashitems')
+        MySQL.query('DELETE FROM apartments')
+        
+        -- Ana karakter kayıtlarını sil
+        MySQL.query('DELETE FROM players', function(delResult)
+            if delResult and delResult.affectedRows > 0 then
+                TriggerClientEvent('QBCore:Notify', src, charCount .. " karakter başarıyla silindi!", "success")
+                print("^2[SWX-AdminChar] TÜM KARAKTERLER SİLİNDİ: " .. charCount .. " karakter^7")
+                print("^3[SWX-AdminChar] Bu işlem geri alınamaz!^7")
+            else
+                TriggerClientEvent('QBCore:Notify', src, "Karakterler silinirken hata oluştu!", "error")
+            end
+        end)
+    end)
+end, "admin")
+
 print("^2[SWX-AdminChar] Admin Character Delete Tool yüklendi!^7")
-print("^3Komutlar: /delchar [citizenid] | /delcharid [oyuncu_id] | /listchars [isim]^7")
+print("^3Komutlar: /delchar [citizenid] | /delcharid [oyuncu_id] | /listchars [isim] | /delallchars^7")

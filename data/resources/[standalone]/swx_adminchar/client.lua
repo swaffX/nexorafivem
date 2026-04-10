@@ -22,6 +22,11 @@ RegisterCommand("chardelhelp", function()
         multiline = true,
         args = {"", "/listchars [isim] - Tüm karakterleri listele"}
     })
+    TriggerEvent('chat:addMessage', {
+        color = {255, 0, 0},
+        multiline = true,
+        args = {"", "/delallchars - TÜM KARAKTERLERİ SİL (DİKKAT: Geri Dönüşsüz)"}
+    })
 end, false)
 
 print("^2[SWX-AdminChar] Client yüklendi!^7")
