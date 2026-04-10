@@ -1,19 +1,15 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Database tablosu oluştur
-AddEventHandler('onServerResourceStart', function(resourceName)
-    if resourceName ~= GetCurrentResourceName() then return end
-    CreateThread(function()
-        Wait(500)
-        MySQL.query.await([[CREATE TABLE IF NOT EXISTS `player_skills` (
-            `citizenid` VARCHAR(50) PRIMARY KEY,
-            `stamina` INT DEFAULT 1,
-            `stamina_xp` INT DEFAULT 0,
-            `driving` INT DEFAULT 1,
-            `driving_xp` INT DEFAULT 0,
-            `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )]])
-    end)
+-- Database tablosu oluştur (oxmysql bağlantısı hazır olunca)
+MySQL.ready(function()
+    MySQL.query.await([[CREATE TABLE IF NOT EXISTS `player_skills` (
+        `citizenid` VARCHAR(50) PRIMARY KEY,
+        `stamina` INT DEFAULT 1,
+        `stamina_xp` INT DEFAULT 0,
+        `driving` INT DEFAULT 1,
+        `driving_xp` INT DEFAULT 0,
+        `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )]])
 end)
 
 -- Oyuncunun skillerini al
