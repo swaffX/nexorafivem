@@ -93,7 +93,9 @@ local vehicleStyleFeatures = {
 
 -- Player Loaded Event
 RegisterNetEvent("wais:hudv6:client:playerLoaded", function()
-    wFramework.playerLoaded()
+    if wFramework and wFramework.playerLoaded then
+        wFramework.playerLoaded()
+    end
 end)
 
 -- Set Player Dead State
@@ -194,10 +196,14 @@ AddEventHandler("onClientResourceStart", function(resourceName)
                 end
                 
                 -- Call playerLoaded immediately (it will initialize HUD with default data if needed)
-                wFramework.playerLoaded()
+                if wFramework and wFramework.playerLoaded then
+                    wFramework.playerLoaded()
+                end
             end)
         else
-            wFramework.playerLoaded()
+            if wFramework and wFramework.playerLoaded then
+                wFramework.playerLoaded()
+            end
         end
     end
 end)

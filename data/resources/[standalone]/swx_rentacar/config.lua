@@ -1,15 +1,15 @@
 Config = {}
 
--- NPC Konumu (Ekran görüntüsündeki konum)
-Config.NPCLocation = vector4(-1039.28, -2730.74, 20.21, 226.21)
+-- NPC Konumu (Ekran görüntüsündeki konum - YERE INDIRILDI)
+Config.NPCLocation = vector4(-1039.28, -2730.74, 19.1, 226.21)
 
 -- NPC Modeli (galerideki gibi)
 Config.NPCModel = "s_m_m_autoshop_01"
 
--- Araç Spawn Konumları (NPC'nin yakınında)
+-- Araç Spawn Konumları (NPC'nin yakınında - 1 TANE KALDI)
 Config.SpawnLocations = {
-    vector4(-1045.28, -2732.74, 20.21, 145.0),
-    vector4(-1042.28, -2728.74, 20.21, 145.0),
+    vector4(-1045.28, -2732.74, 19.2, 145.0),
+    -- vector4(-1042.28, -2728.74, 20.21, 145.0), -- KALDIRILDI
 }
 
 -- Kiralanabilir Araçlar
@@ -30,10 +30,10 @@ Config.RentVehicles = {
     }
 }
 
--- Hoşgeldin Mesajı (Baloncuk)
+-- Hosgeldin Mesaji (Baloncuk) - Turkce karakterler kaldirildi
 Config.WelcomeMessage = {
-    title = "Nexora Roleplay'e Hoşgeldin!",
-    subtitle = "Sunucumuzda Keyifli Vakitler Geçirmeni Dileriz!",
+    title = "Nexora Roleplay'e Hosgeldin!",
+    subtitle = "Sunucumuzda Keyifli Vakitler Gecirmeni Dileriz!",
     duration = 5000 -- 5 saniye
 }
 

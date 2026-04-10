@@ -94,36 +94,69 @@ local function ShowWelcomeBubble()
     })
 end
 
--- 3D Baloncuk Çizim
+-- 3D KONUSMA BALONCUGU Çizim (Speech Bubble)
 function DrawWelcomeBubble(coords)
-    local onScreen, _x, _y = World3dToScreen2d(coords.x, coords.y, coords.z + 1.2)
+    -- NPC'nin kafasinin uzerinde gorunecek sekilde ayarlandi
+    local onScreen, _x, _y = World3dToScreen2d(coords.x, coords.y, coords.z + 1.75)
     
     if onScreen then
-        local scale = 0.35
-        local padding = 0.005
+        local bubbleWidth = 0.28
+        local bubbleHeight = 0.09
+        local tailHeight = 0.02
+        local alpha = 220
         
-        -- Arka plan
-        DrawRect(_x, _y - 0.025, 0.25 + padding, 0.08, 0, 0, 0, 200)
+        -- Ana baloncuğun arka planı (yuvarlatılmış dikdörtgen efekti için çoklu rect)
+        -- Üst kısım
+        DrawRect(_x, _y - bubbleHeight/2 + 0.015, bubbleWidth - 0.02, 0.03, 0, 0, 0, alpha)
+        -- Orta kısım
+        DrawRect(_x, _y - 0.005, bubbleWidth, bubbleHeight - 0.04, 0, 0, 0, alpha)
+        -- Alt kısım
+        DrawRect(_x, _y + bubbleHeight/2 - 0.025, bubbleWidth - 0.02, 0.02, 0, 0, 0, alpha)
         
-        -- Başlık
-        SetTextScale(scale, scale)
+        -- Köşe yuvarlaklığı için küçük rect'ler
+        DrawRect(_x - bubbleWidth/2 + 0.01, _y - bubbleHeight/2 + 0.02, 0.02, 0.025, 0, 0, 0, alpha)
+        DrawRect(_x + bubbleWidth/2 - 0.01, _y - bubbleHeight/2 + 0.02, 0.02, 0.025, 0, 0, 0, alpha)
+        DrawRect(_x - bubbleWidth/2 + 0.01, _y + bubbleHeight/2 - 0.03, 0.02, 0.015, 0, 0, 0, alpha)
+        DrawRect(_x + bubbleWidth/2 - 0.01, _y + bubbleHeight/2 - 0.03, 0.02, 0.015, 0, 0, 0, alpha)
+        
+        -- Kuyruk (üçgen efekti için 3 küçük dikdörtgen)
+        -- Orta kuyruk
+        DrawRect(_x, _y + bubbleHeight/2 - 0.005, 0.015, tailHeight + 0.01, 0, 0, 0, alpha)
+        -- Kuyruk yanları
+        DrawRect(_x - 0.008, _y + bubbleHeight/2 - 0.01, 0.01, tailHeight, 0, 0, 0, alpha)
+        DrawRect(_x + 0.008, _y + bubbleHeight/2 - 0.01, 0.01, tailHeight, 0, 0, 0, alpha)
+        -- Kuyruk ucu
+        DrawRect(_x, _y + bubbleHeight/2 + tailHeight/2 - 0.002, 0.008, 0.008, 0, 0, 0, alpha)
+        
+        -- Başlık (Altın renk)
+        SetTextScale(0.32, 0.32)
         SetTextFont(4)
         SetTextProportional(1)
-        SetTextColour(255, 215, 0, 255) -- Altın renk
+        SetTextColour(255, 215, 0, 255)
         SetTextEntry("STRING")
         SetTextCentre(1)
         AddTextComponentString(Config.WelcomeMessage.title)
-        DrawText(_x, _y - 0.05)
+        DrawText(_x, _y - 0.035)
         
-        -- Alt başlık
-        SetTextScale(0.25, 0.25)
+        -- Alt başlık (Beyaz)
+        SetTextScale(0.23, 0.23)
         SetTextFont(4)
         SetTextProportional(1)
         SetTextColour(255, 255, 255, 255)
         SetTextEntry("STRING")
         SetTextCentre(1)
         AddTextComponentString(Config.WelcomeMessage.subtitle)
-        DrawText(_x, _y - 0.025)
+        DrawText(_x, _y - 0.002)
+        
+        -- İkon (Opsiyonel - konuşma baloncuğu ikonu)
+        SetTextScale(0.35, 0.35)
+        SetTextFont(4)
+        SetTextProportional(1)
+        SetTextColour(255, 215, 0, 255)
+        SetTextEntry("STRING")
+        SetTextCentre(1)
+        AddTextComponentString("💬")
+        DrawText(_x - bubbleWidth/2 + 0.025, _y - 0.035)
     end
 end
 
@@ -249,7 +282,7 @@ CreateThread(function()
         
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
-        local npcCoords = Config.NPCLocation
+        local npcCoords = vector3(Config.NPCLocation.x, Config.NPCLocation.y, Config.NPCLocation.z)
         local distance = #(playerCoords - npcCoords)
         
         if distance < Config.DrawTextDistance then

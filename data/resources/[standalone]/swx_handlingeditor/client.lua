@@ -5,7 +5,16 @@ local tempHandling = {}
 
 -- Admin kontrolü
 local function IsAdmin()
+    -- AdminGroups nil ise herkese izin ver (geliştirme modu)
+    if Config.AdminGroups == nil then
+        return true
+    end
+    
     local Player = QBCore.Functions.GetPlayerData()
+    if not Player or not Player.group then
+        return false
+    end
+    
     return Config.AdminGroups[Player.group] or false
 end
 
