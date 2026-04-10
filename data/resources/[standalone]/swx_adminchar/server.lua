@@ -16,7 +16,7 @@ QBCore.Commands.Add("delchar", "Karakter Sil (Admin - CitizenID)", {{name = "cit
             local playerData = result[1]
             local charName = playerData.charinfo and json.decode(playerData.charinfo).firstname .. " " .. json.decode(playerData.charinfo).lastname or "Bilinmiyor"
             
-            -- İlişkili tabloları sil
+            -- İlişkili tabloları sil (sadece var olan tablolar)
             MySQL.query('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
             MySQL.query('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
             MySQL.query('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
@@ -24,11 +24,6 @@ QBCore.Commands.Add("delchar", "Karakter Sil (Admin - CitizenID)", {{name = "cit
             MySQL.query('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
             MySQL.query('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
             MySQL.query('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM phone_messages WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM phone_invoices WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM player_mails WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM crypto_transactions WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM bank_accounts WHERE citizenid = ?', {citizenid})
             
             -- Ana karakter kaydını sil
             MySQL.query('DELETE FROM players WHERE citizenid = ?', {citizenid}, function(delResult)
@@ -71,7 +66,7 @@ QBCore.Commands.Add("delcharid", "Online Oyuncu Karakterini Sil (Admin)", {{name
     -- Kısa bekleme sonra karakteri sil
     Citizen.Wait(1000)
     
-    -- İlişkili tabloları sil
+    -- İlişkili tabloları sil (sadece var olan tablolar)
     MySQL.query('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
     MySQL.query('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
     MySQL.query('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
@@ -79,11 +74,6 @@ QBCore.Commands.Add("delcharid", "Online Oyuncu Karakterini Sil (Admin)", {{name
     MySQL.query('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
     MySQL.query('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
     MySQL.query('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM phone_messages WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM phone_invoices WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM player_mails WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM crypto_transactions WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM bank_items WHERE citizenid = ?', {citizenid})
     
     -- Ana karakter kaydını sil
     MySQL.query('DELETE FROM players WHERE citizenid = ?', {citizenid}, function(delResult)
