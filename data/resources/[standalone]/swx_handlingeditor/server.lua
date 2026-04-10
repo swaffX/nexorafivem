@@ -117,6 +117,7 @@ RegisterNetEvent('swx_handlingeditor:delete', function(model)
 end)
 
 -- Araç spawn olduğunda handling uygula
+-- Araç spawn olduğunda handling uygula (Client hash kontrolu yapar)
 AddEventHandler('entityCreated', function(entity)
     if not Config.AutoApply then return end
     
@@ -124,12 +125,10 @@ AddEventHandler('entityCreated', function(entity)
         local entityType = GetEntityType(entity)
         if entityType == 2 then
             local model = GetEntityModel(entity)
-            local modelName = GetDisplayNameFromVehicleModel(model):lower()
-            
-            if handlingData[modelName] then
-                local netId = NetworkGetNetworkIdFromEntity(entity)
-                TriggerClientEvent('swx_handlingeditor:apply', -1, netId, handlingData[modelName])
-            end
+            -- Server side'da GetDisplayNameFromVehicleModel kullanilamaz
+            -- Client'a model hash gonder, client cozumlesin
+            local netId = NetworkGetNetworkIdFromEntity(entity)
+            TriggerClientEvent('swx_handlingeditor:checkAndApply', -1, netId, model)
         end
     end
 end)

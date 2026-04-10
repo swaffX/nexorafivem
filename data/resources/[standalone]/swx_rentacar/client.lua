@@ -9,6 +9,11 @@ local RentStartTime = nil
 
 -- NPC Spawn
 local function SpawnNPC()
+    -- Zaten NPC varsa spawn etme (cift NPC onlemek icin)
+    if NPC and DoesEntityExist(NPC) then
+        return
+    end
+    
     local model = Config.NPCModel
     
     -- Model yükle
@@ -17,9 +22,11 @@ local function SpawnNPC()
         Wait(100)
     end
     
-    -- NPC oluştur
+    -- NPC olustur (sadece 1 tane)
     local coords = Config.NPCLocation
-    NPC = CreatePed(4, model, coords.x, coords.y, coords.z, coords.w, false, true)
+    if not NPC or not DoesEntityExist(NPC) then
+        NPC = CreatePed(4, model, coords.x, coords.y, coords.z, coords.w, false, true)
+    end
     
     -- NPC ayarları
     SetEntityHeading(NPC, coords.w)

@@ -33,26 +33,25 @@ RegisterNetEvent("QBCore:Player:SetPlayerData", function(val)
             end
         end
     end
-    -- PARA/BANKA GUNCELLEME KALDIRILDI - Nexora RP
-    -- Wait(250)
-    -- wFramework.GetPlayerBank()
-    -- wFramework.GetPlayerMoney()
+    Wait(250)
+    wFramework.GetPlayerBank()
+    wFramework.GetPlayerMoney()
 end)
 
--- PARA GUNCELLEME EVENTI KALDIRILDI - Nexora RP
---[[
+-- Para güncelleme eventi (qb-inventory bridge'den gelir)
 RegisterNetEvent('hud:client:UpdateMoney', function(money)
     if money then
+        -- Para bilgisini güncelle
         if wFramework and wFramework.Framework and wFramework.Framework.PlayerData then
             wFramework.Framework.PlayerData.money = money
+            -- HUD'ı güncelle
             Wait(100)
             wFramework.GetPlayerBank()
             wFramework.GetPlayerMoney()
-            Config.Debug("[^2INFO - QB^0] Para güncellendi")
+            Config.Debug("[^2INFO - QB^0] Para güncellendi: Cash=" .. (money.cash or 0) .. ", Bank=" .. (money.bank or 0))
         end
     end
 end)
---]]
 
 -- QBX Player Loaded Event - Store player data when loaded
 CreateThread(function()

@@ -189,6 +189,25 @@ RegisterNetEvent('swx_handlingeditor:apply', function(netId, handling)
     end
 end)
 
+-- Server'dan gelen araç kontrol ve handling uygulama (entityCreated icin)
+RegisterNetEvent('swx_handlingeditor:checkAndApply', function(netId, modelHash)
+    local vehicle = NetworkGetEntityFromNetworkId(netId)
+    if vehicle and DoesEntityExist(vehicle) then
+        -- Model hash'den isim al
+        local modelName = GetDisplayNameFromVehicleModel(modelHash):lower()
+        
+        -- Server'dan handling verisi iste
+        local savedHandling = lib.callback.await('swx_handlingeditor:getHandling', false, modelName)
+        
+        if savedHandling then
+            Citizen.SetTimeout(500, function()
+                ApplyHandling(vehicle, savedHandling)
+                print('[SWX-HandlingEditor] Auto-Applied:', modelName)
+            end)
+        end
+    end
+end)
+
 -- Handling güncellendi bildirimi
 RegisterNetEvent('swx_handlingeditor:updated', function(model, data)
     lib.notify({type = 'info', description = model .. ' handling güncellendi!'})
