@@ -34,9 +34,9 @@ Config.Vehicles = {
     Car = {
         ['car'] = {
             -- [BAŞLANGIÇ/ECONOMY ARAÇLARI]
-            {model='asea',       label='Asea',          price=6500,    category='luxury'},
-            {model='emperor',    label='Emperor',       price=8000,    category='luxury'},
-            {model=' Injection',  label='Injection',     price=12000,   category='luxury'},        
+            {model='asea',       label='Asea',          price=6500,    category='sedan'},
+            {model='emperor',    label='Emperor',       price=8000,    category='sedan'},
+            {model='Injection',  label='Injection',     price=12000,   category='jeep'},        
             {model='bifta',      label='Bifta',         price=15000,   category='jeep'},
             {model='rebel2',     label='Rebel',         price=8500,    category='jeep'},
             {model='rancherxl',  label='Rancher XL',    price=18000,   category='jeep'},
@@ -55,17 +55,17 @@ Config.Vehicles = {
             {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='sport'},
             {model='r820',       label='Audi R8 2020',  price=100000,  category='sport'},
             {model='redeye',     label='Dodge Challenger', price=80000, category='sport'},
-            {model='cla250',     label='Mercedes Benz CLA 250', price=85000, category='sport'},
+            {model='cla250',     label='Mercedes Benz CLA 250', price=85000, category='luxury'},
             {model='hermes',     label='Hermes',        price=38000,   category='trunk'},
             {model='blade',      label='Blade',         price=24000,   category='trunk'},
             
             -- [LÜKS ARABALAR]
-            {model='zentorno',   label='Zentorno',      price=145000,  category='luxury'},
+            {model='zentorno',   label='Zentorno',      price=145000,  category='sport'},
             
             -- [MOTOSİKLETLER]
-            {model='bati',       label='Bati',          price=22000,   category='luxury'},
-            {model='sanchez',    label='Sanchez',       price=9500,    category='luxury'},
-            {model='avarus',     label='Avarus',        price=15000,   category='trunk'},
+            {model='bati',       label='Bati',          price=22000,   category='moto'},
+            {model='sanchez',    label='Sanchez',       price=9500,    category='moto'},
+            {model='avarus',     label='Avarus',        price=15000,   category='moto'},
             
             -- [MUSCLE/CLASSIC]
             {model='buccaneer',  label='Buccaneer',     price=16500,   category='trunk'},
@@ -118,8 +118,9 @@ Config.Vehicles = {
             {name='jeep',      trunk='50'},
             {name='sport',     trunk='7.5'},
             {name='trunk',     trunk='75'},
-            {name='sedan',     trunk='5'},
+            {name='sedan',     trunk='15'},
             {name='universal', trunk='5'},
+            {name='moto',      trunk='5'},
         },
 
         ['boat'] = {
