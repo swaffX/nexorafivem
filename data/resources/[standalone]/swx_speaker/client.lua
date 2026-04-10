@@ -383,35 +383,35 @@ function PlayMusic(url, title)
                             if lastPlayState then
                                 if Config.AutoRestartOnStop and currentUrl then
                                     -- Otomatik yeniden başlat
-                                QBCore.Functions.Notify('Müzik durdu, otomatik yeniden başlatılıyor...', 'info', 3000)
-                                print('[SWX Speaker] Otomatik yeniden başlatma başlıyor...')
-                                
-                                Wait(Config.AutoRestartDelay or 2000)
-                                
-                                -- Eski müziği temizle
-                                if currentMusicId then
-                                    exports.xsound:Destroy(currentMusicId)
-                                    currentMusicId = nil
+                                    QBCore.Functions.Notify('Müzik durdu, otomatik yeniden başlatılıyor...', 'info', 3000)
+                                    print('[SWX Speaker] Otomatik yeniden başlatma başlıyor...')
+                                    
+                                    Wait(Config.AutoRestartDelay or 2000)
+                                    
+                                    -- Eski müziği temizle
+                                    if currentMusicId then
+                                        exports.xsound:Destroy(currentMusicId)
+                                        currentMusicId = nil
+                                    end
+                                    
+                                    -- Yeniden başlat
+                                    PlayMusic(currentUrl, currentTitle)
+                                    QBCore.Functions.Notify('Müzik yeniden başlatıldı!', 'success')
+                                else
+                                    -- Sadece bildir
+                                    QBCore.Functions.Notify('Müzik durdu! Yeniden başlatmak için menüyü açın.', 'error', 5000)
                                 end
-                                
-                                -- Yeniden başlat
-                                PlayMusic(currentUrl, currentTitle)
-                                QBCore.Functions.Notify('Müzik yeniden başlatıldı!', 'success')
-                            else
-                                -- Sadece bildir
-                                QBCore.Functions.Notify('Müzik durdu! Yeniden başlatmak için menüyü açın.', 'error', 5000)
+                                lastPlayState = false
                             end
-                            lastPlayState = false
                         end
                     end
                 end
-            end
-        end)
-        
-        QBCore.Functions.Notify('Müzik çalıyor!', 'success')
-        print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+            end)
+            
+            QBCore.Functions.Notify('Müzik çalıyor!', 'success')
+            print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
+        end, plate)
     end
-end, plate)
 end
 
 -- Araçtaki tüm oyuncuları al
