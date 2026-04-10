@@ -642,22 +642,39 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
         if isPedMenu then
             header = "Kıyafet Değiştir"
         end
-        menuItems[#menuItems + 1] = {
-            header = "Kıyafet Mağazası Seçenekleri",
-            icon = "fas fa-shirt",
-            isMenuHeader = true -- Set to true to make a nonclickable title
-        }
-        menuItems[#menuItems + 1] = {
-            header = header,
-            txt = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
-            params = {
-                event = "fivem-appearance:client:openClothingShop",
-                args = isPedMenu
+
+        -- ox_lib context menu for clothing shop
+        local options = {
+            {
+                title = header,
+                description = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
+                icon = "shirt",
+                onSelect = function()
+                    TriggerEvent("fivem-appearance:client:openClothingShop", isPedMenu)
+                end
             }
         }
+
+        -- Add outfit menu items
         for i = 0, #outfitMenuItems, 1 do
-            menuItems[#menuItems + 1] = outfitMenuItems[i]
+            local item = outfitMenuItems[i]
+            options[#options + 1] = {
+                title = item.header,
+                description = item.txt or "",
+                icon = "shirt",
+                onSelect = function()
+                    if item.params and item.params.event then
+                        TriggerEvent(item.params.event, item.params.args)
+                    end
+                end
+            }
         end
+
+        lib.registerContext('clothing_shop_menu', {
+            title = 'Kıyafet Mağazası',
+            options = options
+        })
+        lib.showContext('clothing_shop_menu')
     elseif menuType == "outfit" then
         menuItems[#menuItems + 1] = {
             header = "👔 | Kıyafet Seçenekleri",

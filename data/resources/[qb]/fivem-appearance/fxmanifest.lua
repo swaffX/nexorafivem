@@ -27,6 +27,7 @@ server_scripts {
 }
 
 shared_scripts {
+  '@ox_lib/init.lua',
   'shared/config.lua'
 }
 
@@ -46,4 +47,5 @@ provide 'qb-clothing'
 
 dependencies {
   'qb-core',
+  'ox_lib',
 }
