@@ -19,16 +19,6 @@
         <div id="app">
             <div class="inventory-container" v-if="isInventoryOpen" @mousemove="drag" @mouseup="endDrag" @mousedown="containerMouseDownAction">
                 <div class="inventory-section player-inventory-section" :class="{ 'centered-inventory-section': shouldCenterInventory }">
-                    <!-- Eşya Arama Başlığı -->
-                    <div class="search-header">
-                        <h3><i class="fas fa-search"></i> Eşya Arama</h3>
-                        <div class="sort-controls">
-                            <button @click="sortItems('az')" title="A-Z"><i class="fas fa-arrow-down-a-z"></i></button>
-                            <button @click="sortItems('za')" title="Z-A"><i class="fas fa-arrow-down-z-a"></i></button>
-                            <button @click="sortItems('amount')" title="Miktar"><i class="fas fa-sort-amount-down"></i></button>
-                        </div>
-                    </div>
-                    
                     <div class="inventory-header">
                         <div class="weight-bar-vertical-container">
                             <div class="weight-bar-label weight-bar-label-max">{{ (maxWeight / 1000).toFixed(1) }} kg</div>

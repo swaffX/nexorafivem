@@ -918,30 +918,6 @@ const InventoryContainer = Vue.createApp({
                     console.error("Error posting inventory data:", error);
                 });
         },
-        // Eşya sıralama fonksiyonu
-        sortItems(sortType) {
-            const items = Object.values(this.playerInventory);
-            
-            if (sortType === 'az') {
-                items.sort((a, b) => a.label.localeCompare(b.label));
-            } else if (sortType === 'za') {
-                items.sort((a, b) => b.label.localeCompare(a.label));
-            } else if (sortType === 'amount') {
-                items.sort((a, b) => b.amount - a.amount);
-            }
-            
-            // Sıralanmış itemleri yeniden slotlara yerleştir
-            this.playerInventory = {};
-            items.forEach((item, index) => {
-                this.playerInventory[index + 1] = item;
-            });
-            
-            // Lua'ya bildir
-            axios.post("https://qb-inventory/SortItems", JSON.stringify({
-                sortType: sortType,
-                inventory: this.playerInventory
-            }));
-        },
     },
     mounted() {
         window.addEventListener("keydown", (event) => {
