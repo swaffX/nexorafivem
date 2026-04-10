@@ -111,3 +111,7 @@ Config.XPActivities = {
 -- Skill bar görünürlük ayarları
 Config.ShowSkillBarDuration = 5000 -- Level atlayınca 5 saniye göster
 Config.ShowSkillBarOnXP = false -- XP kazanınca göster (sadece level atlayınca göstermek için false)
+
+-- XP biriktirme sistemi (bar güncellemesi için)
+Config.XPThreshold = 10 -- Her 10 XP'de bir bar güncelle (0.5 XP yerine 10 XP biriktirince göster)
+

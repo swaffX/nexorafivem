@@ -4,6 +4,7 @@ local playerSkills = {}
 local isRunning = false
 local isDriving = false
 local lastXPTime = 0
+local accumulatedXP = {} -- Her skill için biriktirilen XP
 
 -- Skill verilerini yükle
 RegisterNetEvent('swx_skills:loadSkills', function(skills)
@@ -69,9 +70,52 @@ local function CheckXPGain(skillName, activity)
     -- 1 saniye bekleme süresi
     if currentTime - lastXPTime >= 1000 then
         lastXPTime = currentTime
-        print('[SWX Skills] XP Gained: ' .. skillName .. ' + ' .. xpAmount .. ' (' .. activity .. ')')
-        TriggerServerEvent('swx_skills:addXP', skillName, xpAmount)
+        
+        -- XP biriktir
+        if not accumulatedXP[skillName] then
+            accumulatedXP[skillName] = 0
+        end
+        accumulatedXP[skillName] = accumulatedXP[skillName] + xpAmount
+        
+        print('[SWX Skills] XP Gained: ' .. skillName .. ' + ' .. xpAmount .. ' (' .. activity .. ') | Accumulated: ' .. accumulatedXP[skillName])
+        
+        -- Threshold'a ulaştıysa server'a gönder ve bar göster
+        if accumulatedXP[skillName] >= (Config.XPThreshold or 10) then
+            TriggerServerEvent('swx_skills:addXP', skillName, accumulatedXP[skillName])
+            accumulatedXP[skillName] = 0 -- Sıfırla
+            
+            -- Skill bar göster
+            ShowSkillBarUpdate(skillName)
+        end
     end
+end
+
+-- Skill bar güncelleme göster
+local function ShowSkillBarUpdate(skillName)
+    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
+    if not playerSkills[skillName] then return end
+    
+    local skillConfig = Config.Skills[skillName]
+    local level = playerSkills[skillName] or 1
+    local xp = playerSkills[skillName .. '_xp'] or 0
+    local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
+    
+    SendNUIMessage({
+        type = 'showSkillBar',
+        skill = skillName,
+        level = level,
+        xp = xp,
+        requiredXP = requiredXP,
+        config = skillConfig
+    })
+    
+    -- 3 saniye sonra gizle
+    SetTimeout(3000, function()
+        SendNUIMessage({
+            type = 'hideSkillBar',
+            skill = skillName
+        })
+    end)
 end
 
 -- Koşma kontrolü (stamina XP)
