@@ -179,8 +179,18 @@ function OpenSpeakerMenu()
 end
 
 function InstallSpeakerDialog(plate)
-    local Player = QBCore.Functions.GetPlayer()
-    local speakerItem = Player.Functions.GetItemByName('car_speaker')
+    local PlayerData = QBCore.Functions.GetPlayerData()
+    local speakerItem = nil
+    
+    -- Check inventory for car_speaker item
+    if PlayerData and PlayerData.items then
+        for _, item in ipairs(PlayerData.items) do
+            if item and item.name == 'car_speaker' then
+                speakerItem = item
+                break
+            end
+        end
+    end
     
     if not speakerItem or speakerItem.amount < 1 then
         QBCore.Functions.Notify('Envanterinde hoparlör itemi yok!', 'error')
