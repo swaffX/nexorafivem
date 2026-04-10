@@ -7,6 +7,7 @@ QBShared.StarterItems = {
     ['white_phone'] = { amount = 1, item = 'white_phone' },
     ['id_card'] = { amount = 1, item = 'id_card' },
     ['driver_license'] = { amount = 1, item = 'driver_license' },
+    ['water'] = { amount = 3, item = 'water' },
 }
 
 for i = 48, 57 do NumberCharset[#NumberCharset + 1] = string.char(i) end

@@ -23,14 +23,13 @@ end
 
 function WalkCommandStart(source, args, raw)
     local name = firstToUpper(string.lower(args[1]))
-
     if name == "Reset" then
         ResetPedMovementClipset(PlayerPedId())
         return
     end
 
     if tableHasKey(RP.Walks, name) then
-        local name2 = table.unpack(RP.Walks[name])
+        local name2 = RP.Walks[name]
         WalkMenuStart(name2)
     elseif name == "Yaralı" then
         WalkMenuStart("move_m@injured")

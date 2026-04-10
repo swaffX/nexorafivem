@@ -89,7 +89,7 @@ if Config.EnableXtoCancel then
 end
 
 if Config.MenuKeybindEnabled then
-    RegisterKeyMapping("animasyonlar", "Open rpemotes menu", "keyboard", Config.MenuKeybind or "F5")
+    RegisterKeyMapping("animasyonlar", "Open rpemotes menu", "keyboard", "F5")
 end
 
 if Config.HandsupKeybindEnabled then
@@ -232,49 +232,49 @@ end)
 
 function EmoteCancel(force)
     local ply = PlayerPedId()
-	if not CanCancel and force ~= true then return end
-    if ChosenDict == "MaleScenario" and IsInAnimation then
-        ClearPedTasksImmediately(ply)
-        IsInAnimation = false
-        DebugPrint("Forced scenario exit")
-    elseif ChosenDict == "Scenario" and IsInAnimation then
-        ClearPedTasksImmediately(ply)
-        IsInAnimation = false
-        DebugPrint("Forced scenario exit")
-    end
-
-    PtfxNotif = false
-    PtfxPrompt = false
-	Pointing = false
-
-    if IsInAnimation then
-        if LocalPlayer.state.ptfx then
-            PtfxStop()
+        if not CanCancel and force ~= true then return end
+        if ChosenDict == "MaleScenario" and IsInAnimation then
+            ClearPedTasksImmediately(ply)
+            IsInAnimation = false
+            DebugPrint("Forced scenario exit")
+        elseif ChosenDict == "Scenario" and IsInAnimation then
+            ClearPedTasksImmediately(ply)
+            IsInAnimation = false
+            DebugPrint("Forced scenario exit")
         end
-        DetachEntity(ply, true, false)
-        CancelSharedEmote(ply)
-        DestroyAllProps()
-
-        if ChosenAnimOptions and ChosenAnimOptions.ExitEmote then
-            -- If the emote exit type is not spesifed it defaults to Emotes
-            local ExitEmoteType = ChosenAnimOptions.ExitEmoteType or "Emotes"
-
-            -- Checks that the exit emote actually exists
-            if not RP[ExitEmoteType] or not RP[ExitEmoteType][ChosenAnimOptions.ExitEmote] then
-                DebugPrint("Exit emote was invalid")
+    
+        PtfxNotif = false
+        PtfxPrompt = false
+        Pointing = false
+    
+        if IsInAnimation then
+            if LocalPlayer.state.ptfx then
+                PtfxStop()
+            end
+            DetachEntity(ply, true, false)
+            CancelSharedEmote(ply)
+            DestroyAllProps()
+    
+            if ChosenAnimOptions and ChosenAnimOptions.ExitEmote then
+                -- If the emote exit type is not spesifed it defaults to Emotes
+                local ExitEmoteType = ChosenAnimOptions.ExitEmoteType or "Emotes"
+    
+                -- Checks that the exit emote actually exists
+                if not RP[ExitEmoteType] or not RP[ExitEmoteType][ChosenAnimOptions.ExitEmote] then
+                    DebugPrint("Exit emote was invalid")
+                    ClearPedTasks(ply)
+                    IsInAnimation = false
+                    return
+                end
+    
+                OnEmotePlay(RP[ExitEmoteType][ChosenAnimOptions.ExitEmote])
+                DebugPrint("Playing exit animation")
+            else
                 ClearPedTasks(ply)
                 IsInAnimation = false
-                return
             end
-
-            OnEmotePlay(RP[ExitEmoteType][ChosenAnimOptions.ExitEmote])
-            DebugPrint("Playing exit animation")
-        else
-            ClearPedTasks(ply)
-            IsInAnimation = false
         end
-    end
-    AnimationThreadStatus = false
+        AnimationThreadStatus = false
 end
 
 function EmoteChatMessage(msg, multiline)
@@ -393,7 +393,11 @@ function EmoteMenuStart(args, hard, textureVariation)
 
     if etype == "dances" then
         if RP.Dances[name] ~= nil then
-            OnEmotePlay(RP.Dances[name])
+            if RP.Dances[name].animpos then
+                PlacingThread(RP.Dances[name])
+            else
+                OnEmotePlay(RP.Dances[name])
+            end
         end
     elseif etype == "animals" then
         if RP.AnimalEmotes[name] ~= nil then
@@ -401,17 +405,29 @@ function EmoteMenuStart(args, hard, textureVariation)
         end
     elseif etype == "props" then
         if RP.PropEmotes[name] ~= nil then
-            OnEmotePlay(RP.PropEmotes[name], textureVariation)
+            if RP.PropEmotes[name].animpos then
+                PlacingThread(RP.PropEmotes[name], textureVariation)
+            else
+                OnEmotePlay(RP.PropEmotes[name], textureVariation)
+            end
         end
     elseif etype == "emotes" then
         if RP.Emotes[name] ~= nil then
-            OnEmotePlay(RP.Emotes[name])
+            if RP.Emotes[name].animpos then
+                PlacingThread(RP.Emotes[name])
+            else
+                OnEmotePlay(RP.Emotes[name])
+            end
         else
             if name ~= "🕺 Dance Emotes" then end
         end
     elseif etype == "expression" then
         if RP.Expressions[name] ~= nil then
-            OnEmotePlay(RP.Expressions[name])
+            if RP.Expressions[name].animpos then
+                PlacingThread(RP.Expressions[name])
+            else
+                OnEmotePlay(RP.Expressions[name])
+            end
         end
     end
 end
@@ -430,23 +446,40 @@ function EmoteCommandStart(source, args, raw)
         end
 
         if RP.Emotes[name] ~= nil then
-            OnEmotePlay(RP.Emotes[name])
+            PlacingThread(RP.Emotes[name])
+            print(RP.Emotes[name])
             return
         elseif RP.Dances[name] ~= nil then
-            OnEmotePlay(RP.Dances[name])
+            if RP.Dances[name].animpos then
+                PlacingThread(RP.Dances[name])
+            else
+                OnEmotePlay(RP.Dances[name])
+            end
             return
         elseif RP.AnimalEmotes[name] ~= nil then
-            OnEmotePlay(RP.AnimalEmotes[name])
+            if RP.AnimalEmotes[name].animpos then
+                PlacingThread(RP.AnimalEmotes[name])
+            else
+                OnEmotePlay(RP.AnimalEmotes[name])
+            end
             return
         elseif RP.Exits[name] ~= nil then
-            OnEmotePlay(RP.Exits[name])
+            if RP.Exits[name].animpos then
+                PlacingThread(RP.Exits[name])
+            else
+                OnEmotePlay(RP.Exits[name])
+            end
             return
         elseif RP.PropEmotes[name] ~= nil then
             if RP.PropEmotes[name].AnimationOptions.PropTextureVariations then
                 if #args > 1 then
                     local textureVariation = tonumber(args[2])
                     if (RP.PropEmotes[name].AnimationOptions.PropTextureVariations[textureVariation] ~= nil) then
-                        OnEmotePlay(RP.PropEmotes[name], textureVariation - 1)
+                        if RP.PropEmotes[name].animpos then
+                            PlacingThread(RP.PropEmotes[name], textureVariation - 1)
+                        else
+                            OnEmotePlay(RP.PropEmotes[name], textureVariation - 1)
+                        end
                         return
                     else
                         local str = ""
@@ -455,12 +488,20 @@ function EmoteCommandStart(source, args, raw)
                         end
                         
                         EmoteChatMessage(string.format(Config.Languages[lang]['invalidvariation'], str), true)
-                        OnEmotePlay(RP.PropEmotes[name], 0)
+                        if RP.PropEmotes[name].animpos then
+                            PlacingThread(RP.PropEmotes[name], 0)
+                        else
+                            OnEmotePlay(RP.PropEmotes[name], 0)
+                        end
                         return
                     end
                 end
             end
-            OnEmotePlay(RP.PropEmotes[name])
+            if RP.PropEmotes[name].animpos then
+                PlacingThread(RP.PropEmotes[name])
+            else
+                OnEmotePlay(RP.PropEmotes[name])
+            end
             return
         else
             EmoteChatMessage("'" .. name .. "' " .. Config.Languages[lang]['notvalidemote'] .. "")
@@ -539,13 +580,94 @@ end
 ------ This is the major function for playing emotes! -----------------------------------------------
 -----------------------------------------------------------------------------------------------------
 
-function OnEmotePlay(EmoteName, textureVariation)
-    InVehicle = IsPedInAnyVehicle(PlayerPedId(), true)
-	Pointing = false
+local ped = nil
+local animsiso = false
 
-    if not Config.AllowedInCars and InVehicle == 1 then
-        return
+StartAnimThread = function()
+    animsiso = true
+    exports['qb-core']:DrawText("İptal etmek için [Q] tuşuna basın")
+    CreateThread(function ()
+        while animsiso do
+            Wait(1)
+            if IsControlJustPressed(0, 44) then
+                animsiso = false
+                exports['qb-core']:HideText()
+                ClearPedTasksImmediately(PlayerPedId())
+                return
+            end
+        end
+    end)
+end
+
+requestAnimDict = function(animDict)
+	if HasAnimDictLoaded(animDict) then return end
+	RequestAnimDict(animDict)
+	while not HasAnimDictLoaded(animDict) do
+		Wait(0)
+	end
+end
+
+
+local function RotationToDirection(rotation)
+	local adjustedRotation =
+	{
+		x = (math.pi / 180) * rotation.x,
+		y = (math.pi / 180) * rotation.y,
+		z = (math.pi / 180) * rotation.z
+	}
+	local direction =
+	{
+		x = -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
+		y = math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
+		z = math.sin(adjustedRotation.x)
+	}
+	return direction
+end
+
+Camera = function(ped)
+    local cameraRotation = GetGameplayCamRot()
+	local cameraCoord = GetGameplayCamCoord()
+	local direction = RotationToDirection(cameraRotation)
+	local destination =
+	{
+		x = cameraCoord.x + direction.x * 10.0,
+		y = cameraCoord.y + direction.y * 10.0,
+		z = cameraCoord.z + direction.z * 10.0
+	}
+
+    local sphereCast = StartShapeTestSweptSphere(
+        cameraCoord.x,
+        cameraCoord.y,
+        cameraCoord.z,
+        destination.x,
+        destination.y,
+        destination.z,
+        0.2,
+        339,
+        ped,
+        4
+    );
+    return GetShapeTestResultIncludingMaterial(sphereCast);
+end
+
+startPlacing = function()
+    local _, hit, endCoords, _, _, _ = Camera(ped)
+    if hit then
+        currentCoords = endCoords
     end
+end
+
+stopPlacing = function()
+    if ped then
+        DeleteEntity(ped)
+    end
+    ped = nil
+    heading = 0.0
+    currentCoords = nil
+    exports['qb-core']:HideText()
+end
+
+MakePedAnim = function(coords, heading, EmoteName, textureVariation)
 
     if not DoesEntityExist(PlayerPedId()) then
         return false
@@ -572,7 +694,10 @@ function OnEmotePlay(EmoteName, textureVariation)
 
     if ChosenDict == "MaleScenario" or "Scenario" then
         CheckGender()
-        if ChosenDict == "MaleScenario" then if InVehicle then return end
+        if ChosenDict == "MaleScenario" then
+            if InVehicle then
+                return
+            end
             if PlayerGender == "male" then
                 ClearPedTasks(PlayerPedId())
                 TaskStartScenarioInPlace(PlayerPedId(), ChosenAnimation, 0, true)
@@ -583,8 +708,11 @@ function OnEmotePlay(EmoteName, textureVariation)
                 EmoteChatMessage(Config.Languages[lang]['maleonly'])
             end
             return
-        elseif ChosenDict == "ScenarioObject" then if InVehicle then return end
-            BehindPlayer = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0 - 0.5, -0.5);
+        elseif ChosenDict == "ScenarioObject" then
+            if InVehicle then
+                return
+            end
+            BehindPlayer = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0 - 0.5, -0.5)
             ClearPedTasks(PlayerPedId())
             TaskStartScenarioAtPosition(PlayerPedId(), ChosenAnimation, BehindPlayer['x'], BehindPlayer['y'],
                 BehindPlayer['z'], GetEntityHeading(PlayerPedId()), 0, 1, false)
@@ -592,7 +720,10 @@ function OnEmotePlay(EmoteName, textureVariation)
             IsInAnimation = true
             RunAnimationThread()
             return
-        elseif ChosenDict == "Scenario" then if InVehicle then return end
+        elseif ChosenDict == "Scenario" then
+            if InVehicle then
+                return
+            end
             ClearPedTasks(PlayerPedId())
             TaskStartScenarioInPlace(PlayerPedId(), ChosenAnimation, 0, true)
             DebugPrint("Playing scenario = (" .. ChosenAnimation .. ")")
@@ -652,7 +783,8 @@ function OnEmotePlay(EmoteName, textureVariation)
             else
                 PtfxNoProp = false
             end
-            Ptfx1, Ptfx2, Ptfx3, Ptfx4, Ptfx5, Ptfx6, PtfxScale = table.unpack(EmoteName.AnimationOptions.PtfxPlacement)
+            Ptfx1, Ptfx2, Ptfx3, Ptfx4, Ptfx5, Ptfx6, PtfxScale = table.unpack(
+                EmoteName.AnimationOptions.PtfxPlacement)
             PtfxColor = EmoteName.AnimationOptions.PtfxColor
             PtfxInfo = EmoteName.AnimationOptions.PtfxInfo
             PtfxWait = EmoteName.AnimationOptions.PtfxWait
@@ -661,43 +793,62 @@ function OnEmotePlay(EmoteName, textureVariation)
             PtfxPrompt = true
             -- RunAnimationThread() -- ? This call should not be required, see if needed with tests
 
-            TriggerServerEvent("rpemotes:ptfx:sync", PtfxAsset, PtfxName, vector3(Ptfx1, Ptfx2, Ptfx3),
-                vector3(Ptfx4, Ptfx5, Ptfx6), PtfxScale, PtfxColor)
+            TriggerServerEvent("rpemotes:ptfx:sync", PtfxAsset, PtfxName,
+                vector3(Ptfx1, Ptfx2, Ptfx3), vector3(Ptfx4, Ptfx5, Ptfx6), PtfxScale, PtfxColor)
         else
             DebugPrint("Ptfx = none")
             PtfxPrompt = false
         end
     end
 
-    TaskPlayAnim(PlayerPedId(), ChosenDict, ChosenAnimation, 5.0, 5.0, AnimationDuration, MovementType, 0, false, false,
-        false)
+    stopPlacing()
+    TaskGoToCoordAnyMeans(PlayerPedId(), coords.x, coords.y, coords.z, 1.0, 0, 0, 786603, 0xbf800000)
+    local PlayerCoords = GetEntityCoords(PlayerPedId())
+    exports['qb-core']:DrawText("İptal etmek için [Sağ Tık] tuşuna basın")
+    while #(PlayerCoords - coords) > 1.5 do
+        Wait(1)
+        PlayerCoords = GetEntityCoords(PlayerPedId())
+        if IsControlJustPressed(0, 177) then
+            exports['qb-core']:HideText()
+            ClearPedTasksImmediately(PlayerPedId())
+            return
+        end
+    end
+    exports['qb-core']:HideText()
+    SetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, false)
+    TaskPlayAnimAdvanced(PlayerPedId(), ChosenDict, ChosenAnimation, coords.x, coords.y, coords.z, 0, 0, heading, 3.0, 3.0, -1, 2, 1.0, false, false)
+    StartAnimThread()
     RemoveAnimDict(ChosenDict)
     IsInAnimation = true
     RunAnimationThread()
     MostRecentDict = ChosenDict
     MostRecentAnimation = ChosenAnimation
-	
+
     if EmoteName.AnimationOptions then
         if EmoteName.AnimationOptions.Prop then
             PropName = EmoteName.AnimationOptions.Prop
             PropBone = EmoteName.AnimationOptions.PropBone
-            PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6 = table.unpack(EmoteName.AnimationOptions.PropPlacement)
+            PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6 = table.unpack(
+                EmoteName.AnimationOptions.PropPlacement)
             if EmoteName.AnimationOptions.SecondProp then
                 SecondPropName = EmoteName.AnimationOptions.SecondProp
                 SecondPropBone = EmoteName.AnimationOptions.SecondPropBone
-                SecondPropPl1, SecondPropPl2, SecondPropPl3, SecondPropPl4, SecondPropPl5, SecondPropPl6 = table.unpack(EmoteName
-                    .AnimationOptions.SecondPropPlacement)
+                SecondPropPl1, SecondPropPl2, SecondPropPl3, SecondPropPl4, SecondPropPl5, SecondPropPl6 = table.unpack(
+                    EmoteName.AnimationOptions.SecondPropPlacement)
                 SecondPropEmote = true
             else
                 SecondPropEmote = false
             end
             Wait(AttachWait)
-            if not AddPropToPlayer(PropName, PropBone, PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6, textureVariation) then return end
+            if not AddPropToPlayer(PropName, PropBone, PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6,
+                textureVariation) then
+                return
+            end
             if SecondPropEmote then
-                if not AddPropToPlayer(SecondPropName, SecondPropBone, SecondPropPl1, SecondPropPl2, SecondPropPl3,
-                    SecondPropPl4, SecondPropPl5, SecondPropPl6, textureVariation) then 
+                if not AddPropToPlayer(SecondPropName, SecondPropBone, SecondPropPl1, SecondPropPl2,
+                    SecondPropPl3, SecondPropPl4, SecondPropPl5, SecondPropPl6, textureVariation) then
                     DestroyAllProps()
-                    return 
+                    return
                 end
             end
 
@@ -706,6 +857,277 @@ function OnEmotePlay(EmoteName, textureVariation)
                 TriggerServerEvent("rpemotes:ptfx:syncProp", ObjToNet(prop))
             end
         end
+    end
+end
+
+local txt = {
+    '[E] Onayla \n',
+    '[X / Sağ Tık] İptal \n',
+    '[Yukarı/Aşağı Ok] Yükseklik \n',
+    '[SCROLL] Döndür \n',
+}
+
+PlacingThread = function(animData, textureVariation)
+    if ped == nil then
+        local playerPed = PlayerPedId()
+        ped = ClonePed(playerPed, false, false, false)
+        FreezeEntityPosition(ped, true)
+        SetEntityAlpha(ped, 0)
+
+        local animDict = animData[1]
+        local animName = animData[2]
+
+        requestAnimDict(animDict)
+        TaskPlayAnim(ped, animDict, animName, 8.0, 8.0, -1, 1, 0, false, false, false)
+
+        SetEntityCollision(ped, false, false)
+        SetEntityAlpha(ped, 100)
+        SetBlockingOfNonTemporaryEvents(ped, true)
+        heading = GetEntityHeading(playerPed) + 90.0
+        exports['qb-core']:DrawText(table.concat(txt))
+        CreateThread(function ()
+            local currentCoordsZ = 0
+            while ped ~= nil do
+                Wait(1)
+                DisableControlAction(0, 22, true)
+                startPlacing()
+                if currentCoords then
+                    SetEntityCoords(ped, currentCoords.x, currentCoords.y, currentCoords.z + currentCoordsZ)
+                    SetEntityHeading(ped, heading)
+                end
+                if IsDisabledControlJustPressed(0, 14) then
+                    heading = heading + 5
+                    if heading > 360 then heading = 0.0 end
+                end
+                if IsDisabledControlPressed(0, 27) then
+                    currentCoordsZ = currentCoordsZ + 0.01
+                end
+                if IsDisabledControlPressed(0, 173) then
+                    currentCoordsZ = currentCoordsZ - 0.01
+                end
+                if IsDisabledControlJustPressed(0, 15) then
+                    heading = heading - 5
+                    if heading < 0 then heading = 360.0 end
+                end
+                if IsControlJustPressed(0, 38) then
+                    if #(GetEntityCoords(PlayerPedId()) - currentCoords) < 5.0 then
+                        MakePedAnim(GetEntityCoords(ped), GetEntityHeading(ped), animData, textureVariation)
+                    else
+                        QBCore.Functions.Notify("Çok uzaktasın.", "error")
+                    end
+                end
+
+                if IsControlJustPressed(0, 47) then -- G
+
+                    requestAnimDict(animDict)
+                    TaskPlayAnim(ped, animDict, animName, 8.0, 8.0, -1, 1, 0, false, false, false)
+            
+                end
+
+                if IsControlJustPressed(0, 74) then -- H
+
+                    requestAnimDict(animDict)
+                    TaskPlayAnim(ped, animDict, animName, 8.0, 8.0, -1, 1, 0, false, false, false)
+                end
+
+                if IsControlJustPressed(0, 177) then
+                    stopPlacing()
+                end
+            end
+        end)
+    else
+        DeleteObject(ped)
+        ped = nil
+        stopPlacing()
+        return
+    end
+end
+
+function OnEmotePlay(EmoteName, textureVariation)
+    local playerPed = PlayerPedId()
+    if not IsEntityInAir(playerPed) then
+        InVehicle = IsPedInAnyVehicle(PlayerPedId(), true)
+        Pointing = false
+
+        if not Config.AllowedInCars and InVehicle == 1 then
+            return
+        end
+
+        if not DoesEntityExist(PlayerPedId()) then
+            return false
+        end
+
+        ChosenDict, ChosenAnimation, ename = table.unpack(EmoteName)
+        ChosenAnimOptions = EmoteName.AnimationOptions
+        AnimationDuration = -1
+
+        if ChosenDict == "Expression" then
+            SetFacialIdleAnimOverride(PlayerPedId(), ChosenAnimation, 0)
+            return
+        end
+
+        if Config.DisarmPlayer then
+            if IsPedArmed(PlayerPedId(), 7) then
+                SetCurrentPedWeapon(PlayerPedId(), joaat('WEAPON_UNARMED'), true)
+            end
+        end
+
+        if PlayerHasProp then
+            DestroyAllProps()
+        end
+
+        if ChosenDict == "MaleScenario" or "Scenario" then
+            CheckGender()
+            if ChosenDict == "MaleScenario" then
+                if InVehicle then
+                    return
+                end
+                if PlayerGender == "male" then
+                    ClearPedTasks(PlayerPedId())
+                    TaskStartScenarioInPlace(PlayerPedId(), ChosenAnimation, 0, true)
+                    DebugPrint("Playing scenario = (" .. ChosenAnimation .. ")")
+                    IsInAnimation = true
+                    RunAnimationThread()
+                else
+                    EmoteChatMessage(Config.Languages[lang]['maleonly'])
+                end
+                return
+            elseif ChosenDict == "ScenarioObject" then
+                if InVehicle then
+                    return
+                end
+                BehindPlayer = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0 - 0.5, -0.5)
+                ClearPedTasks(PlayerPedId())
+                TaskStartScenarioAtPosition(PlayerPedId(), ChosenAnimation, BehindPlayer['x'], BehindPlayer['y'],
+                    BehindPlayer['z'], GetEntityHeading(PlayerPedId()), 0, 1, false)
+                DebugPrint("Playing scenario = (" .. ChosenAnimation .. ")")
+                IsInAnimation = true
+                RunAnimationThread()
+                return
+            elseif ChosenDict == "Scenario" then
+                if InVehicle then
+                    return
+                end
+                ClearPedTasks(PlayerPedId())
+                TaskStartScenarioInPlace(PlayerPedId(), ChosenAnimation, 0, true)
+                DebugPrint("Playing scenario = (" .. ChosenAnimation .. ")")
+                IsInAnimation = true
+                RunAnimationThread()
+                return
+            end
+        end
+
+        -- Small delay at the start
+        if EmoteName.AnimationOptions and EmoteName.AnimationOptions.StartDelay then
+            Wait(EmoteName.AnimationOptions.StartDelay)
+        end
+
+        if not LoadAnim(ChosenDict) then
+            EmoteChatMessage("'" .. ename .. "' " .. Config.Languages[lang]['notvalidemote'] .. "")
+            return
+        end
+
+        if EmoteName.AnimationOptions then
+            if EmoteName.AnimationOptions.EmoteLoop then
+                MovementType = 1
+                if EmoteName.AnimationOptions.EmoteMoving then
+                    MovementType = 51 -- 110011
+                end
+
+            elseif EmoteName.AnimationOptions.EmoteMoving then
+                MovementType = 51 -- 110011
+            elseif EmoteName.AnimationOptions.EmoteMoving == false then
+                MovementType = 0
+            elseif EmoteName.AnimationOptions.EmoteStuck then
+                MovementType = 50 -- 110010
+            end
+
+        else
+            MovementType = 0
+        end
+
+        if InVehicle == 1 then
+            MovementType = 51
+        end
+
+        if EmoteName.AnimationOptions then
+            if EmoteName.AnimationOptions.EmoteDuration == nil then
+                EmoteName.AnimationOptions.EmoteDuration = -1
+                AttachWait = 0
+            else
+                AnimationDuration = EmoteName.AnimationOptions.EmoteDuration
+                AttachWait = EmoteName.AnimationOptions.EmoteDuration
+            end
+
+            if EmoteName.AnimationOptions.PtfxAsset then
+                PtfxAsset = EmoteName.AnimationOptions.PtfxAsset
+                PtfxName = EmoteName.AnimationOptions.PtfxName
+                if EmoteName.AnimationOptions.PtfxNoProp then
+                    PtfxNoProp = EmoteName.AnimationOptions.PtfxNoProp
+                else
+                    PtfxNoProp = false
+                end
+                Ptfx1, Ptfx2, Ptfx3, Ptfx4, Ptfx5, Ptfx6, PtfxScale = table.unpack(
+                    EmoteName.AnimationOptions.PtfxPlacement)
+                PtfxColor = EmoteName.AnimationOptions.PtfxColor
+                PtfxInfo = EmoteName.AnimationOptions.PtfxInfo
+                PtfxWait = EmoteName.AnimationOptions.PtfxWait
+                PtfxCanHold = EmoteName.AnimationOptions.PtfxCanHold
+                PtfxNotif = false
+                PtfxPrompt = true
+                -- RunAnimationThread() -- ? This call should not be required, see if needed with tests
+
+                TriggerServerEvent("rpemotes:ptfx:sync", PtfxAsset, PtfxName,
+                    vector3(Ptfx1, Ptfx2, Ptfx3), vector3(Ptfx4, Ptfx5, Ptfx6), PtfxScale, PtfxColor)
+            else
+                DebugPrint("Ptfx = none")
+                PtfxPrompt = false
+            end
+        end
+
+        TaskPlayAnim(PlayerPedId(), ChosenDict, ChosenAnimation, 5.0, 5.0, AnimationDuration, MovementType, 0, false, false, false)
+        RemoveAnimDict(ChosenDict)
+        IsInAnimation = true
+        RunAnimationThread()
+        MostRecentDict = ChosenDict
+        MostRecentAnimation = ChosenAnimation
+
+        if EmoteName.AnimationOptions then
+            if EmoteName.AnimationOptions.Prop then
+                PropName = EmoteName.AnimationOptions.Prop
+                PropBone = EmoteName.AnimationOptions.PropBone
+                PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6 = table.unpack(
+                    EmoteName.AnimationOptions.PropPlacement)
+                if EmoteName.AnimationOptions.SecondProp then
+                    SecondPropName = EmoteName.AnimationOptions.SecondProp
+                    SecondPropBone = EmoteName.AnimationOptions.SecondPropBone
+                    SecondPropPl1, SecondPropPl2, SecondPropPl3, SecondPropPl4, SecondPropPl5, SecondPropPl6 = table.unpack(
+                        EmoteName.AnimationOptions.SecondPropPlacement)
+                    SecondPropEmote = true
+                else
+                    SecondPropEmote = false
+                end
+                Wait(AttachWait)
+                if not AddPropToPlayer(PropName, PropBone, PropPl1, PropPl2, PropPl3, PropPl4, PropPl5, PropPl6,
+                    textureVariation) then
+                    return
+                end
+                if SecondPropEmote then
+                    if not AddPropToPlayer(SecondPropName, SecondPropBone, SecondPropPl1, SecondPropPl2,
+                        SecondPropPl3, SecondPropPl4, SecondPropPl5, SecondPropPl6, textureVariation) then
+                        DestroyAllProps()
+                        return
+                    end
+                end
+
+                -- Ptfx is on the prop, then we need to sync it
+                if EmoteName.AnimationOptions.PtfxAsset and not PtfxNoProp then
+                    TriggerServerEvent("rpemotes:ptfx:syncProp", ObjToNet(prop))
+                end
+            end
+        end
+    else
+        QBCore.Functions.Notify('Havada iken animasyon kullanamazsın', 'error')
     end
 end
 

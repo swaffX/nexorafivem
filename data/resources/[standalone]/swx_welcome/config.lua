@@ -33,12 +33,10 @@ Config.Messages = {
 }
 
 -- Başlangıç itemleri (qb-inventory için)
--- NOT: phone yerine white_phone (beyaz telefon), bandaj kaldırıldı, su eklendi
+-- NOT: Telefon ve kimlik kartları ak4y-multicharacter'dan veriliyor!
 Config.StarterItems = {
-    {name = 'white_phone', amount = 1},  -- Beyaz telefon (phone yerine)
-    {name = 'water', amount = 2},        -- Su (içecek)
+    {name = 'water', amount = 3},        -- Su (içecek)
     {name = 'sandwich', amount = 2},     -- Sandviç (yiyecek)
-    -- {name = 'bandage', amount = 3},   -- BANDAJ KALDIRILDI
 }
 
 -- Başlangıç parası

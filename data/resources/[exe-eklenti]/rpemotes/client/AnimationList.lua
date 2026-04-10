@@ -8277,6 +8277,7 @@ RP.Emotes = {
         "anim@heists@ornate_bank@hostages@hit",
         "hit_loop_ped_b",
         "Korkarak Otur",
+        animpos = true,
         AnimationOptions = {
             EmoteLoop = true,
         }
@@ -12116,6 +12117,7 @@ RP.PropEmotes = {
         "misssnowie@gatlax",
         "base",
         "Oturarak Gitar Çalma",
+        animpos = true,
         AnimationOptions = {
             Prop = "prop_acc_guitar_01",
             PropBone = 24818,

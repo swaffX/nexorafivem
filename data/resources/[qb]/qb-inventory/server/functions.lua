@@ -761,7 +761,7 @@ function AddItem(identifier, item, amount, slot, info, reason)
     local resourceName = GetInvokingResource() or 'qb-inventory'
    TriggerEvent(
     'qb-log:server:CreateLog',
-    'playerInventory',
+    'playerinventory',
     'Item Added',
     'green',
     '**Inventory:** ' .. invName .. ' (Slot: ' .. tostring(slot) .. ')\n' ..
