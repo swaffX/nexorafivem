@@ -23,6 +23,7 @@ window.addEventListener('message', function(event) {
 });
 
 function showSkillBar(data) {
+    console.log('[SWX Skills UI] showSkillBar:', data.skill, 'Level:', data.level, 'XP:', data.xp, '/', data.requiredXP);
     const skillBarsContainer = document.getElementById('skill-bars');
     
     // Eğer bu skill zaten gösteriliyorsa güncelle
@@ -35,11 +36,6 @@ function showSkillBar(data) {
     const skillBar = createSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
     skillBarsContainer.appendChild(skillBar);
     skillBars[data.skill] = skillBar;
-    
-    // Belirli süre sonra gizle
-    setTimeout(() => {
-        hideSkillBar(data.skill);
-    }, 5000);
 }
 
 function hideSkillBar(skillName) {
@@ -50,8 +46,14 @@ function hideSkillBar(skillName) {
 }
 
 function updateSkill(data) {
+    console.log('[SWX Skills UI] updateSkill:', data.skill, 'Level:', data.level, 'XP:', data.xp, '/', data.requiredXP);
+    
     if (skillBars[data.skill]) {
+        // Var olan barı güncelle
         updateSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
+    } else {
+        // Bar yoksa oluştur ve göster
+        showSkillBar(data);
     }
 }
 

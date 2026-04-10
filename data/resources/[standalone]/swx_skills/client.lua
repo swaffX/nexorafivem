@@ -14,11 +14,22 @@ end)
 
 -- Skill güncelleme
 RegisterNetEvent('swx_skills:updateSkill', function(skillName, level, xp, requiredXP)
-    if not playerSkills[skillName] then return end
-    if not Config or not Config.Skills or not Config.Skills[skillName] then return end
+    print('[SWX Skills] updateSkill received: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. xp)
+    
+    if not Config or not Config.Skills or not Config.Skills[skillName] then 
+        print('[SWX Skills] ERROR: Config not loaded for ' .. skillName)
+        return 
+    end
+    
+    -- playerSkills'i başlat (eğer boşsa)
+    if not playerSkills then
+        playerSkills = {}
+    end
     
     playerSkills[skillName] = level
     playerSkills[skillName .. '_xp'] = xp
+    
+    print('[SWX Skills] playerSkills updated: ' .. skillName .. ' = ' .. level .. ' (XP: ' .. xp .. ')')
     
     -- UI güncelle
     SendNUIMessage({
@@ -62,12 +73,20 @@ local function ShowSkillBarUpdate(skillName)
     if not Config or not Config.Skills or not Config.Skills[skillName] then return end
     
     local skillConfig = Config.Skills[skillName]
-    local level = (playerSkills and playerSkills[skillName]) or 1
-    local xp = (playerSkills and playerSkills[skillName .. '_xp']) or 0
+    
+    -- playerSkills'i kontrol et ve başlat
+    if not playerSkills then
+        playerSkills = {}
+    end
+    
+    local level = playerSkills[skillName] or 1
+    local currentXP = playerSkills[skillName .. '_xp'] or 0
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
     
-    -- accumulatedXP'den gelen toplam XP'i ekle (gösterim için)
-    local displayXP = xp + (accumulatedXP[skillName] or 0)
+    -- Toplam XP (database'deki + biriktirilen)
+    local displayXP = currentXP + (accumulatedXP[skillName] or 0)
+    
+    print('[SWX Skills] Showing bar: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. displayXP .. '/' .. requiredXP)
     
     SendNUIMessage({
         type = 'showSkillBar',

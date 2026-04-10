@@ -114,9 +114,11 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
         QBCore.Functions.Notify(src, skillConfig.label .. ' level ' .. currentLevel .. ' oldu!', 'success', 5000)
     end
     
-    -- Database güncelle
-    MySQL.update('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?', 
+    -- Database güncelle (await ile)
+    MySQL.update.await('UPDATE player_skills SET `' .. skillName .. '` = ?, `' .. skillName .. '_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?', 
         {currentLevel, currentXP, citizenid})
+    
+    print('[SWX Skills] Sending updateSkill to client: ' .. skillName .. ' Level: ' .. currentLevel .. ' XP: ' .. currentXP .. '/' .. requiredXP)
     
     -- Client'a güncel skill verilerini gönder
     TriggerClientEvent('swx_skills:updateSkill', src, skillName, currentLevel, currentXP, requiredXP)
