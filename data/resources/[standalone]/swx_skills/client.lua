@@ -68,8 +68,8 @@ RegisterNetEvent('swx_skills:levelUp', function(skillName, level)
     end)
 end)
 
--- Skill bar güncelleme göster
-local function ShowSkillBarUpdate(skillName)
+-- Skill bar güncelleme göster (xpToShow parametresi ile)
+local function ShowSkillBarUpdate(skillName, xpToShow)
     if not Config or not Config.Skills or not Config.Skills[skillName] then return end
     
     local skillConfig = Config.Skills[skillName]
@@ -83,8 +83,8 @@ local function ShowSkillBarUpdate(skillName)
     local currentXP = playerSkills[skillName .. '_xp'] or 0
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
     
-    -- Toplam XP (database'deki + biriktirilen)
-    local displayXP = currentXP + (accumulatedXP[skillName] or 0)
+    -- Gösterilecek XP (database'deki + yeni gelen)
+    local displayXP = currentXP + (xpToShow or 0)
     
     print('[SWX Skills] Showing bar: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. displayXP .. '/' .. requiredXP)
     
@@ -130,11 +130,14 @@ local function CheckXPGain(skillName, activity)
         
         -- Threshold'a ulaştıysa server'a gönder ve bar göster
         if accumulatedXP[skillName] >= (Config.XPThreshold or 10) then
-            TriggerServerEvent('swx_skills:addXP', skillName, accumulatedXP[skillName])
-            accumulatedXP[skillName] = 0 -- Sıfırla
+            local xpToSend = accumulatedXP[skillName] -- Kaydet
+            accumulatedXP[skillName] = 0 -- Hemen sıfırla
             
-            -- Skill bar göster
-            ShowSkillBarUpdate(skillName)
+            -- Skill bar göster (sıfırlanmadan önceki değerle)
+            ShowSkillBarUpdate(skillName, xpToSend)
+            
+            -- Server'a gönder
+            TriggerServerEvent('swx_skills:addXP', skillName, xpToSend)
         end
     end
 end
