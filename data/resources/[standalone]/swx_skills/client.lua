@@ -3,7 +3,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local playerSkills = {}
 local isRunning = false
 local isDriving = false
-local lastXPTime = 0
+local lastXPTime = { stamina = 0, driving = 0 } -- Her skill için ayrı cooldown
 local accumulatedXP = {} -- Her skill için biriktirilen XP
 
 -- Skill verilerini yükle
@@ -98,9 +98,10 @@ local function CheckXPGain(skillName, activity)
     local xpAmount = activityConfig[activity]
     local currentTime = GetGameTimer()
     
-    -- 1 saniye bekleme süresi
-    if currentTime - lastXPTime >= 1000 then
-        lastXPTime = currentTime
+    -- Her skill için ayrı 1 saniyelik cooldown
+    if not lastXPTime[skillName] then lastXPTime[skillName] = 0 end
+    if currentTime - lastXPTime[skillName] >= 1000 then
+        lastXPTime[skillName] = currentTime
         
         -- XP biriktir
         if not accumulatedXP[skillName] then
@@ -132,14 +133,18 @@ CreateThread(function()
     while true do
         Wait(1000)
         local ped = PlayerPedId()
+        local inVehicle = IsPedInAnyVehicle(ped, false)
 
         if IsPedSwimming(ped) then
             CheckXPGain('stamina', 'swimming')
         elseif IsPedOnAnyBike(ped) and GetEntitySpeed(ped) * 3.6 > 5 then
+            -- Motorsiklet/bisiklet: hareket ederken stamina kazan
             CheckXPGain('stamina', 'cycling')
-        elseif IsPedSprinting(ped) then
+        elseif not inVehicle and IsPedSprinting(ped) then
+            -- Araçta değilken sprint
             CheckXPGain('stamina', 'sprinting')
-        elseif IsPedRunning(ped) then
+        elseif not inVehicle and IsPedRunning(ped) then
+            -- Araçta değilken koşu
             CheckXPGain('stamina', 'running')
         end
     end

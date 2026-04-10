@@ -358,9 +358,21 @@ function PlayMusic(url, title)
             local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
             TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
             
-            -- Not: PlayUrlPos 3D pozisyonel ses için isPlaying() güvenilir çalışmıyor,
-            -- bu yüzden heartbeat kontrolü kaldırıldı. destroyOnFinish=false olduğu için
-            -- müzik manuel durdurulana ya da araçtan inilene kadar çalar.
+            -- Araç hareket ettikçe ses pozisyonunu güncelle
+            local trackedId = currentMusicId
+            CreateThread(function()
+                while isPlaying and currentMusicId == trackedId do
+                    Wait(250)
+                    local ped = PlayerPedId()
+                    local veh = GetVehiclePedIsIn(ped, false)
+                    if veh ~= 0 and DoesEntityExist(veh) then
+                        local newCoords = GetEntityCoords(veh)
+                        pcall(function()
+                            exports.xsound:Position(trackedId, newCoords)
+                        end)
+                    end
+                end
+            end)
             
             QBCore.Functions.Notify('Müzik çalıyor!', 'success')
             print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
