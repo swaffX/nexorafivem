@@ -1,7 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Database tablosu oluştur
-CreateThread(function()
+-- Database tablosu oluştur (MySQL hazır olunca)
+MySQL.ready(function()
     MySQL.query.await([[CREATE TABLE IF NOT EXISTS `player_skills` (
         `citizenid` VARCHAR(50) PRIMARY KEY,
         `stamina` INT DEFAULT 1,
