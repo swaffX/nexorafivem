@@ -317,14 +317,20 @@ function wFramework.GetPlayerMoney()
     elseif Config.Framework.Framework == "qbcore" then
         if Config.MoneySettings.isItem then
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from inventory")
-            
+            Config.Debug("[^2INFO - FRAMEWORK^0] Looking for item: " .. Config.MoneySettings.name)
+
             if playerData.items then
                 for _, item in pairs(playerData.items) do
+                    Config.Debug("[^2INFO - FRAMEWORK^0] Item found: " .. item.name .. " - " .. item.amount)
                     if item.name == Config.MoneySettings.name then
                         wFramework.Money.cash = item.amount
+                        Config.Debug("[^2INFO - FRAMEWORK^0] Found money item: " .. item.amount)
                         break
                     end
                 end
+                Config.Debug("[^2INFO - FRAMEWORK^0] Money item not found, cash remains: " .. wFramework.Money.cash)
+            else
+                Config.Debug("[^3WARNING - FRAMEWORK^0] playerData.items is nil")
             end
         else
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from data")
