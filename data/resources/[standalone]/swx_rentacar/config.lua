@@ -63,12 +63,16 @@ Config.Debug = false
 
 -- Araç Anahtarı Verme Fonksiyonu
 Config.GiveCarKeys = function(plate)
-    -- qb-vehiclekeys veya ps-vehiclekeys için
+    if not plate then return end
+    -- qb-vehiclekeys için (event)
     TriggerEvent('vehiclekeys:client:SetOwner', plate)
+    -- Alternatif: qb-vehiclekeys export (eğer varsa)
+    -- exports['qb-vehiclekeys']:GiveKeys(plate)
 end
 
 -- Araç Anahtarını Silme Fonksiyonu (çıkış yapınca / süre dolunca)
 Config.RemoveCarKeys = function(plate)
+    if not plate then return end
     -- qb-vehiclekeys için anahtarı sil
     TriggerEvent('vehiclekeys:client:RemoveOwner', plate)
 end

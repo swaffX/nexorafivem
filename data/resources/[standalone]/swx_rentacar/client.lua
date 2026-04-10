@@ -7,6 +7,12 @@ local GUIOpen = false
 local CurrentRentedVehicle = nil
 local RentStartTime = nil
 
+-- Trim fonksiyonu (plaka temizleme)
+function Trim(value)
+    if not value then return nil end
+    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
+end
+
 -- NPC Spawn
 local function SpawnNPC()
     -- Zaten NPC varsa spawn etme (cift NPC onlemek icin)
@@ -242,10 +248,11 @@ local function SpawnRentedVehicle(vehicleData)
     -- Yakıt
     SetVehicleFuelLevel(vehicle, 100.0)
 
-    -- Kilit AÇIK (her zaman erişilebilir)
-    SetVehicleDoorsLocked(vehicle, 1) -- 1 = unlocked
-    SetVehicleDoorsLockedForAllPlayers(vehicle, false)
-    SetVehicleNeedsToBeHotwired(vehicle, false)
+    -- Kilit AYARLARI - Oyuncu kapıları açabilsin
+    SetVehicleDoorsLocked(vehicle, 0) -- 0 = kapılar açık
+    SetVehicleDoorsLockedForPlayer(vehicle, PlayerId(), false) -- Oyuncu için kilidi aç
+    SetVehicleNeedsToBeHotwired(vehicle, false) -- Hotwire gerektirmesin
+    SetVehicleHasBeenOwnedByPlayer(vehicle, true) -- Oyuncunun sahipliğini ayarla
 
     -- Temizlik
     SetModelAsNoLongerNeeded(vehicleData.model)
@@ -258,6 +265,9 @@ local function SpawnRentedVehicle(vehicleData)
     local plate = GetVehicleNumberPlateText(vehicle)
     if plate then
         plate = Trim(plate)
+        if Config.Debug then
+            print('[SWX-RentACar] Anahtar veriliyor: ' .. tostring(plate))
+        end
         Config.GiveCarKeys(plate)
     end
 
