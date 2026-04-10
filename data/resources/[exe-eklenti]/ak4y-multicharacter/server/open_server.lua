@@ -45,6 +45,21 @@ function GiveStarterItems(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
+    -- Karakterin daha önce starter item alıp almadığını kontrol et (inventory'de var mı?)
+    local hasStarterItems = false
+    for _, v in pairs(AK4Y.StarterItems) do
+        local item = Player.Functions.GetItemByName(v.item)
+        if item and item.amount > 0 then
+            hasStarterItems = true
+            break
+        end
+    end
+
+    if hasStarterItems then
+        print('^3[AK4Y-MultiChar] Karakter zaten starter itemlere sahip: ' .. Player.PlayerData.citizenid)
+        return
+    end
+
     for _, v in pairs(AK4Y.StarterItems) do
         local info = {}
         if v.item == "id_card" then
@@ -63,6 +78,8 @@ function GiveStarterItems(source)
         Player.Functions.AddItem(v.item, v.amount, false, info)
         TriggerEvent("", "karakterlog", "", "karakterlog", "``" .. GetPlayerIdentifiers(src)[1] .. "(".. src ..")``, İdli Kişi  **" .. Player.PlayerData.charinfo.firstname .. " " .. Player.PlayerData.charinfo.lastname .. " - Adında Karakter Oluşturdu**")
     end
+
+    print('^2[AK4Y-MultiChar] Starter itemler verildi: ' .. Player.PlayerData.citizenid)
 end
 
 
