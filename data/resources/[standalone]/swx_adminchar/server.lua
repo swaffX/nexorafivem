@@ -11,33 +11,31 @@ QBCore.Commands.Add("delchar", "Karakter Sil (Admin - CitizenID)", {{name = "cit
     end
     
     -- Karakter var mı kontrol et
-    MySQL.query('SELECT * FROM players WHERE citizenid = ?', {citizenid}, function(result)
-        if result and #result > 0 then
-            local playerData = result[1]
-            local charName = playerData.charinfo and json.decode(playerData.charinfo).firstname .. " " .. json.decode(playerData.charinfo).lastname or "Bilinmiyor"
-            
-            -- İlişkili tabloları sil (sadece var olan tablolar)
-            MySQL.query('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM player_contacts WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
-            MySQL.query('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
-            MySQL.query('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
-            
-            -- Ana karakter kaydını sil
-            MySQL.query('DELETE FROM players WHERE citizenid = ?', {citizenid}, function(delResult)
-                if delResult and delResult.affectedRows > 0 then
-                    TriggerClientEvent('QBCore:Notify', src, "Karakter silindi: " .. charName .. " (" .. citizenid .. ")", "success")
-                    print("^2[SWX-AdminChar] Karakter silindi: " .. charName .. " | CitizenID: " .. citizenid .. "^7")
-                else
-                    TriggerClientEvent('QBCore:Notify', src, "Karakter silinirken hata oluştu!", "error")
-                end
-            end)
+    local result = MySQL.query.await('SELECT * FROM players WHERE citizenid = ?', {citizenid})
+    if result and #result > 0 then
+        local playerData = result[1]
+        local charName = playerData.charinfo and json.decode(playerData.charinfo).firstname .. " " .. json.decode(playerData.charinfo).lastname or "Bilinmiyor"
+        
+        -- İlişkili tabloları sil (sadece var olan tablolar)
+        MySQL.query.await('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
+        MySQL.query.await('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
+        MySQL.query.await('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
+        MySQL.query.await('DELETE FROM player_contacts WHERE citizenid = ?', {citizenid})
+        MySQL.query.await('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
+        MySQL.query.await('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
+        MySQL.query.await('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
+        
+        -- Ana karakter kaydını sil
+        local delResult = MySQL.query.await('DELETE FROM players WHERE citizenid = ?', {citizenid})
+        if delResult and delResult.affectedRows > 0 then
+            TriggerClientEvent('QBCore:Notify', src, "Karakter silindi: " .. charName .. " (" .. citizenid .. ")", "success")
+            print("^2[SWX-AdminChar] Karakter silindi: " .. charName .. " | CitizenID: " .. citizenid .. "^7")
         else
-            TriggerClientEvent('QBCore:Notify', src, "Bu CitizenID'ye sahip karakter bulunamadı!", "error")
+            TriggerClientEvent('QBCore:Notify', src, "Karakter silinirken hata oluştu!", "error")
         end
-    end)
+    else
+        TriggerClientEvent('QBCore:Notify', src, "Bu CitizenID'ye sahip karakter bulunamadı!", "error")
+    end
 end, "admin")
 
 -- Admin: Oyuncu ID'sine göre karakter sil (online oyuncu)
@@ -67,23 +65,22 @@ QBCore.Commands.Add("delcharid", "Online Oyuncu Karakterini Sil (Admin)", {{name
     Citizen.Wait(1000)
     
     -- İlişkili tabloları sil (sadece var olan tablolar)
-    MySQL.query('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM player_contacts WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
-    MySQL.query('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
-    MySQL.query('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM player_vehicles WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM player_houses WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM player_outfits WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM player_contacts WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM playerskins WHERE citizenid = ?', {citizenid})
+    MySQL.query.await('DELETE FROM stashitems WHERE stash LIKE ?', {"%"..citizenid.."%"})
+    MySQL.query.await('DELETE FROM apartments WHERE citizenid = ?', {citizenid})
     
     -- Ana karakter kaydını sil
-    MySQL.query('DELETE FROM players WHERE citizenid = ?', {citizenid}, function(delResult)
-        if delResult and delResult.affectedRows > 0 then
-            TriggerClientEvent('QBCore:Notify', src, "Karakter silindi: " .. charName .. " (" .. citizenid .. ")", "success")
-            print("^2[SWX-AdminChar] Online oyuncu karakteri silindi: " .. charName .. " | CitizenID: " .. citizenid .. "^7")
-        else
-            TriggerClientEvent('QBCore:Notify', src, "Karakter silinirken hata oluştu!", "error")
-        end
-    end)
+    local delResult = MySQL.query.await('DELETE FROM players WHERE citizenid = ?', {citizenid})
+    if delResult and delResult.affectedRows > 0 then
+        TriggerClientEvent('QBCore:Notify', src, "Karakter silindi: " .. charName .. " (" .. citizenid .. ")", "success")
+        print("^2[SWX-AdminChar] Online oyuncu karakteri silindi: " .. charName .. " | CitizenID: " .. citizenid .. "^7")
+    else
+        TriggerClientEvent('QBCore:Notify', src, "Karakter silinirken hata oluştu!", "error")
+    end
 end, "admin")
 
 -- Admin: Tüm karakterleri listele
@@ -97,27 +94,26 @@ QBCore.Commands.Add("listchars", "Tüm Karakterleri Listele", {{name = "name", h
     end
     query = query .. " LIMIT 50"
     
-    MySQL.query(query, {}, function(results)
-        if results and #results > 0 then
-            print("^2[SWX-AdminChar] Karakter Listesi:^7")
-            for _, player in ipairs(results) do
-                local charinfo = json.decode(player.charinfo) or {}
-                local name = (charinfo.firstname or "") .. " " .. (charinfo.lastname or "")
-                local job = json.decode(player.job) or {}
-                local money = json.decode(player.money) or {}
-                
-                print(string.format("  - %s | %s | Meslek: %s | Nakit: $%s", 
-                    player.citizenid, 
-                    name,
-                    job.label or "Yok",
-                    money.cash or 0
-                ))
-            end
-            TriggerClientEvent('QBCore:Notify', src, #results .. " karakter listelendi (console'da görüntüleyin)", "success")
-        else
-            TriggerClientEvent('QBCore:Notify', src, "Karakter bulunamadı!", "error")
+    local results = MySQL.query.await(query, {})
+    if results and #results > 0 then
+        print("^2[SWX-AdminChar] Karakter Listesi:^7")
+        for _, player in ipairs(results) do
+            local charinfo = json.decode(player.charinfo) or {}
+            local name = (charinfo.firstname or "") .. " " .. (charinfo.lastname or "")
+            local job = json.decode(player.job) or {}
+            local money = json.decode(player.money) or {}
+            
+            print(string.format("  - %s | %s | Meslek: %s | Nakit: $%s", 
+                player.citizenid, 
+                name,
+                job.label or "Yok",
+                money.cash or 0
+            ))
         end
-    end)
+        TriggerClientEvent('QBCore:Notify', src, #results .. " karakter listelendi (console'da görüntüleyin)", "success")
+    else
+        TriggerClientEvent('QBCore:Notify', src, "Karakter bulunamadı!", "error")
+    end
 end, "admin")
 
 -- Admin: Tüm karakterleri sil (DİKKAT: GERİ DÖNÜŞÜZ)
@@ -125,34 +121,32 @@ QBCore.Commands.Add("delallchars", "Tüm Karakterleri Sil (DİKKAT: Geri Dönü�
     local src = source
     
     -- Önce kaç karakter olduğunu say
-    MySQL.query('SELECT COUNT(*) as count FROM players', {}, function(countResult)
-        local charCount = countResult[1].count
-        
-        if charCount == 0 then
-            TriggerClientEvent('QBCore:Notify', src, "Silinecek karakter bulunamadı!", "error")
-            return
-        end
-        
-        -- İlişkili tabloları temizle
-        MySQL.query('DELETE FROM player_vehicles')
-        MySQL.query('DELETE FROM player_houses')
-        MySQL.query('DELETE FROM player_outfits')
-        MySQL.query('DELETE FROM player_contacts')
-        MySQL.query('DELETE FROM playerskins')
-        MySQL.query('DELETE FROM stashitems')
-        MySQL.query('DELETE FROM apartments')
-        
-        -- Ana karakter kayıtlarını sil
-        MySQL.query('DELETE FROM players', function(delResult)
-            if delResult and delResult.affectedRows > 0 then
-                TriggerClientEvent('QBCore:Notify', src, charCount .. " karakter başarıyla silindi!", "success")
-                print("^2[SWX-AdminChar] TÜM KARAKTERLER SİLİNDİ: " .. charCount .. " karakter^7")
-                print("^3[SWX-AdminChar] Bu işlem geri alınamaz!^7")
-            else
-                TriggerClientEvent('QBCore:Notify', src, "Karakterler silinirken hata oluştu!", "error")
-            end
-        end)
-    end)
+    local countResult = MySQL.query.await('SELECT COUNT(*) as count FROM players', {})
+    local charCount = countResult[1].count
+    
+    if charCount == 0 then
+        TriggerClientEvent('QBCore:Notify', src, "Silinecek karakter bulunamadı!", "error")
+        return
+    end
+    
+    -- İlişkili tabloları temizle
+    MySQL.query.await('DELETE FROM player_vehicles')
+    MySQL.query.await('DELETE FROM player_houses')
+    MySQL.query.await('DELETE FROM player_outfits')
+    MySQL.query.await('DELETE FROM player_contacts')
+    MySQL.query.await('DELETE FROM playerskins')
+    MySQL.query.await('DELETE FROM stashitems')
+    MySQL.query.await('DELETE FROM apartments')
+    
+    -- Ana karakter kayıtlarını sil
+    local delResult = MySQL.query.await('DELETE FROM players')
+    if delResult and delResult.affectedRows > 0 then
+        TriggerClientEvent('QBCore:Notify', src, charCount .. " karakter başarıyla silindi!", "success")
+        print("^2[SWX-AdminChar] TÜM KARAKTERLER SİLİNDİ: " .. charCount .. " karakter^7")
+        print("^3[SWX-AdminChar] Bu işlem geri alınamaz!^7")
+    else
+        TriggerClientEvent('QBCore:Notify', src, "Karakterler silinirken hata oluştu!", "error")
+    end
 end, "admin")
 
 print("^2[SWX-AdminChar] Admin Character Delete Tool yüklendi!^7")
