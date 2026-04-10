@@ -1,5 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- Load config
+local configFile = LoadResourceFile(GetCurrentResourceName(), 'config.lua')
+assert(load(configFile))()
+
 local playerSkills = {}
 local isRunning = false
 local isDriving = false
@@ -171,10 +175,11 @@ end)
 -- Login olduğunda skill verilerini iste
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     Wait(2000)
-    local skills = lib.callback.await('swx_skills:getSkills', false)
-    if skills then
-        playerSkills = skills
-    end
+    QBCore.Functions.TriggerCallback('swx_skills:getSkills', function(skills)
+        if skills then
+            playerSkills = skills
+        end
+    end)
 end)
 
 print('[SWX Skills] Client yüklendi!')
