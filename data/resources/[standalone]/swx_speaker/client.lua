@@ -318,17 +318,9 @@ function PlayMusic(url, title)
             local coords = GetEntityCoords(vehicle)
             local playerId = GetPlayerServerId(PlayerId())
             
-            -- 3D pozisyonel ses - TÜM OYUNCULAR DUYABİLSİN
-            -- isNetworked=true ile diger oyunculara senkronize ediliyor
-            exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
-                isNetworked = true,
-                maxDistance = currentDistance,
-                rolloffFactor = 0.001,      -- Sıfıra yakın: mesafe seş seviyesini etkilemiyor
-                refDistance = currentDistance, -- maxDistance kadar: alan içinde hep tam ses
-                coneInnerAngle = 360,
-                coneOuterAngle = 360,
-                coneOuterGain = 1.0
-            })
+            -- Sabit ses (non-positional): mesafe/konum hesabı yok, kıpırdamıyor
+            -- Diğer oyuncular server sync event ile kendi positional seslerini yönetiyor
+            exports.xsound:PlayUrl(currentMusicId, url, currentVolume, false)
             
             -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
             exports.xsound:destroyOnFinish(currentMusicId, false)
@@ -357,22 +349,6 @@ function PlayMusic(url, title)
             -- DİGER OYUNCULARA MÜZİK BİLGİSİNİ GÖNDER
             local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
             TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
-            
-            -- Araç hareket ettikçe ses pozisyonunu güncelle
-            local trackedId = currentMusicId
-            CreateThread(function()
-                while isPlaying and currentMusicId == trackedId do
-                    Wait(1000) -- refDistance geniş olduğu için sık güncelleme gerekmiyor, 1 sn yeterli
-                    local ped = PlayerPedId()
-                    local veh = GetVehiclePedIsIn(ped, false)
-                    if veh ~= 0 and DoesEntityExist(veh) then
-                        local newCoords = GetEntityCoords(veh)
-                        pcall(function()
-                            exports.xsound:Position(trackedId, newCoords)
-                        end)
-                    end
-                end
-            end)
             
             QBCore.Functions.Notify('Müzik çalıyor!', 'success')
             print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
@@ -814,10 +790,10 @@ function PlaylistSongActionMenu(song, index)
     lib.showContext('playlist_song_action_menu')
 end
 
--- Araçtan inince durdur (Geliştirilmiş kontrol)
+-- Araçtan inince durdur (debounce: 3 saniye üst üste araçta değilse durdur)
 CreateThread(function()
     local wasInVehicle = false
-    local lastVehicle = nil
+    local notInVehicleCount = 0
     
     while true do
         Wait(1000)
@@ -827,31 +803,35 @@ CreateThread(function()
             local currentVehicle = GetVehiclePedIsIn(ped, false)
             local inVehicle = currentVehicle ~= 0
             
-            -- Debug log
-            if wasInVehicle ~= inVehicle then
-                print(string.format('[SWX Speaker Debug] Araç durumu değişti: wasInVehicle=%s, inVehicle=%s, vehicle=%d', 
-                    tostring(wasInVehicle), tostring(inVehicle), currentVehicle))
-            end
-            
-            -- Sadece araçtan tamamen indiğinde durdur
-            if wasInVehicle and not inVehicle then
-                print('[SWX Speaker] Araçtan indi, müzik durduruluyor')
-                if currentMusicId then
-                    exports.xsound:Destroy(currentMusicId)
-                    currentMusicId = nil
-                    isPlaying = false
-                    isPaused = false
-                    currentSongTitle = nil
-                    TriggerEvent('swx_carplay:stop')
+            if inVehicle then
+                -- Araçta: sayıcıyı sıfırla, durumu güncelle
+                notInVehicleCount = 0
+                wasInVehicle = true
+            else
+                -- Araçta değil: sadece sayıcı arttsın
+                if wasInVehicle then
+                    notInVehicleCount = notInVehicleCount + 1
+                    
+                    -- 3 saniye üst üste araçta değilse gerçekten indi
+                    if notInVehicleCount >= 3 then
+                        print('[SWX Speaker] Araçtan indi (3s onay), müzik durduruluyor')
+                        if currentMusicId then
+                            exports.xsound:Destroy(currentMusicId)
+                            currentMusicId = nil
+                            isPlaying = false
+                            isPaused = false
+                            currentSongTitle = nil
+                            TriggerEvent('swx_carplay:stop')
+                        end
+                        wasInVehicle = false
+                        notInVehicleCount = 0
+                    end
                 end
             end
-            
-            wasInVehicle = inVehicle
-            lastVehicle = currentVehicle
         else
-            -- Müzik çalmıyorsa durumu sıfırla
+            -- Müzik çalmıyorsa sıfırla
             wasInVehicle = false
-            lastVehicle = nil
+            notInVehicleCount = 0
         end
     end
 end)
