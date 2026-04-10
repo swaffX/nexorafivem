@@ -68,31 +68,23 @@ RegisterNetEvent('swx_skills:levelUp', function(skillName, level)
     end)
 end)
 
--- Skill bar güncelleme göster (xpToShow parametresi ile)
-local function ShowSkillBarUpdate(skillName, xpToShow)
+-- Skill bar güncelleme göster
+local function ShowSkillBarUpdate(skillName)
     if not Config or not Config.Skills or not Config.Skills[skillName] then return end
+    if not playerSkills then playerSkills = {} end
     
     local skillConfig = Config.Skills[skillName]
-    
-    -- playerSkills'i kontrol et ve başlat
-    if not playerSkills then
-        playerSkills = {}
-    end
-    
-    local level = playerSkills[skillName] or 1
+    local level     = playerSkills[skillName] or 1
     local currentXP = playerSkills[skillName .. '_xp'] or 0
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
     
-    -- Gösterilecek XP (database'deki + yeni gelen)
-    local displayXP = currentXP + (xpToShow or 0)
-    
-    print('[SWX Skills] Showing bar: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. displayXP .. '/' .. requiredXP)
+    print('[SWX Skills] Showing bar: ' .. skillName .. ' Level: ' .. level .. ' XP: ' .. currentXP .. '/' .. requiredXP)
     
     SendNUIMessage({
         type = 'showSkillBar',
         skill = skillName,
         level = level,
-        xp = displayXP,
+        xp = currentXP,
         requiredXP = requiredXP,
         config = skillConfig
     })
@@ -133,10 +125,15 @@ local function CheckXPGain(skillName, activity)
             local xpToSend = accumulatedXP[skillName] -- Kaydet
             accumulatedXP[skillName] = 0 -- Hemen sıfırla
             
-            -- Skill bar göster (sıfırlanmadan önceki değerle)
-            ShowSkillBarUpdate(skillName, xpToSend)
+            -- Lokalde hemen güncelle (server cevabı beklemeden)
+            if not playerSkills then playerSkills = {} end
+            playerSkills[skillName] = playerSkills[skillName] or 1
+            playerSkills[skillName .. '_xp'] = (playerSkills[skillName .. '_xp'] or 0) + xpToSend
             
-            -- Server'a gönder
+            -- Skill bar göster
+            ShowSkillBarUpdate(skillName, 0)
+            
+            -- Server'a gönder (database kayıt + doğrulama için)
             TriggerServerEvent('swx_skills:addXP', skillName, xpToSend)
         end
     end
