@@ -1,9 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Load config
-local configFile = LoadResourceFile(GetCurrentResourceName(), 'config.lua')
-assert(load(configFile))()
-
 local playerSkills = {}
 local isRunning = false
 local isDriving = false

@@ -5,6 +5,7 @@ description 'SWX Skills - Skill Level System with XP and Stat Bonuses'
 author 'SWX'
 version '1.0.0'
 
+shared_script 'config.lua'
 client_script 'client.lua'
 server_script 'server.lua'
 
@@ -17,6 +18,5 @@ files {
 }
 
 dependencies {
-    'qb-core',
-    'ox_lib'
+    'qb-core'
 }

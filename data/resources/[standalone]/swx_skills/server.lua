@@ -19,9 +19,9 @@ MySQL.query([[CREATE TABLE IF NOT EXISTS `player_skills` (
 )]])
 
 -- Oyuncunun skillerini al
-lib.callback.register('swx_skills:getSkills', function(source)
+QBCore.Functions.CreateCallback('swx_skills:getSkills', function(source, cb)
     local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return nil end
+    if not Player then cb(nil); return end
     
     local citizenid = Player.PlayerData.citizenid
     local result = MySQL.query.await('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
@@ -29,17 +29,17 @@ lib.callback.register('swx_skills:getSkills', function(source)
     if not result or not result[1] then
         -- Yeni kayıt oluştur
         MySQL.insert('INSERT INTO player_skills (citizenid) VALUES (?)', {citizenid})
-        return {
+        cb({
             stamina = 1, stamina_xp = 0,
             driving = 1, driving_xp = 0,
             strength = 1, strength_xp = 0,
             shooting = 1, shooting_xp = 0,
             luck = 1, luck_xp = 0,
             fishing = 1, fishing_xp = 0
-        }
+        })
+    else
+        cb(result[1])
     end
-    
-    return result[1]
 end)
 
 -- XP ekle
@@ -84,11 +84,7 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
         TriggerClientEvent('swx_skills:levelUp', src, skillName, currentLevel)
         
         -- Bildirim gönder
-        TriggerClientEvent('ox_lib:notify', src, {
-            type = 'success',
-            description = skillConfig.label .. ' level ' .. currentLevel .. ' oldu!',
-            duration = 5000
-        })
+        QBCore.Functions.Notify(src, skillConfig.label .. ' level ' .. currentLevel .. ' oldu!', 'success', 5000)
     end
     
     -- Database güncelle
@@ -155,10 +151,8 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {}, false, function(s
     if Config.Skills[skillName] then
         TriggerEvent('swx_skills:addXP', source, skillName, amount)
     else
-        TriggerClientEvent('ox_lib:notify', source, {
-            type = 'error',
-            description = 'Geçersiz skill adı!'
-        })
-    end, 'admin')
+        QBCore.Functions.Notify(source, 'Geçersiz skill adı!', 'error', 5000)
+    end
+end, 'admin')
 
 print('[SWX Skills] Server yüklendi!')
