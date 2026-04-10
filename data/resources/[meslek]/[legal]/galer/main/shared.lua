@@ -102,9 +102,7 @@ Config.Vehicles = {
             {model='police',     label='Police',          price=1600,    category='armor'},
             {model='police2',    label='Police 2',        price=2600,    category='armor'},
             {model='police3',    label='Police 3',        price=3600,    category='armor'},
-            -- pdexe Özel Araçlar (pdbike, mrap, hellancpd, nk araçları)
-            {model='hellancpd',  label='Hellan CPD',      price=5200,    category='armor'},
-            {model='mrap',       label='MRAP',            price=8500,    category='armor'},
+            -- pdexe Özel Araçlar (pdbike, nk araçları)
             {model='nkbuffalos', label='Buffalo Police',  price=4200,    category='armor'},
             {model='nkcoquette', label='Coquette Police', price=5500,    category='armor'},
             {model='nkcruiser',  label='Cruiser Police',  price=3800,    category='armor'},
