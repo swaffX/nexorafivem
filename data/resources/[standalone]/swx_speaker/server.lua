@@ -45,12 +45,10 @@ RegisterNetEvent('swx_speaker:installSpeaker', function(plate)
             return
         end
         
-        -- Hoparlör tak
         MySQL.Async.execute('INSERT INTO vehicle_speakers (plate, citizenid) VALUES (?, ?)', {plate, citizenid}, function(affectedRows)
             if affectedRows > 0 then
-                -- Item'den sil
                 Player.Functions.RemoveItem('car_speaker', 1)
-                TriggerClientEvent('QBCore:Notify', src, 'Hoparlör araca takıldı!', 'success')
+                TriggerClientEvent('swx_speaker:client:speakerInstalled', src)
                 print('[SWX Speaker] Hoparlör takıldı: ' .. plate .. ' | CitizenID: ' .. citizenid)
             else
                 TriggerClientEvent('QBCore:Notify', src, 'Hoparlör takılamadı!', 'error')
@@ -77,9 +75,9 @@ RegisterNetEvent('swx_speaker:removeSpeaker', function(plate)
             if speaker.citizenid == citizenid or QBCore.Functions.HasPermission(src, 'admin') then
                 MySQL.Async.execute('DELETE FROM vehicle_speakers WHERE plate = ?', {plate}, function(affectedRows)
                     if affectedRows > 0 then
-                        -- Item'i geri ver
                         Player.Functions.AddItem('car_speaker', 1)
                         TriggerClientEvent('QBCore:Notify', src, 'Hoparlör araçtan söküldü!', 'success')
+                        TriggerClientEvent('swx_speaker:client:speakerRemoved', src)
                         print('[SWX Speaker] Hoparlör söküldü: ' .. plate)
                     else
                         TriggerClientEvent('QBCore:Notify', src, 'Hoparlör sökülemedi!', 'error')

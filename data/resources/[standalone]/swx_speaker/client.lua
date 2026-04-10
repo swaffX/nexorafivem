@@ -20,6 +20,26 @@ local isTransitioning = false -- Geçiş animasyonu aktif mi?
 -- Remote müzikleri takip için
 local remoteMusicTracks = {}
 
+-- Hoparlör söküldüğünde müzik durdur
+RegisterNetEvent('swx_speaker:client:speakerRemoved')
+AddEventHandler('swx_speaker:client:speakerRemoved', function()
+    if currentMusicId then
+        exports.xsound:Destroy(currentMusicId)
+        currentMusicId = nil
+        isPlaying = false
+        isPaused = false
+        currentSongTitle = nil
+        TriggerEvent('swx_carplay:stop')
+    end
+    QBCore.Functions.Notify('Hoparlör söküldü, müzik durduruldu.', 'error')
+end)
+
+-- Hoparlör takıldı bildirim
+RegisterNetEvent('swx_speaker:client:speakerInstalled')
+AddEventHandler('swx_speaker:client:speakerInstalled', function()
+    QBCore.Functions.Notify('Hoparlör başarıyla takıldı!', 'success')
+end)
+
 -- Oyuncu spawn olduğunda geçmişi yükle
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent('swx_speaker:server:loadHistory')
@@ -208,7 +228,19 @@ function InstallSpeakerDialog(plate)
                 description = 'Hoparlörü araca tak',
                 icon = 'check',
                 onSelect = function()
-                    TriggerServerEvent('swx_speaker:installSpeaker', plate)
+                    local success = lib.progressBar({
+                        duration = 4000,
+                        label = 'Hoparlör takılıyor...',
+                        useWhileDead = false,
+                        canCancel = true,
+                        disable = { move = true, car = true, combat = true, sprint = true },
+                        anim = { dict = 'mini@repair', clip = 'fixing_a_player' }
+                    })
+                    if success then
+                        TriggerServerEvent('swx_speaker:installSpeaker', plate)
+                    else
+                        QBCore.Functions.Notify('Hoparlör takma iptal edildi.', 'error')
+                    end
                 end
             },
             {
