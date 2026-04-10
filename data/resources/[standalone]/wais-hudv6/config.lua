@@ -90,9 +90,9 @@ Config.Commands = {
 
 Config.MoneySettings = {
     ["name"] = "money",
-    ["isItem"] = false, -- If your money is in the form of items, make it `true`. If you are using ox_inventory, make it `false`.
+    ["isItem"] = true, -- If your money is in the form of items, make it `true`. If you are using ox_inventory, make it `false`.
     ["isOldType"] = false, -- If you have an old ESX Version or Chezza Inventory etc. If you are using esx with an old infrastructure, make `true`. If you do not know what you are doing, please leave it as `false`
-    
+
     -- [[ 🟢 Inventory detections, to work automatically compatible with some inventories. 🟢 ]]
     ["qs_inventory"] = GetResourceState("qs-inventory"):find("start") and true or false,
     ["ox_inventory"] = GetResourceState("ox_inventory"):find("start") and true or false,
