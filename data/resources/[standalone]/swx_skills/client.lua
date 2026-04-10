@@ -147,7 +147,7 @@ CreateThread(function()
 
         if IsPedSwimming(ped) then
             CheckXPGain('stamina', 'swimming')
-        elseif IsPedOnBike(ped) and GetEntitySpeed(ped) * 3.6 > 5 then
+        elseif IsPedOnAnyBike(ped) and GetEntitySpeed(ped) * 3.6 > 5 then
             CheckXPGain('stamina', 'cycling')
         elseif IsPedSprinting(ped) then
             CheckXPGain('stamina', 'sprinting')
@@ -219,14 +219,27 @@ RegisterNUICallback('closeUI', function(data, cb)
     cb({})
 end)
 
--- Login olduğunda skill verilerini iste
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+local function LoadSkills()
     Wait(2000)
     QBCore.Functions.TriggerCallback('swx_skills:getSkills', function(skills)
         if skills then
             playerSkills = skills
+            print('[SWX Skills] Skill verileri yüklendi')
         end
     end)
+end
+
+-- Login olduğunda skill verilerini iste
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    LoadSkills()
+end)
+
+-- Resource restart olduğunda verileri koru
+AddEventHandler('onResourceStart', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then return end
+    if LocalPlayer.state.isLoggedIn then
+        LoadSkills()
+    end
 end)
 
 print('[SWX Skills] Client yüklendi!')
