@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +7,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
     background: transparent;
     overflow: hidden;
 }
@@ -20,163 +22,186 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .inventory-container {
     display: flex;
-    gap: 15px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid rgba(0, 212, 255, 0.3);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    max-width: 1200px;
-    width: 95%;
+    gap: 12px;
+    background: #1a1d29;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    max-width: 1100px;
+    width: 92%;
 }
 
-/* Kıyafet Paneli */
+/* Kıyafet Paneli - ox_lib tarzı */
 .clothing-panel {
-    width: 200px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 10px;
-    padding: 15px;
+    width: 220px;
+    background: #14161f;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .clothing-panel h2 {
-    color: #00d4ff;
-    font-size: 16px;
-    margin-bottom: 15px;
-    text-align: center;
-    border-bottom: 2px solid #00d4ff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
     padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clothing-panel h2 i {
+    color: #4a9eff;
+    font-size: 14px;
 }
 
 .clothing-slots {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 .clothing-slot {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(0, 212, 255, 0.2);
-    border-radius: 8px;
-    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     position: relative;
-    transition: all 0.3s;
+    transition: all 0.15s ease;
     cursor: pointer;
 }
 
 .clothing-slot:hover {
-    border-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.1);
-    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(74, 158, 255, 0.4);
 }
 
 .clothing-slot i {
-    color: #00d4ff;
-    font-size: 18px;
-    width: 25px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    width: 20px;
     text-align: center;
+    transition: color 0.15s;
+}
+
+.clothing-slot:hover i {
+    color: #4a9eff;
 }
 
 .clothing-slot span {
-    color: #fff;
-    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 500;
     flex: 1;
 }
 
 .clothing-slot .remove-btn {
-    background: rgba(255, 0, 0, 0.3);
+    background: rgba(239, 68, 68, 0.15);
     border: none;
-    color: #ff4444;
-    width: 24px;
-    height: 24px;
+    color: #ef4444;
+    width: 22px;
+    height: 22px;
     border-radius: 4px;
     cursor: pointer;
     display: none;
-    transition: all 0.3s;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
 }
 
 .clothing-slot:hover .remove-btn {
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .clothing-slot .remove-btn:hover {
-    background: rgba(255, 0, 0, 0.5);
+    background: rgba(239, 68, 68, 0.3);
 }
 
 .clothing-slot.has-item {
-    border-color: #00ff88;
-    background: rgba(0, 255, 136, 0.1);
+    background: rgba(74, 158, 255, 0.08);
+    border-color: rgba(74, 158, 255, 0.25);
 }
 
 .clothing-slot.has-item i {
-    color: #00ff88;
+    color: #4a9eff;
 }
 
-/* Envanter Paneli */
+/* Envanter Paneli - ox_lib tarzı */
 .inventory-panel {
     flex: 1;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 10px;
-    padding: 15px;
+    background: #14161f;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .inventory-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     padding-bottom: 10px;
-    border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .inventory-header h2 {
-    color: #00d4ff;
-    font-size: 18px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inventory-header h2 i {
+    color: #4a9eff;
+    font-size: 14px;
 }
 
 .weight-info {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.6);
     font-size: 12px;
     text-align: right;
 }
 
 .weight-bar {
-    width: 150px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    margin-top: 5px;
+    width: 120px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    margin-top: 4px;
     overflow: hidden;
 }
 
 .weight-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00d4ff, #00ff88);
-    border-radius: 3px;
+    background: #4a9eff;
+    border-radius: 2px;
     transition: width 0.3s;
 }
 
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 8px;
-    min-height: 400px;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
 }
 
 .inv-slot {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(0, 212, 255, 0.2);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
     aspect-ratio: 1;
     display: flex;
     flex-direction: column;
@@ -184,31 +209,30 @@ body {
     justify-content: center;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.15s ease;
 }
 
 .inv-slot:hover {
-    border-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.1);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(74, 158, 255, 0.4);
 }
 
 .inv-slot.occupied {
-    border-color: #00ff88;
-    background: rgba(0, 255, 136, 0.1);
+    background: rgba(74, 158, 255, 0.1);
+    border-color: rgba(74, 158, 255, 0.3);
 }
 
 .inv-slot .slot-number {
     position: absolute;
     top: 3px;
     left: 5px;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 9px;
 }
 
 .inv-slot .item-icon {
-    font-size: 24px;
-    color: #00d4ff;
+    font-size: 20px;
+    color: #4a9eff;
 }
 
 .inv-slot .item-amount {
@@ -216,47 +240,49 @@ body {
     bottom: 3px;
     right: 5px;
     color: #fff;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 10px;
+    font-weight: 600;
 }
 
 .inv-slot .item-name {
     position: absolute;
     bottom: 3px;
-    left: 5px;
-    right: 5px;
-    color: #fff;
-    font-size: 9px;
+    left: 4px;
+    right: 4px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 8px;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Bilgi Paneli */
+/* Bilgi Paneli - ox_lib tarzı */
 .info-panel {
-    width: 180px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 10px;
-    padding: 15px;
+    width: 170px;
+    background: #14161f;
+    border-radius: 6px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .player-info {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .player-info h3 {
-    color: #00d4ff;
-    font-size: 16px;
-    margin-bottom: 5px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
 .player-info p {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.5);
     font-size: 12px;
     margin: 3px 0;
 }
@@ -264,20 +290,20 @@ body {
 .quick-actions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     margin-top: auto;
 }
 
 .action-btn {
-    background: linear-gradient(135deg, #00d4ff, #00ff88);
-    border: none;
-    color: #1a1a2e;
-    padding: 12px;
-    border-radius: 8px;
+    background: rgba(74, 158, 255, 0.15);
+    border: 1px solid rgba(74, 158, 255, 0.25);
+    color: #4a9eff;
+    padding: 10px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 13px;
-    transition: all 0.3s;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -285,25 +311,29 @@ body {
 }
 
 .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+    background: rgba(74, 158, 255, 0.25);
+    border-color: rgba(74, 158, 255, 0.4);
 }
 
 .action-btn i {
-    font-size: 14px;
+    font-size: 12px;
 }
 
-/* Scrollbar */
+/* Scrollbar - ox_lib tarzı */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #00d4ff;
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
