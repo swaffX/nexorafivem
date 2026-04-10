@@ -28,9 +28,16 @@
         <div class="cp-progress-bar"><div class="cp-progress-fill" id="cp-progress-fill"></div></div>
       </div>
       <div class="cp-controls">
-        <div class="cp-btn">&#9664;&#9664;</div>
-        <div class="cp-btn cp-btn-main" id="cp-playpause-btn">&#9646;&#9646;</div>
-        <div class="cp-btn">&#9654;&#9654;</div>
+        <div class="cp-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        </div>
+        <div class="cp-btn cp-btn-main" id="cp-playpause-btn">
+          <svg id="cp-icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+          <svg id="cp-icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="cp-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z"/></svg>
+        </div>
       </div>
     </div>
 
@@ -39,17 +46,28 @@
       var widget = document.getElementById('carplay-widget');
       var cpTitle = document.getElementById('cp-title');
       var cpStatus = document.getElementById('cp-status');
-      var cpPlayPause = document.getElementById('cp-playpause-btn');
       var cpFill = document.getElementById('cp-progress-fill');
+      var iconPause = document.getElementById('cp-icon-pause');
+      var iconPlay = document.getElementById('cp-icon-play');
       var progressInterval = null;
       var progressValue = 0;
+
+      function setPaused(p) {
+        if (p) {
+          iconPause.style.display = 'none';
+          iconPlay.style.display = '';
+        } else {
+          iconPause.style.display = '';
+          iconPlay.style.display = 'none';
+        }
+      }
 
       function startProgress() {
         if (progressInterval) clearInterval(progressInterval);
         progressValue = 0;
         cpFill.style.width = '0%';
         progressInterval = setInterval(function() {
-          progressValue += 0.05;
+          progressValue += 0.055;
           if (progressValue > 100) progressValue = 0;
           cpFill.style.width = progressValue + '%';
         }, 1000);
@@ -71,13 +89,13 @@
           widget.classList.add('cp-show');
           if (data.title) cpTitle.textContent = data.title;
           cpStatus.textContent = 'Duraklatıldı';
-          cpPlayPause.innerHTML = '&#9654;';
+          setPaused(true);
           stopProgress();
         } else {
           widget.classList.add('cp-show');
           if (data.title) cpTitle.textContent = data.title;
           cpStatus.textContent = 'Çalıyor';
-          cpPlayPause.innerHTML = '&#9646;&#9646;';
+          setPaused(false);
           startProgress();
         }
       });
