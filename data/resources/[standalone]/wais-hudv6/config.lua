@@ -89,7 +89,7 @@ Config.Commands = {
 }
 
 Config.MoneySettings = {
-    ["name"] = "money",
+    ["name"] = "cash",
     ["isItem"] = true, -- If your money is in the form of items, make it `true`. If you are using ox_inventory, make it `false`.
     ["isOldType"] = false, -- If you have an old ESX Version or Chezza Inventory etc. If you are using esx with an old infrastructure, make `true`. If you do not know what you are doing, please leave it as `false`
 
