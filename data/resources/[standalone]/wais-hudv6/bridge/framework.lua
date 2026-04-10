@@ -19,7 +19,7 @@ wFramework.GangScript = nil
 wFramework.GetGangFromScript = nil
 
 
--- ============================================
+-- ============================================dd
 -- FUNKCJE WYSYŁAJĄCE DANE DO UI
 -- ============================================
 
