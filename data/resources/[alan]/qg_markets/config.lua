@@ -32,6 +32,12 @@ Config.ItemGroups = {
             price = 200,
             category = 'teknoloji'
         },
+        {
+            name = 'car_speaker',
+            label = 'Araç Hoparlörü',
+            price = 500,
+            category = 'teknoloji'
+        },
     },
     marketitemleri = {
         {
