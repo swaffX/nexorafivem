@@ -61,10 +61,7 @@ AK4Y.CamCoords = vector4(-814.0, 174.34, 76.74, 291.05) -- Camera coordinates fo
 AK4Y.EnableDeleteButton = false -- doesnt work now, i will release an update
 
 AK4Y.DefaultNumberOfCharacters = 1 -- Define maximum amount of default characters (maximum 5 characters defined by default)
-AK4Y.PlayersNumberOfCharacters = { -- Define maximum amount of player characters by rockstar license (you can find this license in your server's database in the player table)
-    { license = "license:ee1dd8d0a4a2b3ef5fd6419f40b2f6aef629249a", numberOfChars = 4 },
-    { license = "license:d14fbc3e38c6d3fc4cae61384176bbbced59dca3", numberOfChars = 2 },
-}
+AK4Y.PlayersNumberOfCharacters = {} -- Admin slot kontrolü server-side yapılacak
 
 AK4Y.StarterItems = {
     {item = "id_card", amount = 1},

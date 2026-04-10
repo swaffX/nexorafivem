@@ -431,4 +431,7 @@ QBShared.Items = {
     trout = { name = 'trout', label = 'Alabalık', weight = 85, type = 'item', image = 'trout.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış alabalık.' },
     salmon = { name = 'salmon', label = 'Somon', weight = 125, type = 'item', image = 'salmon.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış somon balığı.' },
     tuna = { name = 'tuna', label = 'Ton Balığı', weight = 225, type = 'item', image = 'tuna.png', unique = false, useable = false, shouldClose = true, combinable = true, description = 'Taze yakalanmış ton balığı.' },
+
+    -- Araç Hoparlör Sistemi
+    car_speaker = { name = 'car_speaker', label = 'Araç Hoparlörü', weight = 5000, type = 'item', image = 'car_speaker.png', unique = true, useable = true, shouldClose = true, description = 'Araca takılabilir hoparlör. M tuşu ile müzik çalabilirsin.' },
 }

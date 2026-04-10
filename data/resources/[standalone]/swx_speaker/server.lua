@@ -1,7 +1,98 @@
 -- SWX Speaker - Server Side
 -- Kalıcı Müzik Geçmişi Sistemi
+-- Araç Hoparlör Sistemi (Item-based)
 
 local QBCore = exports['qb-core']:GetCoreObject()
+
+-- Database tablosu oluşturma (ilk başlatma için)
+MySQL.Async.execute([[
+    CREATE TABLE IF NOT EXISTS vehicle_speakers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        plate VARCHAR(20) NOT NULL UNIQUE,
+        citizenid VARCHAR(50) NOT NULL,
+        installed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_plate (plate),
+        INDEX idx_citizenid (citizenid)
+    )
+]], {}, function(success)
+    if success then
+        print('[SWX Speaker] vehicle_speakers tablosu hazır')
+    else
+        print('[SWX Speaker] vehicle_speakers tablosu oluşturulurken hata!')
+    end
+end)
+
+-- Araçta hoparlör var mı kontrol et
+QBCore.Functions.CreateCallback('swx_speaker:hasVehicleSpeaker', function(source, cb, plate)
+    MySQL.Async.fetchScalar('SELECT COUNT(*) FROM vehicle_speakers WHERE plate = ?', {plate}, function(count)
+        cb(count > 0)
+    end)
+end)
+
+-- Araça hoparlör tak
+RegisterNetEvent('swx_speaker:installSpeaker', function(plate)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    
+    if not Player then return end
+    
+    local citizenid = Player.PlayerData.citizenid
+    
+    -- Önce araçta hoparlör var mı kontrol et
+    MySQL.Async.fetchScalar('SELECT COUNT(*) FROM vehicle_speakers WHERE plate = ?', {plate}, function(count)
+        if count > 0 then
+            TriggerClientEvent('QBCore:Notify', src, 'Bu araçta zaten hoparlör var!', 'error')
+            return
+        end
+        
+        -- Hoparlör tak
+        MySQL.Async.execute('INSERT INTO vehicle_speakers (plate, citizenid) VALUES (?, ?)', {plate, citizenid}, function(affectedRows)
+            if affectedRows > 0 then
+                -- Item'den sil
+                Player.Functions.RemoveItem('car_speaker', 1)
+                TriggerClientEvent('QBCore:Notify', src, 'Hoparlör araca takıldı!', 'success')
+                print('[SWX Speaker] Hoparlör takıldı: ' .. plate .. ' | CitizenID: ' .. citizenid)
+            else
+                TriggerClientEvent('QBCore:Notify', src, 'Hoparlör takılamadı!', 'error')
+            end
+        end)
+    end)
+end)
+
+-- Araçtan hoparlör sök
+RegisterNetEvent('swx_speaker:removeSpeaker', function(plate)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    
+    if not Player then return end
+    
+    local citizenid = Player.PlayerData.citizenid
+    
+    -- Araçta hoparlör var mı ve bu oyuncunun mı kontrol et
+    MySQL.Async.fetchAll('SELECT * FROM vehicle_speakers WHERE plate = ?', {plate}, function(result)
+        if result and #result > 0 then
+            local speaker = result[1]
+            
+            -- Sadece kendi takılan hoparlörü sökebilir (veya admin)
+            if speaker.citizenid == citizenid or QBCore.Functions.HasPermission(src, 'admin') then
+                MySQL.Async.execute('DELETE FROM vehicle_speakers WHERE plate = ?', {plate}, function(affectedRows)
+                    if affectedRows > 0 then
+                        -- Item'i geri ver
+                        Player.Functions.AddItem('car_speaker', 1)
+                        TriggerClientEvent('QBCore:Notify', src, 'Hoparlör araçtan söküldü!', 'success')
+                        print('[SWX Speaker] Hoparlör söküldü: ' .. plate)
+                    else
+                        TriggerClientEvent('QBCore:Notify', src, 'Hoparlör sökülemedi!', 'error')
+                    end
+                end)
+            else
+                TriggerClientEvent('QBCore:Notify', src, 'Bu hoparlör senin değil!', 'error')
+            end
+        else
+            TriggerClientEvent('QBCore:Notify', src, 'Bu araçta hoparlör yok!', 'error')
+        end
+    end)
+end)
 
 -- YouTube Title Çekme (oEmbed API kullanarak)
 QBCore.Functions.CreateCallback('swx_speaker:getYouTubeTitle', function(source, cb, url)

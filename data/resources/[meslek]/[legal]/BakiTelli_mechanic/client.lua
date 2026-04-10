@@ -37,6 +37,20 @@ end)
 local customCamMain = ""
 local customCamSec = ""
 function OpenMenu()
+    -- Ek güvenlik kontrolü: Menüyü açmadan önce tekrar meslek kontrolü yap
+    local hasAccess = false
+    for k, v in pairs(Config.Mechanics) do
+        if checkJob(k) then
+            hasAccess = true
+            break
+        end
+    end
+    
+    if not hasAccess then
+        notify("Bu menüye erişim izniniz yok!")
+        return
+    end
+    
     local playerPed = PlayerPedId()
     local playerVeh = GetVehiclePedIsIn(playerPed, false)
     local vehPos = GetEntityCoords(playerVeh)

@@ -87,80 +87,131 @@ end, false)
 RegisterKeyMapping('swxspeaker', 'Hoparlör Etkileşimi (M Tuşu)', 'keyboard', Config.OpenKey)
 
 function OpenSpeakerMenu()
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    local plate = GetVehicleNumberPlateText(vehicle)
+    
+    -- Hoparlör kontrolü
+    QBCore.Functions.TriggerCallback('swx_speaker:hasVehicleSpeaker', function(hasSpeaker)
+        if not hasSpeaker then
+            lib.registerContext({
+                id = 'speaker_menu',
+                title = 'Hoparlör etkileşimi',
+                options = {
+                    {
+                        title = 'Hoparlör tak',
+                        description = 'Araca hoparlör takmak için car_speaker itemine sahip olmalısın.',
+                        icon = 'wrench',
+                        onSelect = function()
+                            InstallSpeakerDialog(plate)
+                        end
+                    }
+                }
+            })
+        else
+            lib.registerContext({
+                id = 'speaker_menu',
+                title = 'Hoparlör etkileşimi',
+                options = {
+                    {
+                        title = 'Müzik çal',
+                        description = 'Youtube videoları ve çalma listeleri destekleniyor.',
+                        icon = 'play',
+                        onSelect = function()
+                            PlayMusicDialog()
+                        end
+                    },
+                    {
+                        title = 'Müzik sıraya al',
+                        description = 'Bir şarkıyı sıraya ekle.',
+                        icon = 'list',
+                        onSelect = function()
+                            AddToQueueDialog()
+                        end
+                    },
+                    {
+                        title = 'Sonraki şarkı',
+                        description = 'Sıradaki sonraki şarkıyı çal.',
+                        icon = 'forward',
+                        disabled = #playlist == 0,
+                        onSelect = function()
+                            PlayNextSong()
+                        end
+                    },
+                    {
+                        title = isPaused and 'Müziği devam ettir' or 'Müziği duraklat',
+                        description = isPaused and 'Müziği yeniden başlat' or 'Mevcut şarkıyı duraklat',
+                        icon = isPaused and 'play' or 'pause',
+                        disabled = not isPlaying and not isPaused,
+                        onSelect = function()
+                            TogglePause()
+                        end
+                    },
+                    {
+                        title = 'Ses seviyesini/aralığını değiştir',
+                        description = 'Müzik sesini veya aralığını ayarla.',
+                        icon = 'volume-up',
+                        onSelect = function()
+                            VolumeRangeDialog()
+                        end
+                    },
+                    {
+                        title = 'Hoparlör sök',
+                        description = 'Aracıdan hoparlörü sök.',
+                        icon = 'trash',
+                        onSelect = function()
+                            TriggerServerEvent('swx_speaker:removeSpeaker', plate)
+                        end
+                    },
+                    {
+                        title = 'Diğer',
+                        description = 'Sırayı yönet, müzik geçmişi, filtreler.',
+                        icon = 'cog',
+                        onSelect = function()
+                            OtherMenu()
+                        end
+                    }
+                }
+            })
+        end
+        lib.showContext('speaker_menu')
+    end, plate)
+end
+
+function InstallSpeakerDialog(plate)
+    local Player = QBCore.Functions.GetPlayer()
+    local speakerItem = Player.Functions.GetItemByName('car_speaker')
+    
+    if not speakerItem or speakerItem.amount < 1 then
+        QBCore.Functions.Notify('Envanterinde hoparlör itemi yok!', 'error')
+        return
+    end
+    
     lib.registerContext({
-        id = 'speaker_menu',
-        title = 'Hoparlör etkileşimi',
+        id = 'install_speaker_confirm',
+        title = 'Hoparlör Tak',
+        menu = 'speaker_menu',
         options = {
             {
-                title = 'Müzik çal',
-                description = 'Youtube videoları ve çalma listeleri destekleniyor.',
-                icon = 'play',
+                title = 'Evet, tak',
+                description = 'Hoparlörü araca tak',
+                icon = 'check',
                 onSelect = function()
-                    PlayMusicDialog()
+                    TriggerServerEvent('swx_speaker:installSpeaker', plate)
                 end
             },
             {
-                title = 'Müzik sıraya al',
-                description = 'Bir şarkıyı sıraya ekle.',
-                icon = 'list',
+                title = 'İptal',
+                description = 'İptal et',
+                icon = 'xmark',
                 onSelect = function()
-                    AddToQueueDialog()
-                end
-            },
-            {
-                title = 'Sonraki şarkı',
-                description = 'Sıradaki sonraki şarkıyı çal.',
-                icon = 'forward',
-                disabled = #playlist == 0,
-                onSelect = function()
-                    PlayNextSong()
-                end
-            },
-            {
-                title = isPaused and 'Müziği devam ettir' or 'Müziği duraklat',
-                description = isPaused and 'Müziği yeniden başlat' or 'Mevcut şarkıyı duraklat',
-                icon = isPaused and 'play' or 'pause',
-                disabled = not isPlaying and not isPaused,
-                onSelect = function()
-                    TogglePause()
-                end
-            },
-            {
-                title = 'Ses seviyesini/aralığını değiştir',
-                description = 'Müzik sesini veya aralığını ayarla.',
-                icon = 'volume-up',
-                onSelect = function()
-                    VolumeRangeDialog()
-                end
-            },
-            {
-                title = 'Hoparlörü tut',
-                description = 'Hoparlörü taşı.',
-                icon = 'hand',
-                onSelect = function()
-                    QBCore.Functions.Notify('Taşınabilir hoparlör özelliği yakında!', 'info')
-                end
-            },
-            {
-                title = 'Hoparlörü yerden al',
-                description = 'Hoparlörü yerden al.',
-                icon = 'trash',
-                onSelect = function()
-                    QBCore.Functions.Notify('Taşınabilir hoparlör özelliği yakında!', 'info')
-                end
-            },
-            {
-                title = 'Diğer',
-                description = 'Sırayı yönet, müzik geçmişi, filtreler.',
-                icon = 'cog',
-                onSelect = function()
-                    OtherMenu()
+                    OpenSpeakerMenu()
                 end
             }
         }
     })
     
-    lib.showContext('speaker_menu')
+    lib.showContext('install_speaker_confirm')
 end
 
 function PlayMusicDialog()
@@ -234,95 +285,104 @@ function AddToQueueDialog()
 end
 
 function PlayMusic(url, title)
-    if currentMusicId then
-        exports.xsound:Destroy(currentMusicId)
-    end
-    
-    currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
-    
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
+    local plate = GetVehicleNumberPlateText(vehicle)
     
     if vehicle ~= 0 and DoesEntityExist(vehicle) then
-        local coords = GetEntityCoords(vehicle)
-        local playerId = GetPlayerServerId(PlayerId())
-        
-        -- 3D pozisyonel ses - TÜM OYUNCULAR DUYABİLSİN
-        -- isNetworked=true ile diger oyunculara senkronize ediliyor
-        exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
-            isNetworked = true,
-            maxDistance = currentDistance,
-            rolloffFactor = 0.8,        -- Düşük = daha uzak mesafede duyulur
-            refDistance = 5.0,          -- Referans mesafe (5 metre)
-            coneInnerAngle = 360,       -- 360 derece = her yönde eşit ses
-            coneOuterAngle = 360,
-            coneOuterGain = 1.0         -- Dışarıda da tam ses
-        })
-        
-        -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
-        exports.xsound:destroyOnFinish(currentMusicId, false)
-        
-        isPlaying = true
-        isPaused = false
-        
-        -- Geçmişe ekle (local) - FiveM uyumlu timestamp
-        local timestamp = GetGameTimer()
-        table.insert(musicHistory, 1, {
-            url = url,
-            title = title or 'Bilinmeyen Şarkı',
-            timestamp = timestamp
-        })
-        
-        -- Geçmişi 50 ile sınırla (local)
-        if #musicHistory > 50 then
-            table.remove(musicHistory, #musicHistory)
-        end
-        
-        -- Server'a kaydet (kalıcı)
-        TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
-        
-        -- DİGER OYUNCULARA MÜZİK BİLGİSİNİ GÖNDER
-        local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
-        TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
-        
-        -- Pozisyon güncelleme KALDIRILDI - 3D ses yerine global ses kullan
-        -- Araç hareketiyle müzik kesilmesini önlemek için position yerine play kullanıyoruz
-        -- Global ses her yerden duyulur, pozisyon takibi gerekmez
-        print('[SWX Speaker] Global ses modu - araç hareketi müziği etkilemez')
-        
-        -- Müzik durma kontrolü (heartbeat) - YouTube timeout sorunu için
-        CreateThread(function()
-            local checkInterval = 5000  -- 5 saniyede bir kontrol et
-            local lastPlayState = true
-            local consecutiveStoppedCount = 0
-            local maxConsecutiveStopped = 3  -- 3 kez üst üste durduysa bildir
-            local currentUrl = url  -- Şarkı URL'sini sakla
-            local currentTitle = title  -- Şarkı başlığını sakla
+        -- Hoparlör kontrolü
+        QBCore.Functions.TriggerCallback('swx_speaker:hasVehicleSpeaker', function(hasSpeaker)
+            if not hasSpeaker then
+                QBCore.Functions.Notify('Araçta hoparlör yok! Önce hoparlör takmalısın.', 'error')
+                return
+            end
             
-            Wait(5000)  -- İlk 5 saniye bekle (müzik yüklenmesi için)
+            -- Hoparlör var, müziği başlat
+            if currentMusicId then
+                exports.xsound:Destroy(currentMusicId)
+            end
             
-            while isPlaying and currentMusicId do
-                Wait(checkInterval)
+            currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
+            
+            local coords = GetEntityCoords(vehicle)
+            local playerId = GetPlayerServerId(PlayerId())
+            
+            -- 3D pozisyonel ses - TÜM OYUNCULAR DUYABİLSİN
+            -- isNetworked=true ile diger oyunculara senkronize ediliyor
+            exports.xsound:PlayUrlPos(currentMusicId, url, currentVolume, coords, false, {
+                isNetworked = true,
+                maxDistance = currentDistance,
+                rolloffFactor = 0.8,        -- Düşük = daha uzak mesafede duyulur
+                refDistance = 5.0,          -- Referans mesafe (5 metre)
+                coneInnerAngle = 360,       -- 360 derece = her yönde eşit ses
+                coneOuterAngle = 360,
+                coneOuterGain = 1.0         -- Dışarıda da tam ses
+            })
+            
+            -- Şarkı bitince otomatik kapanmasın (loop değil ama destroyOnFinish = false)
+            exports.xsound:destroyOnFinish(currentMusicId, false)
+            
+            isPlaying = true
+            isPaused = false
+            
+            -- Geçmişe ekle (local) - FiveM uyumlu timestamp
+            local timestamp = GetGameTimer()
+            table.insert(musicHistory, 1, {
+                url = url,
+                title = title or 'Bilinmeyen Şarkı',
+                timestamp = timestamp
+            })
+            
+            -- Geçmişi 50 ile sınırla (local)
+            if #musicHistory > 50 then
+                table.remove(musicHistory, #musicHistory)
+            end
+            
+            -- Server'a kaydet (kalıcı)
+            TriggerServerEvent('swx_speaker:server:addToHistory', url, title or 'Bilinmeyen Şarkı')
+            
+            -- DİGER OYUNCULARA MÜZİK BİLGİSİNİ GÖNDER
+            local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
+            TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
+            
+            -- Pozisyon güncelleme KALDIRILDI - 3D ses yerine global ses kullan
+            -- Araç hareketiyle müzik kesilmesini önlemek için position yerine play kullanıyoruz
+            -- Global ses her yerden duyulur, pozisyon takibi gerekmez
+            print('[SWX Speaker] Global ses modu - araç hareketi müziği etkilemez')
+            
+            -- Müzik durma kontrolü (heartbeat) - YouTube timeout sorunu için
+            CreateThread(function()
+                local checkInterval = 5000  -- 5 saniyede bir kontrol et
+                local lastPlayState = true
+                local consecutiveStoppedCount = 0
+                local maxConsecutiveStopped = 3  -- 3 kez üst üste durduysa bildir
+                local currentUrl = url  -- Şarkı URL'sini sakla
+                local currentTitle = title  -- Şarkı başlığını sakla
                 
-                if not isPlaying or not currentMusicId then
-                    break
-                end
+                Wait(5000)  -- İlk 5 saniye bekle (müzik yüklenmesi için)
                 
-                -- xSound çalıyor mu kontrol et
-                local isSoundPlaying = exports.xsound:isPlaying(currentMusicId)
-                
-                if isSoundPlaying then
-                    consecutiveStoppedCount = 0
-                    lastPlayState = true
-                else
-                    consecutiveStoppedCount = consecutiveStoppedCount + 1
-                    print('[SWX Speaker] Müzik durma algılandı! (' .. consecutiveStoppedCount .. '/' .. maxConsecutiveStopped .. ')')
+                while isPlaying and currentMusicId do
+                    Wait(checkInterval)
                     
-                    if consecutiveStoppedCount >= maxConsecutiveStopped then
-                        -- Müzik durdu
-                        if lastPlayState then
-                            if Config.AutoRestartOnStop and currentUrl then
-                                -- Otomatik yeniden başlat
+                    if not isPlaying or not currentMusicId then
+                        break
+                    end
+                    
+                    -- xSound çalıyor mu kontrol et
+                    local isSoundPlaying = exports.xsound:isPlaying(currentMusicId)
+                    
+                    if isSoundPlaying then
+                        consecutiveStoppedCount = 0
+                        lastPlayState = true
+                    else
+                        consecutiveStoppedCount = consecutiveStoppedCount + 1
+                        print('[SWX Speaker] Müzik durma algılandı! (' .. consecutiveStoppedCount .. '/' .. maxConsecutiveStopped .. ')')
+                        
+                        if consecutiveStoppedCount >= maxConsecutiveStopped then
+                            -- Müzik durdu
+                            if lastPlayState then
+                                if Config.AutoRestartOnStop and currentUrl then
+                                    -- Otomatik yeniden başlat
                                 QBCore.Functions.Notify('Müzik durdu, otomatik yeniden başlatılıyor...', 'info', 3000)
                                 print('[SWX Speaker] Otomatik yeniden başlatma başlıyor...')
                                 
@@ -351,6 +411,7 @@ function PlayMusic(url, title)
         QBCore.Functions.Notify('Müzik çalıyor!', 'success')
         print('[SWX Speaker] Müzik başlatıldı: ' .. currentMusicId .. ' | destroyOnFinish: false')
     end
+end, plate)
 end
 
 -- Araçtaki tüm oyuncuları al
