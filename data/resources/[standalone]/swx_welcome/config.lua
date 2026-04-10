@@ -19,6 +19,12 @@ Config.Messages = {
     },
     -- YARDIM MENÜSÜ KALDIRILDI - /yardım komutu kullanılmıyor
     {
+        title = 'Araç Kiralama!',
+        description = 'Yakınındaki Görevliden E tuşunu kullanarak Araç kiralama menüsüne erişip araç kiralayabilirsin!',
+        icon = 'car',
+        duration = 8000
+    },
+    {
         title = 'Bol Şans!',
         description = 'Nexora Roleplay ailesine hoş geldin. İyi eğlenceler!',
         icon = 'sparkles',

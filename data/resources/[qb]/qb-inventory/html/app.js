@@ -107,18 +107,6 @@ const InventoryContainer = Vue.createApp({
                 ghostElement: null,
                 dragStartInventoryType: "player",
                 transferAmount: null,
-                // Clothing System
-                showClothingSlots: true,
-                clothing: {
-                    head: null,
-                    torso: null,
-                    undershirt: null,
-                    legs: null,
-                    shoes: null,
-                    bag: null,
-                    belt: null,
-                    back: null
-                },
             };
         },
         openInventory(data) {
@@ -930,12 +918,8 @@ const InventoryContainer = Vue.createApp({
                     console.error("Error posting inventory data:", error);
                 });
         },
-        // Kıyafet Sistemi Fonksiyonları
-        toggleClothing() {
-            this.showClothingSlots = !this.showClothingSlots;
-        },
+        // Eşya sıralama fonksiyonu
         sortItems(sortType) {
-            // Eşya sıralama fonksiyonu
             const items = Object.values(this.playerInventory);
             
             if (sortType === 'az') {
@@ -957,65 +941,6 @@ const InventoryContainer = Vue.createApp({
                 sortType: sortType,
                 inventory: this.playerInventory
             }));
-        },
-        equipClothing(slot) {
-            // Kıyafet giy/çıkar
-            const currentClothing = this.clothing[slot];
-            
-            if (currentClothing) {
-                // Kıyafeti çıkar
-                axios.post("https://qb-inventory/RemoveClothing", JSON.stringify({
-                    slot: slot,
-                    clothing: currentClothing
-                })).then(() => {
-                    this.clothing[slot] = null;
-                });
-            } else {
-                // Envanterde kıyafet ara
-                const clothingItem = this.findClothingItem(slot);
-                if (clothingItem) {
-                    axios.post("https://qb-inventory/WearClothing", JSON.stringify({
-                        slot: slot,
-                        item: clothingItem
-                    })).then(() => {
-                        this.clothing[slot] = clothingItem;
-                    });
-                }
-            }
-        },
-        findClothingItem(slot) {
-            // Envanterde belirli slottaki kıyafeti bul
-            const clothingTypes = {
-                head: ['hat', 'helmet', 'cap'],
-                torso: ['shirt', 'jacket', 'torso'],
-                undershirt: ['tshirt', 'undershirt'],
-                legs: ['pants', 'legs', 'trousers'],
-                shoes: ['shoes', 'boots', 'footwear'],
-                bag: ['bag', 'backpack'],
-                belt: ['belt', 'accessory'],
-                back: ['back', 'backpack']
-            };
-            
-            const types = clothingTypes[slot] || [];
-            
-            for (const key in this.playerInventory) {
-                const item = this.playerInventory[key];
-                if (item && item.name) {
-                    const itemName = item.name.toLowerCase();
-                    for (const type of types) {
-                        if (itemName.includes(type)) {
-                            return item;
-                        }
-                    }
-                }
-            }
-            return null;
-        },
-        updateClothing(data) {
-            // Server'dan gelen kıyafet verilerini güncelle
-            if (data.clothing) {
-                this.clothing = { ...this.clothing, ...data.clothing };
-            }
         },
     },
     mounted() {

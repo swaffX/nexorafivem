@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora - Araç Kiralama</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/d37231be1f.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <div class="rental-container" v-if="isOpen">
+            <!-- Header -->
+            <div class="rental-header">
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>NEXORA RENT</span>
+                </div>
+                <button class="close-btn" @click="closeGUI">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Hoşgeldin Mesajı -->
+            <div class="welcome-banner">
+                <div class="welcome-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="welcome-text">
+                    <h2>Nexora Roleplay'e Hoşgeldiniz!</h2>
+                    <p>Sunucumuzda keyifli vakitler geçirmenizi dileriz.</p>
+                </div>
+            </div>
+
+            <!-- Araç Listesi -->
+            <div class="vehicles-section">
+                <h3 class="section-title">
+                    <i class="fas fa-key"></i>
+                    Kiralık Araçlar
+                </h3>
+                
+                <div class="vehicles-grid">
+                    <div v-for="vehicle in vehicles" :key="vehicle.model" 
+                         class="vehicle-card" 
+                         @click="selectVehicle(vehicle)"
+                         :class="{ 'selected': selectedVehicle && selectedVehicle.model === vehicle.model }">
+                        
+                        <div class="vehicle-image">
+                            <i :class="getVehicleIcon(vehicle.model)"></i>
+                        </div>
+                        
+                        <div class="vehicle-info">
+                            <h4 class="vehicle-name">{{ vehicle.label }}</h4>
+                            <p class="vehicle-desc">{{ vehicle.description }}</p>
+                        </div>
+                        
+                        <div class="vehicle-price">
+                            <span class="price-amount">${{ vehicle.price }}</span>
+                            <span class="price-period">/gün</span>
+                        </div>
+                        
+                        <div class="select-indicator" v-if="selectedVehicle && selectedVehicle.model === vehicle.model">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seçim Detayları -->
+            <div class="selection-details" v-if="selectedVehicle">
+                <div class="detail-row">
+                    <span class="detail-label">Seçilen Araç:</span>
+                    <span class="detail-value">{{ selectedVehicle.label }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Kiralama Ücreti:</span>
+                    <span class="detail-value price">${{ selectedVehicle.price }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ödeme Yöntemi:</span>
+                    <span class="detail-value">Nakit</span>
+                </div>
+            </div>
+
+            <!-- Footer / Kiralama Butonu -->
+            <div class="rental-footer" v-if="selectedVehicle">
+                <button class="rent-btn" @click="rentVehicle" :disabled="isRenting">
+                    <i class="fas fa-car-side" v-if="!isRenting"></i>
+                    <i class="fas fa-spinner fa-spin" v-else></i>
+                    <span>{{ isRenting ? 'İşleniyor...' : 'Aracı Kirala' }}</span>
+                </button>
+            </div>
+
+            <div class="rental-footer no-selection" v-else>
+                <p class="hint">Kiralamak için bir araç seçin</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

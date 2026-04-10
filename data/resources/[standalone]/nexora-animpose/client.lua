@@ -1,4 +1,32 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+-- QB-Core kontrolü
+local QBCore = nil
+
+CreateThread(function()
+    -- QB-Core'un yüklenmesini bekle
+    local attempts = 0
+    while attempts < 10 do
+        attempts = attempts + 1
+        local success, result = pcall(function()
+            return exports['qb-core']:GetCoreObject()
+        end)
+        
+        if success and result then
+            QBCore = result
+            print('[^2nexora-animpose^7] QB-Core başarıyla yüklendi!')
+            break
+        else
+            print('[^3nexora-animpose^7] QB-Core bekleniyor... (' .. attempts .. '/10)')
+            Wait(1000)
+        end
+    end
+    
+    if not QBCore then
+        print('[^1nexora-animpose^7] QB-Core yüklenemedi! Script devre dışı.')
+        return
+    end
+    
+    print('[^2nexora-animpose^7] Script aktif! Komut: /' .. Config.Command)
+end)
 
 local isActive = false
 local originalPos = nil

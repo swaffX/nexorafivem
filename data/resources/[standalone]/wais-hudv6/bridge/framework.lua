@@ -14,10 +14,8 @@ wFramework.Status = {
     stress = 0,
     stamina = 0
 }
-wFramework.Money = {
-    bank = 0,
-    cash = 0
-}
+-- PARA/BANKA SISTEMI KALDIRILDI - Nexora RP
+-- wFramework.Money = { bank = 0, cash = 0 }
 wFramework.GangScript = nil
 wFramework.GetGangFromScript = nil
 
@@ -26,21 +24,9 @@ wFramework.GetGangFromScript = nil
 -- FUNKCJE WYSYŁAJĄCE DANE DO UI
 -- ============================================
 
-function wFramework.sendMoneyToUI()
-    -- Cash gizlendi - gönderim devre dışı
-    -- SendNUIMessage({
-    --     type = "SET_PLAYER_CASH",
-    --     cash = wFramework.Money.cash
-    -- })
-end
-
-function wFramework.sendBankToUI()
-    -- Bank gizlendi - gönderim devre dışı
-    -- SendNUIMessage({
-    --     type = "SET_PLAYER_BANK",
-    --     bank = wFramework.Money.bank
-    -- })
-end
+-- PARA/BANKA FONKSIYONLARI KALDIRILDI - Nexora RP
+-- function wFramework.sendMoneyToUI() ... end
+-- function wFramework.sendBankToUI() ... end
 
 function wFramework.sendJobToUI()
     if Config.Framework.Framework == "esx" then
@@ -276,140 +262,11 @@ function wFramework.GetPlayerData()
     end
 end
 
-function wFramework.GetPlayerMoney()
-    Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money...")
-    local playerData = wFramework.GetPlayerData()
-    
-    -- Safety check: if playerData is nil, set default values
-    if not playerData then
-        Config.Debug("[^3WARNING - FRAMEWORK^0] PlayerData is nil, setting default cash to 0")
-        wFramework.Money.cash = 0
-        wFramework.sendMoneyToUI()
-        return
-    end
-    
-    if Config.Framework.Framework == "esx" then
-        if Config.MoneySettings.isItem then
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from inventory")
-            
-            if playerData.inventory then
-                for _, item in pairs(playerData.inventory) do
-                    if item.name == Config.MoneySettings.name then
-                        local amount = Config.MoneySettings.qs_inventory and item.amount or item.count or 0
-                        wFramework.Money.cash = amount
-                        break
-                    end
-                end
-            end
-        elseif Config.MoneySettings.isOldType then
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from callback")
-            lib.callback("wais:hudv6:server:getMoney", false, function(amount)
-                wFramework.Money.cash = amount or 0
-            end)
-        else
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from accounts")
-            
-            if playerData.accounts then
-                for _, account in pairs(playerData.accounts) do
-                    if account.name == "money" then
-                        wFramework.Money.cash = account.money
-                        break
-                    end
-                end
-            end
-        end
-    
-    elseif Config.Framework.Framework == "qbcore" then
-        if Config.MoneySettings.isItem then
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from inventory")
-            
-            if playerData.items then
-                for _, item in pairs(playerData.items) do
-                    if item.name == Config.MoneySettings.name then
-                        wFramework.Money.cash = item.amount
-                        break
-                    end
-                end
-            end
-        else
-            Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from data")
-            if playerData.money then
-                wFramework.Money.cash = playerData.money.cash or 0
-            else
-                wFramework.Money.cash = 0
-            end
-        end
-    
-    elseif Config.Framework.Framework == "qbx" then
-        if Config.MoneySettings.isItem then
-            if playerData.items then
-                for _, item in pairs(playerData.items) do
-                    if item.name == Config.MoneySettings.name then
-                        wFramework.Money.cash = item.amount
-                        break
-                    end
-                end
-            end
-        else
-            if playerData.money then
-                wFramework.Money.cash = playerData.money.cash or 0
-            else
-                wFramework.Money.cash = 0
-            end
-        end
-    else
-        Config.Debug("[^2WARNING - FRAMEWORK^0] Framework is not initialized, please check your config.lua")
-    end
-    
-    wFramework.sendMoneyToUI()
-end
-
-function wFramework.GetPlayerBank()
-    Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank...")
-    local playerData = wFramework.GetPlayerData()
-    
-    -- Safety check: if playerData is nil, set default values
-    if not playerData then
-        Config.Debug("[^3WARNING - FRAMEWORK^0] PlayerData is nil, setting default bank to 0")
-        wFramework.Money.bank = 0
-        wFramework.sendBankToUI()
-        return
-    end
-    
-    if Config.Framework.Framework == "esx" then
-        Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from accounts")
-        
-        if playerData.accounts then
-            for _, account in pairs(playerData.accounts) do
-                if account.name == "bank" then
-                    wFramework.Money.bank = account.money
-                    break
-                end
-            end
-        end
-    
-    elseif Config.Framework.Framework == "qbcore" then
-        Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from data")
-        if playerData.money then
-            wFramework.Money.bank = playerData.money.bank or 0
-        else
-            wFramework.Money.bank = 0
-        end
-    
-    elseif Config.Framework.Framework == "qbx" then
-        Config.Debug("[^2INFO - FRAMEWORK^0] Getting player bank from data")
-        if playerData.money then
-            wFramework.Money.bank = playerData.money.bank or 0
-        else
-            wFramework.Money.bank = 0
-        end
-    
-    else
-        Config.Debug("[^2WARNING - FRAMEWORK^0] Framework is not initialized, please check your config.lua")
-    end
-    
-    wFramework.sendBankToUI()
-end
+-- PARA/BANKA FONKSIYONLARI KALDIRILDI - Nexora RP
+--[[
+function wFramework.GetPlayerMoney() ... end
+function wFramework.GetPlayerBank() ... end
+--]]
 
 function wFramework.GetPlayerStatus()
     Config.Debug("[^2INFO - FRAMEWORK^0] Getting player status...")
@@ -566,44 +423,6 @@ function wFramework.SetPlayerJob(jobData)
     
     Config.Debug("[^2INFO - FRAMEWORK^0] Setting player job data.")
     
-    wFramework.Framework.PlayerData.job = jobData
-    wFramework.sendJobToUI()
-end
-
-function wFramework.SetPlayerMoney(money)
-    if type(money) ~= "number" then
-        Config.Debug("[^2WARNING - FRAMEWORK^0] Money data is not a number, please check your parameters")
-        return
-    end
-    
-    Config.Debug("[^2INFO - FRAMEWORK^0] Setting player money data.")
-    
-    wFramework.Money.cash = money
-    wFramework.sendMoneyToUI()
-end
-
-function wFramework.SetPlayerBank(bank)
-    if type(bank) ~= "number" then
-        Config.Debug("[^2WARNING - FRAMEWORK^0] Bank data is not a number, please check your parameters")
-        return
-    end
-    
-    Config.Debug("[^2INFO - FRAMEWORK^0] Setting player bank data.")
-    
-    wFramework.Money.bank = bank
-    wFramework.sendBankToUI()
-end
-
-
--- ============================================
--- ZAŁADOWANIE/ROZŁADOWANIE GRACZA
--- ============================================
-
-function wFramework.playerLoaded()
-    -- For QBX, allow proceeding even if GetPlayerData returns nil initially
-    -- The data will be set via events
-    local playerData = wFramework.GetPlayerData()
-    
     if playerData or Config.Framework.Framework == "qbx" then
         -- For QBX, initialize HUD immediately with default data, then update when real data arrives
         if Config.Framework.Framework == "qbx" and not playerData then
@@ -627,8 +446,6 @@ function wFramework.playerLoaded()
             wFramework.PlayerLoaded = true
             
             wFramework.GetPlayerStatus()
-            wFramework.GetPlayerMoney()
-            wFramework.GetPlayerBank()
             wFramework.GetPlayerGang()
             wFramework.sendJobToUI()
             wFramework.sendGangToUI()
@@ -660,8 +477,6 @@ function wFramework.playerLoaded()
                 if wFramework.Framework.PlayerData and wFramework.Framework.PlayerData.job and wFramework.Framework.PlayerData.job.name ~= "unemployed" then
                     Config.Debug("[^2INFO - QBX^0] Updating HUD with real player data")
                     wFramework.GetPlayerStatus()
-                    wFramework.GetPlayerMoney()
-                    wFramework.GetPlayerBank()
                     wFramework.GetPlayerGang()
                     wFramework.sendJobToUI()
                     wFramework.sendGangToUI()
@@ -674,8 +489,6 @@ function wFramework.playerLoaded()
         wFramework.PlayerLoaded = true
         
         wFramework.GetPlayerStatus()
-        wFramework.GetPlayerMoney()
-        wFramework.GetPlayerBank()
         wFramework.GetPlayerGang()
         wFramework.sendJobToUI()
         wFramework.sendGangToUI()
@@ -700,10 +513,6 @@ function wFramework.playerUnloaded()
         thirst = 0,
         stress = 0,
         stamina = 0
-    }
-    wFramework.Money = {
-        bank = 0,
-        cash = 0
     }
     
     Player.dead = false

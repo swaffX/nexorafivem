@@ -89,7 +89,7 @@ if Config.EnableXtoCancel then
 end
 
 if Config.MenuKeybindEnabled then
-    RegisterKeyMapping("animasyonlar", "Open rpemotes menu", "keyboard", "F5")
+    RegisterKeyMapping("animasyonlar", "Open rpemotes menu", "keyboard", Config.MenuKeybind or "F5")
 end
 
 if Config.HandsupKeybindEnabled then

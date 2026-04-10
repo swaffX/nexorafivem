@@ -17,13 +17,13 @@ end)
 -- CALLBACK - POBIERANIE PIENIĘDZY
 -- ============================================
 
--- Pobierz pieniądze gracza (dla starego systemu ESX bez itemów)
+-- PARA CALLBACK KALDIRILDI - Nexora RP
+--[[
 lib.callback.register("wais:hudv6:server:getMoney", function(playerSource)
     local xPlayer = wFramework.Framework.GetPlayerFromId(playerSource)
-    
     if xPlayer then
         return xPlayer.getMoney()
     end
-    
     return 0
 end)
+--]]

@@ -1,7 +1,19 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- Duyuru sesi çal
+local function PlayAnnouncementSound()
+    -- Ses dosyasını NUI üzerinden çal
+    SendNUIMessage({
+        action = 'playSound',
+        soundFile = 'voice.mp3'
+    })
+end
+
 -- Modern duyuru göster (sadece üstten animasyonlu bildirim)
 RegisterNetEvent('swx_announce:ShowAnnouncement', function(message, adminName)
+    -- Duyuru sesini çal
+    PlayAnnouncementSound()
+    
     -- Modern bildirim (animasyonlu, yukarıdan gelen)
     lib.notify({
         title = '📢 ' .. Config.TitleStyle,
@@ -30,4 +42,15 @@ RegisterNetEvent('swx_announce:ShowChatAnnouncement', function(message, adminNam
         multiline = true,
         args = {'📢 [DUYURU] ' .. adminName, message}
     })
+end)
+
+-- NUI Başlatma - Resource start olduğunda NUI'yi yükle
+AddEventHandler('onClientResourceStart', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        -- NUI'yi başlat (görünmez şekilde)
+        SendNUIMessage({
+            action = 'init'
+        })
+        print('[SWX-Announce] Ses sistemi başlatıldı!')
+    end
 end)

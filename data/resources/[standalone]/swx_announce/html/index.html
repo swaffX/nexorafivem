@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWX Announce - Ses Sistemi</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+        
+        #audio-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="audio-container">
+        <audio id="announcement-audio" preload="auto">
+            <source src="voice.mp3" type="audio/mpeg">
+            Tarayıcınız ses dosyasını desteklemiyor.
+        </audio>
+    </div>
+
+    <script>
+        const audio = document.getElementById('announcement-audio');
+        
+        // Lua'dan gelen mesajları dinle
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            if (data.action === 'playSound' && data.soundFile) {
+                // Ses seviyesini ayarla (0.0 - 1.0)
+                audio.volume = 0.7;
+                
+                // Sesin başlangıcına git
+                audio.currentTime = 0;
+                
+                // Sesi çal
+                audio.play().catch(function(error) {
+                    console.log('Ses çalma hatası:', error);
+                });
+            }
+        });
+        
+        // Sayfa yüklendiğinde sesi hazırla
+        window.onload = function() {
+            console.log('[SWX-Announce] Ses sistemi hazır');
+        };
+    </script>
+</body>
+</html>

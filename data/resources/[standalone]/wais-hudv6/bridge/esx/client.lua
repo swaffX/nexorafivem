@@ -12,41 +12,31 @@ RegisterNetEvent("esx:onPlayerLogout", function()
     wFramework.playerUnloaded()
 end)
 
-
+-- PARA/BANKA EVENTLERI KALDIRILDI - Nexora RP
+--[[
 -- Zmiana pieniędzy na koncie
 RegisterNetEvent("esx:setAccountMoney", function()
     Wait(250)
     wFramework.GetPlayerBank()
-    
-    -- Pobierz pieniądze tylko jeśli nie są itemem
     if not Config.MoneySettings.isItem then
         wFramework.GetPlayerMoney()
     end
 end)
 
-
--- ============================================
 -- ZDARZENIA INWENTARZA - PIENIĄDZE JAKO ITEM
--- ============================================
-
 if Config.MoneySettings.isItem then
-    -- Jeśli nie używa ox_inventory, nasłuchuj zdarzenia ESX
     if not Config.MoneySettings.ox_inventory then
-        
-        -- Gracz dodał item (w tym pieniądze)
         RegisterNetEvent("esx:addInventoryItem", function()
             Wait(500)
             wFramework.GetPlayerMoney()
         end)
-        
-        -- Gracz usunął item (w tym pieniądze)
         RegisterNetEvent("esx:removeInventoryItem", function()
             Wait(500)
             wFramework.GetPlayerMoney()
         end)
     end
 end
-
+--]]
 
 -- ============================================
 -- PRACA
@@ -88,8 +78,10 @@ end)
 -- NIESTANDARDOWE ZDARZENIA
 -- ============================================
 
--- Aktualizacja pieniędzy (stary system bez itemów)
+-- PARA GUNCELLEME EVENTI KALDIRILDI - Nexora RP
+--[[
 RegisterNetEvent("wais:hudv6:client:updateOldMoney", function(money)
     wFramework.Money.cash = money
     wFramework.sendMoneyToUI()
 end)
+--]]
