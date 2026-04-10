@@ -61,13 +61,13 @@ Config.Jobs = {
         },
         ["CameraOffsets"] = { x = 0.75, y = -0.75, z = 0.5, zRot = 0.5, fov = 30.0 },
         ["reward"] = {
-            ["min"] = 150,
-            ["max"] = 250
+            ["min"] = 200,
+            ["max"] = 320
         },
         ["timer"] = {
             ["extra_time"] = 2 * 60 * 1000,
             ["delivery_time"] = 5 * 60 * 1000,
-            ["deducted_per_min"] = 50,
+            ["deducted_per_min"] = 40,
         },
         ["car_settings"] = {
             ["model"] = "pizzaboy",
@@ -203,13 +203,13 @@ Config.Jobs = {
             }
         },
         ["delivery_reward"] = {
-            ["min"] = 4,
-            ["max"] = 13
+            ["min"] = 130,
+            ["max"] = 180
         },
         ["timer"] = {
             ["extra_time"] = 2 * 60 * 1000,
             ["delivery_time"] = 6 * 60 * 1000,
-            ["deducted_per_min"] = 5,
+            ["deducted_per_min"] = 20,
         },
         ["car_settings"] = {
             ["model"] = "rumpo",
@@ -318,8 +318,8 @@ Config.Jobs = {
             }
         },
         ["reward"] = {
-            ["min"] = 80,
-            ["max"] = 150
+            ["min"] = 120,
+            ["max"] = 200
         },
         ["randomPedTime"] = math.random(5, 7),
         ["prop"] = {
@@ -431,14 +431,14 @@ Config.Jobs = {
         ["cargo_list"] = {
             [1] = {
                 ["menuTitle"] = "Napkin loading",
-                ["reward"] = 150,
+                ["reward"] = 220,
                 ["area"] = vec3(1157.48, -3280.74, 5.90),
                 ["radius"] = 45.0,
                 ["forkliftCoords"] = vec4(1157.37, -3294.78, 5.90, 3.18),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 6 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -504,14 +504,14 @@ Config.Jobs = {
             },
             [2] = {
                 ["menuTitle"] = "Tyre loading",
-                ["reward"] = 150,
+                ["reward"] = 220,
                 ["area"] = vec3(1255.13, -3258.02, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1264.60, -3243.45, 5.90, 177.19),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -577,14 +577,14 @@ Config.Jobs = {
             },
             [3] = {
                 ["menuTitle"] = "Fish  loading",
-                ["reward"] = 150,
+                ["reward"] = 220,
                 ["area"] = vec3(1256.33, -3192.25, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1245.74, -3193.01, 6.03, 266.85),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -650,14 +650,14 @@ Config.Jobs = {
             },
             [4] = {
                 ["menuTitle"] = "Cement loading",
-                ["reward"] = 150,
+                ["reward"] = 220,
                 ["area"] = vec3(1215.10, -3218.25, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1226.12, -3210.17, 5.86, 90.20),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -723,14 +723,14 @@ Config.Jobs = {
             },
             [5] = {
                 ["menuTitle"] = "Flour loading",
-                ["reward"] = 250,
+                ["reward"] = 280,
                 ["area"] = vec3(1257.45, -3290.61, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1244.69, -3303.57, 6.03, 271.64),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -796,14 +796,14 @@ Config.Jobs = {
             },
             [6] = {
                 ["menuTitle"] = "Christmas decorations loading",
-                ["reward"] = 250,
+                ["reward"] = 280,
                 ["area"] = vec3(1254.63, -3229.64, 5.80),
                 ["radius"] = 35.0,
                 ["forkliftCoords"] = vec4(1264.84, -3219.89, 5.90, 93.96),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -869,14 +869,14 @@ Config.Jobs = {
             },
             [7] = {
                 ["menuTitle"] = "Fish loading",
-                ["reward"] = 250,
+                ["reward"] = 280,
                 ["area"] = vec3(1218.85, -3218.34, 5.80),
                 ["radius"] = 55.0,
                 ["forkliftCoords"] = vec4(1229.73, -3225.53, 5.85, 89.04),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -942,14 +942,14 @@ Config.Jobs = {
             },
             [8] = {
                 ["menuTitle"] = "Spare tire loading",
-                ["reward"] = 250,
+                ["reward"] = 280,
                 ["area"] = vec3(1183.78, -3198.86, 6.03),
                 ["radius"] = 40.0,
                 ["forkliftCoords"] = vec4(1179.46, -3205.24, 5.48, 0.11),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
@@ -1015,14 +1015,14 @@ Config.Jobs = {
             },
             [9] = {
                 ["menuTitle"] = "Flour loading - 2",
-                ["reward"] = 250,
+                ["reward"] = 280,
                 ["area"] = vec3(1166.41, -3292.30, 5.90),
                 ["radius"] = 40.0,
                 ["forkliftCoords"] = vec4(1174.11, -3304.43, 5.35, 359.51),
                 ["timer"] = {
                     ["extra_time"] = 2 * 60 * 1000,
                     ["mission_time"] = 4 * 60 * 1000,
-                    ["deducted_per_min"] = 150,
+                    ["deducted_per_min"] = 20,
                 },
                 ["cargo_car"] = {
                     ["truck"] = "phantom3",
