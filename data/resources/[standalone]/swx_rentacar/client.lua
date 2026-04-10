@@ -219,7 +219,7 @@ local function SpawnRentedVehicle(vehicleData)
     
     -- Araç oluştur
     local vehicle = CreateVehicle(vehicleData.model, spawnCoords.x, spawnCoords.y, spawnCoords.z, spawnCoords.w, true, false)
-    
+
     if not DoesEntityExist(vehicle) then
         lib.notify({
             title = 'Hata',
@@ -228,11 +228,14 @@ local function SpawnRentedVehicle(vehicleData)
         })
         return false
     end
-    
+
     -- Araç ayarları
     SetEntityAsMissionEntity(vehicle, true, true)
     SetVehicleNumberPlateText(vehicle, "KIRALIK")
     SetVehicleEngineOn(vehicle, true, true, false)
+
+    -- Oyuncuyu aracın içine koy (SÜRÜCÜ KOLTUĞU)
+    SetPedIntoVehicle(PlayerPedId(), vehicle, -1)
     
     -- Yakıt
     SetVehicleFuelLevel(vehicle, 100.0)

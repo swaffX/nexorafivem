@@ -6,10 +6,9 @@ Config.NPCLocation = vector4(-1039.28, -2730.74, 19.1, 226.21)
 -- NPC Modeli (galerideki gibi)
 Config.NPCModel = "s_m_m_autoshop_01"
 
--- Araç Spawn Konumları (NPC'nin yakınında - 1 TANE KALDI)
+-- Araç Spawn Konumları (Ekrandaki Ped Coordinates konumu)
 Config.SpawnLocations = {
-    vector4(-1045.28, -2732.74, 19.2, 145.0),
-    -- vector4(-1042.28, -2728.74, 20.21, 145.0), -- KALDIRILDI
+    vector4(-1033.85, -2728.22, 20.16, 230.52),
 }
 
 -- Kiralanabilir Araçlar
