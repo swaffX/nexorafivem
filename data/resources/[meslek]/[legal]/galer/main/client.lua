@@ -1,6 +1,130 @@
 isOpen, TestDriveTime, SpawnCoords, Coords, TestDrive, lastPlayerCoords, Framework = {}, true, nil, nil, nil, nil, nil, nil, nil
 local currentVeh = nil
 local createdPeds = {}
+local pendingPurchaseData = nil
+
+-- Ödeme menüsü göster (ox_lib context menu)
+local function ShowPaymentMenu(data, Framework, isQBCore)
+    pendingPurchaseData = data
+
+    -- Bakiye bilgilerini al
+    local cash = 0
+    local bank = 0
+
+    if isQBCore then
+        local PlayerData = Framework.Functions.GetPlayerData()
+        cash = PlayerData.money.cash or 0
+        bank = PlayerData.money.bank or 0
+    else
+        local PlayerData = Framework.GetPlayerData()
+        cash = PlayerData.money or 0
+        bank = PlayerData.bank or 0
+    end
+
+    local price = data.price
+    local vehicleName = data.model
+
+    lib.registerContext({
+        id = 'galer_payment_menu',
+        title = 'Araç Satın Alma',
+        options = {
+            {
+                title = vehicleName:upper(),
+                description = 'Fiyat: $' .. price,
+                icon = 'car',
+                disabled = true
+            },
+            {
+                title = 'Nakit ile Öde',
+                description = 'Mevcut: $' .. cash .. ' | Gereken: $' .. price,
+                icon = 'money-bill',
+                disabled = cash < price,
+                onSelect = function()
+                    ProcessPurchase(data, 'cash', Framework, isQBCore)
+                end
+            },
+            {
+                title = 'Bankadan Öde',
+                description = 'Mevcut: $' .. bank .. ' | Gereken: $' .. price,
+                icon = 'credit-card',
+                disabled = bank < price,
+                onSelect = function()
+                    ProcessPurchase(data, 'bank', Framework, isQBCore)
+                end
+            },
+            {
+                title = 'İptal',
+                description = 'Satın almayı iptal et',
+                icon = 'times',
+                onSelect = function()
+                    pendingPurchaseData = nil
+                end
+            }
+        }
+    })
+
+    lib.showContext('galer_payment_menu')
+end
+
+-- Satın alma işlemini gerçekleştir
+function ProcessPurchase(data, paymentMethod, Framework, isQBCore)
+    local callbackName = isQBCore and "Framework.Functions.TriggerCallback" or "Framework.TriggerServerCallback"
+
+    if isQBCore then
+        Framework.Functions.TriggerCallback("isPrice", function(result)
+            if not result then
+                Framework.Functions.Notify('Yetersiz bakiye!', 'error')
+                return
+            end
+            CompleteVehiclePurchase(data, Framework, isQBCore)
+        end, data.price, paymentMethod)
+    else
+        Framework.TriggerServerCallback("isPrice", function(result)
+            if not result then
+                Framework.ShowNotification("Yetersiz bakiye!")
+                return
+            end
+            CompleteVehiclePurchase(data, Framework, isQBCore)
+        end, data.price, paymentMethod)
+    end
+end
+
+-- Araç oluşturma ve sahiplik atama
+function CompleteVehiclePurchase(data, Framework, isQBCore)
+    local hash = GetHashKey(data.model)
+    local coords = konumfor(SpawnCoords)
+    if coords == nil then return end
+
+    RequestModel(hash)
+    while not HasModelLoaded(hash) do
+        Citizen.Wait(10)
+    end
+
+    local buycar = CreateVehicle(hash, coords.x, coords.y, coords.z, coords.w, true, false)
+    local netid = NetworkGetNetworkIdFromEntity(buycar)
+    SetPedIntoVehicle(PlayerPedId(), buycar, -1)
+    SetVehicleNumberPlateText(buycar, CustomizePlate())
+    SetVehicleCustomPrimaryColour(buycar, data.color.R, data.color.G, data.color.B)
+    SetVehicleCustomSecondaryColour(buycar, data.color.R, data.color.G, data.color.B)
+    SetVehicleHasBeenOwnedByPlayer(buycar, true)
+    SetNetworkIdCanMigrate(netid, true)
+    SetVehicleNeedsToBeHotwired(buycar, false)
+    SetVehRadioStation(buycar, 'OFF')
+
+    local Plate = Trim(GetVehicleNumberPlateText(buycar))
+    CloseNui()
+    CustomizeCamera(isOpen)
+    Config.Carkeys(Plate)
+
+    if isQBCore then
+        TriggerServerEvent("vehicleshop:setVehicleOwned", Plate, Framework.Functions.GetVehicleProperties(buycar), data.model)
+    else
+        TriggerServerEvent("vehicleshop:setVehicleOwned", Plate, Framework.Game.GetVehicleProperties(buycar), data.model)
+    end
+
+    SendNUIMessage({type = "close"})
+    pendingPurchaseData = nil
+end
 
 RegisterNUICallback("TestDrive", function(data, cb)
     SetEntityVisible(PlayerPedId(), 1)
@@ -289,37 +413,9 @@ end)
 
 
    RegisterNUICallback("Buy", function(data, cb)
-    Framework.TriggerServerCallback("isPrice", function(result)
-        if result then 
-        local hash = GetHashKey(data.model)
-        local coords = konumfor(SpawnCoords)
-        if coords ~= nil then
-        if not HasModelLoaded(hash) then RequestModel(hash) while not HasModelLoaded(hash) do Citizen.Wait(10) end end
-        local buycar = CreateVehicle(hash, coords.x,coords.y,coords.z, coords.w, true, false)
-        local netid = NetworkGetNetworkIdFromEntity(buycar)
-        local NewPlate = CustomizePlate()
-        SetPedIntoVehicle(PlayerPedId(), buycar, -1)
-        SetVehicleNumberPlateText(buycar, NewPlate)
-        SetVehicleCustomPrimaryColour(buycar,  data.color.R, data.color.G, data.color.B)
-        SetVehicleCustomSecondaryColour(buycar, data.color.R, data.color.G, data.color.B)
-        SetPedIntoVehicle(PlayerPedId(), buycar, -1)
-        SetVehicleHasBeenOwnedByPlayer(buycar, true)
-        SetNetworkIdCanMigrate(netid, true)
-        SetVehicleNeedsToBeHotwired(buycar, false)
-        SetVehRadioStation(buycar, 'OFF')
-        local Plate = GetVehicleNumberPlateText(buycar)
-        Plate = Trim(GetVehicleNumberPlateText(buycar))
-        CloseNui()
-        CustomizeCamera(isOpen)
-        TriggerServerEvent("vehicleshop:setVehicleOwned", Plate, Framework.Game.GetVehicleProperties(buycar), data.model)
-        SendNUIMessage({type = "close"})
-        Config.Carkeys(Plate)
-    end
-else
-    Framework.ShowNotification("Insufficient Money")
-    end
-end, data.price)
-end)
+       -- Ödeme menüsünü göster
+       ShowPaymentMenu(data, Framework, false)
+   end)
 
 
 end)
@@ -376,39 +472,8 @@ elseif Config.Framework == 'QBCore' or Config.Framework == 'OLDQBCore'  then
         end)  
 
         RegisterNUICallback("Buy", function(data, cb)
-            Framework.Functions.TriggerCallback("isPrice", function(result)
-                if not result then
-                    print('Insufficient Money')
-                    return
-                end
-        
-                local hash = GetHashKey(data.model)
-                local coords = konumfor(SpawnCoords)
-                if coords == nil then return end
-        
-                RequestModel(hash)
-                while not HasModelLoaded(hash) do
-                    Citizen.Wait(10)
-                end
-        
-                local buycar = CreateVehicle(hash, coords.x, coords.y, coords.z, coords.w, true, false)
-                local netid = NetworkGetNetworkIdFromEntity(buycar)
-                SetPedIntoVehicle(PlayerPedId(), buycar, -1)
-                SetVehicleNumberPlateText(buycar, CustomizePlate())
-                SetVehicleCustomPrimaryColour(buycar, data.color.R, data.color.G, data.color.B)
-                SetVehicleCustomSecondaryColour(buycar, data.color.R, data.color.G, data.color.B)
-                SetVehicleHasBeenOwnedByPlayer(buycar, true)
-                SetNetworkIdCanMigrate(netid, true)
-                SetVehicleNeedsToBeHotwired(buycar, false)
-                SetVehRadioStation(buycar, 'OFF')
-        
-                local Plate = Trim(GetVehicleNumberPlateText(buycar))
-                CloseNui()
-                CustomizeCamera(isOpen)
-                Config.Carkeys(Plate)
-                TriggerServerEvent("vehicleshop:setVehicleOwned", Plate, Framework.Functions.GetVehicleProperties(buycar), data.model)
-                SendNUIMessage({type = "close"})
-            end, data.price)
+            -- Ödeme menüsünü göster
+            ShowPaymentMenu(data, Framework, true)
         end)
 
      end

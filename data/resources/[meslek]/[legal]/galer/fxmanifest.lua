@@ -2,8 +2,11 @@ fx_version "adamant"
 
 description "www.fivemscript.store"
 
-
 game "gta5"
+
+shared_scripts {
+    '@ox_lib/init.lua'
+}
 
 client_script { 
 "main/client.lua"

@@ -52,13 +52,18 @@ Config.Vehicles = {
             {model='drafter',    label='Drafter',       price=55000,   category='sport'},
             {model='jester',     label='Jester',        price=48000,   category='sport'},
             {model='elegy2',     label='Elegy Retro',   price=52000,   category='sport'},
-            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='sport'},
-            {model='r820',       label='Audi R8 2020',  price=100000,  category='sport'},
-            {model='redeye',     label='Dodge Challenger', price=80000, category='sport'},
-            {model='cla250',     label='Mercedes Benz CLA 250', price=85000, category='luxury'},
             {model='hermes',     label='Hermes',        price=38000,   category='trunk'},
             {model='blade',      label='Blade',         price=24000,   category='trunk'},
             
+            -- [DONATE ARAÇLAR]
+            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='donate'},
+            {model='r820',       label='Audi R8 2020',  price=100000,  category='donate'},
+            {model='redeye',     label='Dodge Challenger', price=80000, category='donate'},
+            {model='fordmustang', label='Ford Mustang 2019', price=95000, category='donate'},
+            {model='r35',        label='Nissan GT-R R35 Nismo', price=90000, category='donate'},
+            {model='subarubrz',  label='Subaru BRZ 2013', price=55000, category='donate'},
+            {model='porsche911', label='Porsche 911 Turbo S', price=120000, category='donate'},
+
             -- [LÜKS ARABALAR]
             {model='zentorno',   label='Zentorno',      price=145000,  category='sport'},
             
@@ -121,6 +126,7 @@ Config.Vehicles = {
             {name='sedan',     trunk='15'},
             {name='universal', trunk='5'},
             {name='moto',      trunk='5'},
+            {name='donate',    trunk='10'},
         },
 
         ['boat'] = {

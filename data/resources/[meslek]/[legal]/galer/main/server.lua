@@ -49,13 +49,28 @@ if Config.Framework == "ESX" or Config.Framework == "NewESX" then
                 end
             end)
 
-            Framework.RegisterServerCallback("isPrice", function(source, cb, money)
+            Framework.RegisterServerCallback("isPrice", function(source, cb, money, paymentMethod)
                 local Player = Framework.GetPlayerFromId(source)
-                if Player.getMoney() >= tonumber(money) then 
-                    Player.removeMoney(tonumber(money))
-                    cb(true)
+                local amount = tonumber(money)
+                paymentMethod = paymentMethod or 'cash'
+
+                if paymentMethod == 'bank' then
+                    -- Bank account check
+                    local bankMoney = Player.getAccount('bank').money
+                    if bankMoney >= amount then
+                        Player.removeAccountMoney('bank', amount)
+                        cb(true)
+                    else
+                        cb(false)
+                    end
                 else
-                    cb(false)
+                    -- Cash check
+                    if Player.getMoney() >= amount then
+                        Player.removeMoney(amount)
+                        cb(true)
+                    else
+                        cb(false)
+                    end
                 end
             end)
 
@@ -92,9 +107,11 @@ elseif Config.Framework == "QBCore" or Config.Framework == "OLDQBCore" then
         
 
          
-        Framework.Functions.CreateCallback("isPrice", function(source, cb, money)
+        Framework.Functions.CreateCallback("isPrice", function(source, cb, money, paymentMethod)
             local Player = Framework.Functions.GetPlayer(source)
-            if Player.Functions.RemoveMoney('cash', money) then
+            paymentMethod = paymentMethod or 'cash'
+
+            if Player.Functions.RemoveMoney(paymentMethod, money) then
                 cb(true)
             else
                 cb(false)
