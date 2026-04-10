@@ -285,47 +285,10 @@ function PlayMusic(url, title)
         local vehicleNetId = NetworkGetNetworkIdFromEntity(vehicle)
         TriggerServerEvent('swx_speaker:server:playMusic', url, title, vehicleNetId, coords)
         
-        -- Pozisyon güncelleme thread'i - Daha sık güncelleme
-        CreateThread(function()
-            local threadVehicleNetId = vehicleNetId -- Thread için local kopya
-            
-            while isPlaying and currentMusicId do
-                -- Güncel araç bilgisini al (her zaman güncel kalsın)
-                local ped = PlayerPedId()
-                local currentVehicle = GetVehiclePedIsIn(ped, false)
-                local targetVehicle = nil
-                
-                -- Eğer araçta ise ve Network ID eşleşiyorsa kullan
-                if currentVehicle ~= 0 and DoesEntityExist(currentVehicle) then
-                    local currentNetId = NetworkGetNetworkIdFromEntity(currentVehicle)
-                    if currentNetId == threadVehicleNetId then
-                        targetVehicle = currentVehicle
-                    end
-                end
-                
-                -- Araç hala var mi kontrol et
-                if not targetVehicle or not DoesEntityExist(targetVehicle) then
-                    Wait(100)
-                    goto continue
-                end
-                
-                -- Music ID hala gecerli mi
-                local success = pcall(function()
-                    local newCoords = GetEntityCoords(targetVehicle)
-                    if newCoords then
-                        exports.xsound:Position(currentMusicId, newCoords)
-                    end
-                end)
-                
-                if not success then
-                    print('[SWX Speaker] Pozisyon güncelleme hatası, thread durduruluyor')
-                    break
-                end
-                
-                ::continue::
-                Wait(100) -- 100ms'de bir güncelle - daha akıcı takip
-            end
-        end)
+        -- Pozisyon güncelleme KALDIRILDI - 3D ses yerine global ses kullan
+        -- Araç hareketiyle müzik kesilmesini önlemek için position yerine play kullanıyoruz
+        -- Global ses her yerden duyulur, pozisyon takibi gerekmez
+        print('[SWX Speaker] Global ses modu - araç hareketi müziği etkilemez')
         
         -- Müzik durma kontrolü (heartbeat) - YouTube timeout sorunu için
         CreateThread(function()

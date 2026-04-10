@@ -94,7 +94,9 @@ local function OpenRemoteEngineMenu()
         local hasNearbyVehicle = false
         
         for _, veh in ipairs(vehicles) do
-            if Config.AllowedVehicles[veh.vehicle] then
+            -- Eğer AllowedVehicles nil ise tüm araçlar izinli, değilse kontrol et
+            local isAllowed = (Config.AllowedVehicles == nil) or Config.AllowedVehicles[veh.vehicle]
+            if isAllowed then
                 local nearbyVeh = FindVehicleByPlate(veh.plate)
                 if nearbyVeh then
                     local vehicleCoords = GetEntityCoords(nearbyVeh)
@@ -119,8 +121,9 @@ local function OpenRemoteEngineMenu()
             local plate = veh.plate
             local model = veh.vehicle
             
-            -- Sadece izin verilen araç modellerini göster
-            if not Config.AllowedVehicles[model] then
+            -- Sadece izin verilen araç modellerini göster (nil = tüm araçlar)
+            local isAllowed = (Config.AllowedVehicles == nil) or Config.AllowedVehicles[model]
+            if not isAllowed then
                 goto continue  -- İzin verilmeyen araçları atla
             end
             

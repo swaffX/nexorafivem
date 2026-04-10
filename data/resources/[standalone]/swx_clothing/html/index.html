@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora Envanter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="inventory-container">
+            <!-- Kıyafet Paneli (Sol) -->
+            <div class="clothing-panel">
+                <h2><i class="fas fa-tshirt"></i> Kıyafetler</h2>
+                <div class="clothing-slots">
+                    <div class="clothing-slot" data-slot="head">
+                        <i class="fas fa-hat-cowboy"></i>
+                        <span>Kafa</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('head')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="torso">
+                        <i class="fas fa-shirt"></i>
+                        <span>Üst</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('torso')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="undershirt">
+                        <i class="fas fa-vest"></i>
+                        <span>İç Giyim</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('undershirt')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="legs">
+                        <i class="fas fa-socks"></i>
+                        <span>Alt</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('legs')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="shoes">
+                        <i class="fas fa-shoe-prints"></i>
+                        <span>Ayakkabı</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('shoes')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="bag">
+                        <i class="fas fa-suitcase"></i>
+                        <span>Çanta</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('bag')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="accessory">
+                        <i class="fas fa-gem"></i>
+                        <span>Aksesuar</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('accessory')"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clothing-slot" data-slot="mask">
+                        <i class="fas fa-mask"></i>
+                        <span>Maske</span>
+                        <div class="item-preview"></div>
+                        <button class="remove-btn" onclick="removeClothing('mask')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Envanter Paneli (Orta) -->
+            <div class="inventory-panel">
+                <div class="inventory-header">
+                    <h2><i class="fas fa-box"></i> Envanter</h2>
+                    <div class="weight-info">
+                        <span id="current-weight">0.0</span> / <span id="max-weight">50.0</span> kg
+                        <div class="weight-bar">
+                            <div class="weight-fill" id="weight-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="inventory-grid" id="inventory-grid">
+                    <!-- Slotlar JS ile oluşturulacak -->
+                </div>
+            </div>
+
+            <!-- Bilgi Paneli (Sağ) -->
+            <div class="info-panel">
+                <div class="player-info">
+                    <h3 id="player-name">İsimsiz</h3>
+                    <p id="player-job">İşsiz</p>
+                    <p id="player-id">ID: -</p>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="searchPlayer()">
+                        <i class="fas fa-search"></i> Ara
+                    </button>
+                    <button class="action-btn" onclick="closeInventory()">
+                        <i class="fas fa-times"></i> Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,5 +1,8 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-- Config'den izin verilen araçları al (nil = tüm araçlar izinli)
+local AllowedVehicles = Config.AllowedVehicles
+
 -- Oyuncunun araçlarını getir
 QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(source, cb)
     local Player = QBCore.Functions.GetPlayer(source)
@@ -12,19 +15,33 @@ QBCore.Functions.CreateCallback('swx_remoteengine:GetPlayerVehicles', function(s
     local citizenid = Player.PlayerData.citizenid
     
     -- Veritabanından oyuncunun araçlarını çek
-    MySQL.query('SELECT vehicle, plate FROM player_vehicles WHERE citizenid = ?', {citizenid}, function(result)
-        if result then
-            cb(result)
-        else
-            cb({})
-        end
-    end)
+    -- Eğer AllowedVehicles nil ise tüm araçlar, değilse sadece izinliler
+    if AllowedVehicles == nil then
+        -- Tüm araçları getir
+        MySQL.query('SELECT vehicle, plate FROM player_vehicles WHERE citizenid = ?', {citizenid}, function(result)
+            if result then
+                cb(result)
+            else
+                cb({})
+            end
+        end)
+    else
+        -- Sadece izin verilen araçları getir
+        MySQL.query('SELECT vehicle, plate FROM player_vehicles WHERE citizenid = ?', {citizenid}, function(result)
+            if result then
+                local filtered = {}
+                for _, vehicle in ipairs(result) do
+                    if AllowedVehicles[vehicle.vehicle] then
+                        table.insert(filtered, vehicle)
+                    end
+                end
+                cb(filtered)
+            else
+                cb({})
+            end
+        end)
+    end
 end)
-
--- İzin verilen araç modelleri (client ile senkronize olmalı)
-local AllowedVehicles = {
-    ['redeye'] = true,  -- Dodge Challenger
-}
 
 -- Motor durumunu değiştir ve senkronize et
 RegisterNetEvent('swx_remoteengine:ToggleEngine', function(plate, netId, engineState)
@@ -39,8 +56,8 @@ RegisterNetEvent('swx_remoteengine:ToggleEngine', function(plate, netId, engineS
         if result and result[1] then
             local vehicleModel = result[1].vehicle
             
-            -- Araç modeli izin verilen listede mi kontrol et
-            if not AllowedVehicles[vehicleModel] then
+            -- Araç modeli izin verilen listede mi kontrol et (sadece kısıtlama varsa)
+            if AllowedVehicles ~= nil and not AllowedVehicles[vehicleModel] then
                 TriggerClientEvent('QBCore:Notify', src, 'Bu araç uzaktan çalıştırma desteklemiyor!', 'error')
                 return
             end

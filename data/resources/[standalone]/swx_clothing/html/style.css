@@ -1,0 +1,309 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: transparent;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.inventory-container {
+    display: flex;
+    gap: 15px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid rgba(0, 212, 255, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    max-width: 1200px;
+    width: 95%;
+}
+
+/* Kıyafet Paneli */
+.clothing-panel {
+    width: 200px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.clothing-panel h2 {
+    color: #00d4ff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 2px solid #00d4ff;
+    padding-bottom: 10px;
+}
+
+.clothing-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.clothing-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.clothing-slot:hover {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.clothing-slot i {
+    color: #00d4ff;
+    font-size: 18px;
+    width: 25px;
+    text-align: center;
+}
+
+.clothing-slot span {
+    color: #fff;
+    font-size: 12px;
+    flex: 1;
+}
+
+.clothing-slot .remove-btn {
+    background: rgba(255, 0, 0, 0.3);
+    border: none;
+    color: #ff4444;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+    transition: all 0.3s;
+}
+
+.clothing-slot:hover .remove-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clothing-slot .remove-btn:hover {
+    background: rgba(255, 0, 0, 0.5);
+}
+
+.clothing-slot.has-item {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.clothing-slot.has-item i {
+    color: #00ff88;
+}
+
+/* Envanter Paneli */
+.inventory-panel {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+.inventory-header h2 {
+    color: #00d4ff;
+    font-size: 18px;
+}
+
+.weight-info {
+    color: #fff;
+    font-size: 12px;
+    text-align: right;
+}
+
+.weight-bar {
+    width: 150px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.weight-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff, #00ff88);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 8px;
+    min-height: 400px;
+}
+
+.inv-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.inv-slot:hover {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.inv-slot.occupied {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.inv-slot .slot-number {
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+}
+
+.inv-slot .item-icon {
+    font-size: 24px;
+    color: #00d4ff;
+}
+
+.inv-slot .item-amount {
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.inv-slot .item-name {
+    position: absolute;
+    bottom: 3px;
+    left: 5px;
+    right: 5px;
+    color: #fff;
+    font-size: 9px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Bilgi Paneli */
+.info-panel {
+    width: 180px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.player-info {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.player-info h3 {
+    color: #00d4ff;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.player-info p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    margin: 3px 0;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.action-btn {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    border: none;
+    color: #1a1a2e;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+}
+
+.action-btn i {
+    font-size: 14px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00d4ff;
+    border-radius: 3px;
+}
