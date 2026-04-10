@@ -11,7 +11,7 @@ Config.Framework = {
 }
 
 Config.Language = "tr" -- ar, cz, ro, it, fr, de, tr (Türkçe)
-Config.ShowDebug = false -- If you set this to `true`, the debug messages will be printed in the console. If you set it to `false`, no debug messages will be printed.
+Config.ShowDebug = true -- If you set this to `true`, the debug messages will be printed in the console. If you set it to `false`, no debug messages will be printed.
 Config.ShowMapOnFoot = true -- If `true` is set, the player can see the map when not in the vehicle. If `false`, the map will only be visible when in the vehicle.
 Config.SendStatusAlert = false -- If this option is `true`, the player will be notified if the hunger or thirst value falls below 20. Tick `false` if you do not want to use this system
 Config.StressSystem = true -- If you make `true`, stress will come next to the status bars. You will be able to see your stress values. You need to use a script for qb-stress esx for QBCore

@@ -328,10 +328,21 @@ function wFramework.GetPlayerMoney()
             end
         else
             Config.Debug("[^2INFO - FRAMEWORK^0] Getting player money from data")
+            -- Önce wFramework.PlayerData'den al
             if playerData.money then
                 wFramework.Money.cash = playerData.money.cash or 0
+                Config.Debug("[^2INFO - FRAMEWORK^0] Cash from wFramework.PlayerData: " .. wFramework.Money.cash)
             else
                 wFramework.Money.cash = 0
+            end
+
+            -- Fallback: Doğrudan QBCore'dan al
+            if wFramework.Framework and wFramework.Framework.Functions then
+                local qbPlayerData = wFramework.Framework.Functions.GetPlayerData()
+                if qbPlayerData and qbPlayerData.money and qbPlayerData.money.cash then
+                    wFramework.Money.cash = qbPlayerData.money.cash
+                    Config.Debug("[^2INFO - FRAMEWORK^0] Cash from QBCore direct: " .. wFramework.Money.cash)
+                end
             end
         end
     
