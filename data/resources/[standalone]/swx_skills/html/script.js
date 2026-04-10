@@ -1,129 +1,111 @@
 let skillBars = {};
+let hideTimers = {};
 
 window.addEventListener('message', function(event) {
     const data = event.data;
-    
     switch(data.type) {
-        case 'showSkillBar':
-            showSkillBar(data);
-            break;
-        case 'hideSkillBar':
-            hideSkillBar(data.skill);
-            break;
-        case 'updateSkill':
-            updateSkill(data);
-            break;
-        case 'showAllSkills':
-            showAllSkills(data.skills);
-            break;
-        case 'hideAllSkills':
-            hideAllSkills();
-            break;
+        case 'showSkillBar':  showSkillBar(data);          break;
+        case 'hideSkillBar':  hideSkillBar(data.skill);    break;
+        case 'updateSkill':   updateSkill(data);           break;
+        case 'showAllSkills': showAllSkills(data.skills);  break;
+        case 'hideAllSkills': hideAllSkills();             break;
     }
 });
 
+function fmt(n) {
+    return Math.floor(n).toLocaleString('de-DE');
+}
+
+function createSkillBar(skillName, level, xp, requiredXP, config) {
+    const el = document.createElement('div');
+    el.className = 'skill-bar';
+    el.id = `skill-${skillName}`;
+
+    const pct = Math.min((xp / requiredXP) * 100, 100);
+
+    el.innerHTML = `
+        <div class="skill-name">${config.label.toUpperCase()}</div>
+        <div class="skill-row">
+            <span class="skill-level-num">${level}</span>
+            <div class="skill-progress">
+                <div class="skill-progress-bar" style="width:0%"></div>
+            </div>
+            <span class="skill-level-num">${level + 1}</span>
+        </div>
+        <div class="skill-xp-text">${fmt(xp)} / ${fmt(requiredXP)}</div>
+    `;
+
+    // Animate bar after mount
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.querySelector('.skill-progress-bar').style.width = pct + '%';
+        });
+    });
+
+    return el;
+}
+
 function showSkillBar(data) {
-    console.log('[SWX Skills UI] showSkillBar:', data.skill, 'Level:', data.level, 'XP:', data.xp, '/', data.requiredXP);
-    const skillBarsContainer = document.getElementById('skill-bars');
-    
-    // Eğer bu skill zaten gösteriliyorsa güncelle
+    const container = document.getElementById('skill-bars');
+
+    // Clear pending hide timer
+    if (hideTimers[data.skill]) {
+        clearTimeout(hideTimers[data.skill]);
+        delete hideTimers[data.skill];
+    }
+
     if (skillBars[data.skill]) {
-        updateSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
+        // Already visible – just update values
+        updateBarDOM(data.skill, data.level, data.xp, data.requiredXP);
+        // Remove hiding class if mid-animation
+        skillBars[data.skill].classList.remove('hiding');
         return;
     }
-    
-    // Yeni skill bar oluştur
-    const skillBar = createSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
-    skillBarsContainer.appendChild(skillBar);
-    skillBars[data.skill] = skillBar;
+
+    const el = createSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
+    container.appendChild(el);
+    skillBars[data.skill] = el;
 }
 
 function hideSkillBar(skillName) {
-    if (skillBars[skillName]) {
-        skillBars[skillName].remove();
+    const el = skillBars[skillName];
+    if (!el) return;
+
+    el.classList.add('hiding');
+    hideTimers[skillName] = setTimeout(() => {
+        el.remove();
         delete skillBars[skillName];
-    }
+        delete hideTimers[skillName];
+    }, 500); // Match fadeOutDown duration
+}
+
+function updateBarDOM(skillName, level, xp, requiredXP) {
+    const el = skillBars[skillName];
+    if (!el) return;
+    const pct = Math.min((xp / requiredXP) * 100, 100);
+    el.querySelector('.skill-name');                                    // unchanged
+    const nums = el.querySelectorAll('.skill-level-num');
+    nums[0].textContent = level;
+    nums[1].textContent = level + 1;
+    el.querySelector('.skill-progress-bar').style.width = pct + '%';
+    el.querySelector('.skill-xp-text').textContent = `${fmt(xp)} / ${fmt(requiredXP)}`;
 }
 
 function updateSkill(data) {
-    console.log('[SWX Skills UI] updateSkill:', data.skill, 'Level:', data.level, 'XP:', data.xp, '/', data.requiredXP);
-    
     if (skillBars[data.skill]) {
-        // Var olan barı güncelle
-        updateSkillBar(data.skill, data.level, data.xp, data.requiredXP, data.config);
+        updateBarDOM(data.skill, data.level, data.xp, data.requiredXP);
     } else {
-        // Bar yoksa oluştur ve göster
         showSkillBar(data);
     }
 }
 
-function createSkillBar(skillName, level, xp, requiredXP, config) {
-    const skillBar = document.createElement('div');
-    skillBar.className = 'skill-bar';
-    skillBar.id = `skill-${skillName}`;
-    
-    const progressPercent = Math.min((xp / requiredXP) * 100, 100);
-    
-    // Format XP numbers with dots (10.000 / 65.000)
-    const currentXPFormatted = Math.floor(xp).toLocaleString('de-DE');
-    const requiredXPFormatted = requiredXP.toLocaleString('de-DE');
-    
-    skillBar.innerHTML = `
-        <div class="skill-name" style="color: ${config.color}">${config.label.toUpperCase()}</div>
-        <div class="skill-levels">
-            <div class="skill-level-current">${level}</div>
-            <div class="skill-level-next">${level + 1}</div>
-        </div>
-        <div class="skill-progress-wrapper">
-            <div class="skill-progress">
-                <div class="skill-progress-bar" style="width: ${progressPercent}%; background: ${config.color}"></div>
-            </div>
-        </div>
-        <div class="skill-xp-text">${currentXPFormatted} / ${requiredXPFormatted}</div>
-    `;
-    
-    return skillBar;
-}
-
-function updateSkillBar(skillName, level, xp, requiredXP, config) {
-    const skillBar = document.getElementById(`skill-${skillName}`);
-    if (!skillBar) return;
-    
-    const progressPercent = Math.min((xp / requiredXP) * 100, 100);
-    
-    // Format XP numbers with dots (10.000 / 65.000)
-    const currentXPFormatted = Math.floor(xp).toLocaleString('de-DE');
-    const requiredXPFormatted = requiredXP.toLocaleString('de-DE');
-    
-    skillBar.querySelector('.skill-name').textContent = config.label.toUpperCase();
-    skillBar.querySelector('.skill-name').style.color = config.color;
-    skillBar.querySelector('.skill-level-current').textContent = level;
-    skillBar.querySelector('.skill-level-next').textContent = level + 1;
-    skillBar.querySelector('.skill-progress-bar').style.width = `${progressPercent}%`;
-    skillBar.querySelector('.skill-progress-bar').style.background = config.color;
-    skillBar.querySelector('.skill-xp-text').textContent = `${currentXPFormatted} / ${requiredXPFormatted}`;
-    
-    // Level atladıysa animasyon ekle
-    skillBar.classList.add('level-up-animation');
-    setTimeout(() => {
-        skillBar.classList.remove('level-up-animation');
-    }, 800);
-}
-
 function showAllSkills(skills) {
-    const skillBarsContainer = document.getElementById('skill-bars');
-    skillBarsContainer.innerHTML = '';
-    skillBars = {};
-    
-    skills.forEach(skill => {
-        const skillBar = createSkillBar(skill.name, skill.level, skill.xp, skill.requiredXP, skill.config);
-        skillBarsContainer.appendChild(skillBar);
-        skillBars[skill.name] = skillBar;
-    });
+    hideAllSkills();
+    skills.forEach(s => showSkillBar({
+        skill: s.name, level: s.level, xp: s.xp, requiredXP: s.requiredXP, config: s.config
+    }));
 }
 
 function hideAllSkills() {
-    const skillBarsContainer = document.getElementById('skill-bars');
-    skillBarsContainer.innerHTML = '';
-    skillBars = {};
+    Object.keys(skillBars).forEach(name => hideSkillBar(name));
 }
