@@ -131,7 +131,7 @@ local function CheckXPGain(skillName, activity)
             playerSkills[skillName .. '_xp'] = (playerSkills[skillName .. '_xp'] or 0) + xpToSend
             
             -- Skill bar göster
-            ShowSkillBarUpdate(skillName, 0)
+            ShowSkillBarUpdate(skillName)
             
             -- Server'a gönder (database kayıt + doğrulama için)
             TriggerServerEvent('swx_skills:addXP', skillName, xpToSend)
@@ -139,65 +139,41 @@ local function CheckXPGain(skillName, activity)
     end
 end
 
--- Koşma kontrolü (stamina XP)
+-- Dayanıklılık kontrolü (koşu / sprint / yüzme / bisiklet)
 CreateThread(function()
     while true do
         Wait(1000)
         local ped = PlayerPedId()
-        
-        if IsPedRunning(ped) then
-            CheckXPGain('stamina', 'running')
-        elseif IsPedSwimming(ped) then
+
+        if IsPedSwimming(ped) then
             CheckXPGain('stamina', 'swimming')
+        elseif IsPedOnBike(ped) and GetEntitySpeed(ped) * 3.6 > 5 then
+            CheckXPGain('stamina', 'cycling')
+        elseif IsPedSprinting(ped) then
+            CheckXPGain('stamina', 'sprinting')
+        elseif IsPedRunning(ped) then
+            CheckXPGain('stamina', 'running')
         end
     end
 end)
 
--- Sürüş kontrolü (driving XP)
+-- Sürüş kontrolü (hız kademesine göre XP)
 CreateThread(function()
     while true do
         Wait(1000)
-        local ped = PlayerPedId()
+        local ped     = PlayerPedId()
         local vehicle = GetVehiclePedIsIn(ped, false)
-        
+
         if vehicle ~= 0 and GetPedInVehicleSeat(vehicle, -1) == ped then
-            isDriving = true
             local speed = GetEntitySpeed(vehicle) * 3.6 -- km/h
-            
-            if speed > 50 then
-                CheckXPGain('driving', 'driving')
-            elseif speed > 100 then
+
+            if speed > 150 then
                 CheckXPGain('driving', 'racing')
+            elseif speed > 100 then
+                CheckXPGain('driving', 'fast')
+            elseif speed > 50 then
+                CheckXPGain('driving', 'cruising')
             end
-        else
-            isDriving = false
-        end
-    end
-end)
-
--- Dövüş kontrolü (strength XP)
-CreateThread(function()
-    while true do
-        Wait(1000)
-        local ped = PlayerPedId()
-        
-        if IsPedInMeleeCombat(ped) then
-            CheckXPGain('strength', 'fighting')
-        end
-    end
-end)
-
--- Silah kontrolü (shooting XP)
-CreateThread(function()
-    while true do
-        Wait(0)
-        local ped = PlayerPedId()
-        
-        if IsPedShooting(ped) then
-            Wait(500)
-            -- Hedef vurdu mu kontrolü (basit versiyon)
-            -- Gelişmiş versiyon için raycast kullanılabilir
-            CheckXPGain('shooting', 'target_hit')
         end
     end
 end)

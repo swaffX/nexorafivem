@@ -1,117 +1,55 @@
 Config = {}
 
--- Skill tanımları
+-- ─────────────────────────────────────────────
+--  Skill tanımları  (sadece Dayanıklılık & Sürüş)
+-- ─────────────────────────────────────────────
 Config.Skills = {
     ["stamina"] = {
-        label = "Dayanıklılık",
-        icon = "fas fa-heartbeat",
-        color = "#ff4757",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "stamina",
-            amountPerLevel = 0.5 -- Her levelda +0.5 stamina
+        label       = "Dayanıklılık",
+        color       = "#e84393",   -- canlı pembe-kırmızı
+        maxLevel    = 50,
+        -- Seviye başına gereken XP = baseXP * xpMultiplier^(level-1)
+        -- Örnek: Lv1→2: 500 | Lv5→6: ~1.000 | Lv10→11: ~2.000 | Lv20→21: ~8.000 | Lv50: ~1M
+        baseXP      = 500,
+        xpMultiplier = 1.15,
+        statBonus   = {
+            type           = "stamina",
+            amountPerLevel = 2.0   -- Her levelda +2 stamina
         }
     },
     ["driving"] = {
-        label = "Sürüş",
-        icon = "fas fa-car",
-        color = "#2ed573",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "driving_skill",
-            amountPerLevel = 1.0 -- Her levelda +1.0 sürüş becerisi
+        label       = "Sürüş",
+        color       = "#00d2ff",   -- açık mavi
+        maxLevel    = 50,
+        baseXP      = 500,
+        xpMultiplier = 1.15,
+        statBonus   = {
+            type           = "driving_skill",
+            amountPerLevel = 2.0   -- Her levelda +2 sürüş becerisi
         }
     },
-    ["strength"] = {
-        label = "Güç",
-        icon = "fas fa-dumbbell",
-        color = "#ffa502",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "strength",
-            amountPerLevel = 0.5 -- Her levelda +0.5 güç
-        }
-    },
-    ["shooting"] = {
-        label = "Nişancılık",
-        icon = "fas fa-crosshairs",
-        color = "#5352ed",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "shooting_accuracy",
-            amountPerLevel = 0.8 -- Her levelda +0.8 nişan
-        }
-    },
-    ["luck"] = {
-        label = "Şans",
-        icon = "fas fa-clover",
-        color = "#a55eea",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "luck",
-            amountPerLevel = 0.3 -- Her levelda +0.3 şans
-        }
-    },
-    ["fishing"] = {
-        label = "Balıkçılık",
-        icon = "fas fa-fish",
-        color = "#0fb9b1",
-        maxLevel = 50,
-        baseXP = 100,
-        xpMultiplier = 1.2,
-        statBonus = {
-            type = "fishing_skill",
-            amountPerLevel = 1.0 -- Her levelda +1.0 balıkçılık
-        }
-    }
 }
 
--- XP kazanma etkinlikleri
+-- ─────────────────────────────────────────────
+--  XP Kazanma Etkinlikleri  (saniyede kazanılan XP)
+-- ─────────────────────────────────────────────
 Config.XPActivities = {
     ["stamina"] = {
-        running = 1, -- Koşarken saniyede kazanılan XP
-        swimming = 2,
-        fighting = 3
+        running   = 3,   -- normal koşu
+        sprinting = 5,   -- sprint (yüksek hız)
+        swimming  = 4,   -- yüzme
+        cycling   = 2,   -- bisiklet
     },
     ["driving"] = {
-        driving = 0.5, -- Sürerken saniyede kazanılan XP
-        drifting = 2,
-        racing = 3
+        cruising  = 2,   -- 50-100 km/h
+        fast      = 4,   -- 100-150 km/h
+        racing    = 7,   -- 150+ km/h
     },
-    ["strength"] = {
-        lifting = 2,
-        fighting = 3,
-        carrying = 1
-    },
-    ["shooting"] = {
-        target_hit = 5, -- Hedefe isabet ettiğinde
-        kill = 10, -- Öldürdüğünde
-        headshot = 15
-    },
-    ["luck"] = {
-        gambling_win = 10,
-        rare_find = 5
-    },
-    ["fishing"] = {
-        fish_caught = 5,
-        rare_fish = 15
-    }
 }
 
--- Skill bar görünürlük ayarları
-Config.ShowSkillBarDuration = 5000 -- Level atlayınca 5 saniye göster
-Config.ShowSkillBarOnXP = false -- XP kazanınca göster (sadece level atlayınca göstermek için false)
-
--- XP biriktirme sistemi (bar güncellemesi için)
-Config.XPThreshold = 10 -- Her 10 XP'de bir bar güncelle (0.5 XP yerine 10 XP biriktirince göster)
+-- ─────────────────────────────────────────────
+--  Ayarlar
+-- ─────────────────────────────────────────────
+Config.ShowSkillBarDuration = 5000   -- Level atlayınca kaç ms görünsün
+Config.XPThreshold          = 30     -- Kaç XP biriktirince bar güncellensin
 
