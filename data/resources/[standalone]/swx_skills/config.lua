@@ -28,18 +28,6 @@ Config.Skills = {
             amountPerLevel = 2.0   -- Her levelda +2 sürüş becerisi
         }
     },
-    ["character"] = {
-        label       = "Karakter Seviyesi",
-        color       = "#f1c40f",   -- altın sarısı
-        maxLevel    = 50,
-        baseXP      = 7222,
-        xpMultiplier = 1.0,
-        statBonus   = {
-            type           = "none",
-            amountPerLevel = 0
-        },
-        isCharacterLevel = true   -- Diğer skill'lere dayalı otomatik seviye
-    },
 }
 
 -- ─────────────────────────────────────────────

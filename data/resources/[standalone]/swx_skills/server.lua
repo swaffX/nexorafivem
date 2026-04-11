@@ -30,14 +30,8 @@ CreateThread(function()
         `stamina_xp` INT DEFAULT 0,
         `driving` INT DEFAULT 1,
         `driving_xp` INT DEFAULT 0,
-        `character` INT DEFAULT 1,
-        `character_xp` INT DEFAULT 0,
         `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )]])
-
-    -- Mevcut tabloya eksik sütunları ekle
-    dbQuery([[ALTER TABLE `player_skills` ADD COLUMN IF NOT EXISTS `character` INT DEFAULT 1]])
-    dbQuery([[ALTER TABLE `player_skills` ADD COLUMN IF NOT EXISTS `character_xp` INT DEFAULT 0]])
 end)
 
 -- Oyuncunun skillerini al
@@ -51,7 +45,7 @@ QBCore.Functions.CreateCallback('swx_skills:getSkills', function(source, cb)
 
     if not result or not result[1] then
         dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
-        cb({ stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0, character = 1, character_xp = 0 })
+        cb({ stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0 })
     else
         cb(result[1])
     end
@@ -80,26 +74,6 @@ local function ApplyStatBonus(source, skillName, level)
     end)
 end
 
--- Karakter seviyesini hesapla (diğer skill'lerin ortalaması)
-local function CalculateCharacterLevel(citizenid)
-    local result = dbQuery('SELECT stamina, driving FROM player_skills WHERE citizenid = ?', {citizenid})
-    if not result or not result[1] then return 1, 0 end
-
-    local staminaLevel = result[1].stamina or 1
-    local drivingLevel = result[1].driving or 1
-
-    -- Ortalama seviyeyi hesapla
-    local avgLevel = math.floor((staminaLevel + drivingLevel) / 2)
-
-    -- Karakter XP'sini hesapla (diğer skill XP'lerinin toplamı)
-    local resultXP = dbQuery('SELECT stamina_xp, driving_xp FROM player_skills WHERE citizenid = ?', {citizenid})
-    if not resultXP or not resultXP[1] then return avgLevel, 0 end
-
-    local totalXP = (resultXP[1].stamina_xp or 0) + (resultXP[1].driving_xp or 0)
-
-    return avgLevel, totalXP
-end
-
 -- XP ekle
 RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     local src = source
@@ -110,12 +84,6 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
     local skillConfig = Config.Skills[skillName]
 
     if not skillConfig then return end
-
-    -- Karakter seviyesi skill'i için XP ekleme (otomatik hesaplanır)
-    if skillConfig.isCharacterLevel then
-        QBCore.Functions.Notify(src, 'Karakter seviyesi otomatik hesaplanır!', 'error', 3000)
-        return
-    end
 
     local result = dbQuery('SELECT * FROM player_skills WHERE citizenid = ?', {citizenid})
 
@@ -145,16 +113,6 @@ RegisterNetEvent('swx_skills:addXP', function(skillName, amount)
 
     -- Client'a güncel skill verilerini gönder
     TriggerClientEvent('swx_skills:updateSkill', src, skillName, currentLevel, currentXP, requiredXP)
-
-    -- Karakter seviyesini yeniden hesapla
-    local charLevel, charXP = CalculateCharacterLevel(citizenid)
-    local charConfig = Config.Skills['character']
-    local charRequiredXP = math.floor(charConfig.baseXP * math.pow(charConfig.xpMultiplier, charLevel - 1))
-
-    dbUpdate('UPDATE player_skills SET `character` = ?, `character_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?',
-        {charLevel, charXP, citizenid})
-
-    TriggerClientEvent('swx_skills:updateSkill', src, 'character', charLevel, charXP, charRequiredXP)
 end)
 
 -- Oyuncu yüklendiğinde skillerini yükle
@@ -167,13 +125,9 @@ RegisterNetEvent('QBCore:Server:PlayerLoaded', function(Player)
     local skills = {}
     if result and result[1] then
         skills = result[1]
-        -- Karakter seviyesini hesapla
-        local charLevel, charXP = CalculateCharacterLevel(citizenid)
-        skills.character = charLevel
-        skills.character_xp = charXP
     else
         dbInsert('INSERT IGNORE INTO player_skills (citizenid) VALUES (?)', {citizenid})
-        skills = { stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0, character = 1, character_xp = 0 }
+        skills = { stamina = 1, stamina_xp = 0, driving = 1, driving_xp = 0 }
     end
 
     -- Client'a gönder
@@ -186,11 +140,6 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {{name = 'skill', hel
     local amount = tonumber(args[2]) or 100
 
     if Config.Skills[skillName] then
-        if Config.Skills[skillName].isCharacterLevel then
-            QBCore.Functions.Notify(source, 'Karakter seviyesi otomatik hesaplanır, XP ekleyemezsiniz!', 'error', 5000)
-            return
-        end
-
         -- Directly call the event handler function
         local src = source
         local Player = QBCore.Functions.GetPlayer(src)
@@ -229,16 +178,6 @@ QBCore.Commands.Add('addskillxp', 'Skill XP ekle (admin)', {{name = 'skill', hel
 
         -- Client'a güncel skill verilerini gönder
         TriggerClientEvent('swx_skills:updateSkill', src, skillName, currentLevel, currentXP, requiredXP)
-
-        -- Karakter seviyesini yeniden hesapla
-        local charLevel, charXP = CalculateCharacterLevel(citizenid)
-        local charConfig = Config.Skills['character']
-        local charRequiredXP = math.floor(charConfig.baseXP * math.pow(charConfig.xpMultiplier, charLevel - 1))
-
-        dbUpdate('UPDATE player_skills SET `character` = ?, `character_xp` = ?, last_update = CURRENT_TIMESTAMP WHERE citizenid = ?',
-            {charLevel, charXP, citizenid})
-
-        TriggerClientEvent('swx_skills:updateSkill', src, 'character', charLevel, charXP, charRequiredXP)
 
         QBCore.Functions.Notify(source, skillName .. ' skilline ' .. amount .. ' XP eklendi!', 'success', 3000)
     else
