@@ -51,29 +51,32 @@ RegisterNetEvent('swx_welcome:giveStarterItems', function()
     -- Para ver
     Player.Functions.AddMoney('cash', Config.StarterCash)
     Player.Functions.AddMoney('bank', Config.StarterBank)
-    
+
     -- İlk giriş işaretle
     local citizenid = Player.PlayerData.citizenid
     if Config.UseDatabase then
         MySQL.update('UPDATE `' .. Config.DBTable .. '` SET first_join = 0 WHERE citizenid = ?', {citizenid})
     end
-    
-    TriggerClientEvent('ox_lib:notify', src, {
-        type = 'success',
-        description = 'Başlangıç hediyelerin verildi!'
-    })
+
+    QBCore.Functions.Notify(src, 'Başlangıç hediyelerin verildi!', 'success')
 end)
 
--- Oyuncu yüklendiğinde kontrol et
-RegisterNetEvent('QBCore:Server:PlayerLoaded', function(Player)
-    local src = Player.PlayerData.source
-    local citizenid = Player.PlayerData.citizenid
-    
-    -- 3 saniye bekle (karakter oluşturma tamamlansın)
-    SetTimeout(Config.DelayAfterCharacterCreate * 1000, function()
-        -- Client'a yeni oyuncu kontrolü yaptır
-        TriggerClientEvent('swx_welcome:checkNewPlayer', src)
-    end)
+-- Karakter görünümü kaydedildiğinde kontrol et (karakter oluşturma tamamlandıktan sonra)
+RegisterServerEvent("fivem-appearance:server:saveAppearance", function(appearance)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+
+    if not Player then return end
+
+    -- Yeni oyuncu mu kontrol et
+    local isNew = lib.callback.await('swx_welcome:isNewPlayer', false, src)
+
+    if isNew then
+        -- Kısa gecikme ile göster (karakter spawn olana kadar)
+        SetTimeout(2000, function()
+            TriggerClientEvent('swx_welcome:checkNewPlayer', src)
+        end)
+    end
 end)
 
 print('[SWX-Welcome] Server yüklendi!')
