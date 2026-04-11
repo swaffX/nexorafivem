@@ -274,7 +274,19 @@ RegisterNetEvent('lockpicks:UseLockpick', function(isAdvanced)
     if GetVehicleDoorLockStatus(vehicle) <= 0 then return end
 
     local difficulty = isAdvanced and 'easy' or 'medium' -- Easy for advanced lockpick, medium by default
-    local success = exports['qb-minigames']:Skillbar(difficulty)
+    local Skillbar = exports['qb-skillbar']:GetSkillbarObject()
+    local skillbarData = {
+        duration = difficulty == 'easy' and 4000 or 3000,
+        pos = math.random(10, 30),
+        width = math.random(10, 20),
+    }
+    local success = false
+    Skillbar.Start(skillbarData, function()
+        success = true
+    end, function()
+        success = false
+    end)
+    Wait(4000) -- Wait for skillbar to complete
 
     local chance = math.random()
     if success then
