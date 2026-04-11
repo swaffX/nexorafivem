@@ -642,65 +642,29 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
         if isPedMenu then
             header = "Kıyafet Değiştir"
         end
-
-        -- ox_lib context menu for clothing shop
-        local options = {
-            {
-                title = header,
-                description = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
-                icon = "shirt",
-                onSelect = function()
-                    TriggerEvent("fivem-appearance:client:openClothingShop", isPedMenu)
-                end
+        menuItems[#menuItems + 1] = {
+            header = "Kıyafet Mağazası Seçenekleri",
+            icon = "fas fa-shirt",
+            isMenuHeader = true -- Set to true to make a nonclickable title
+        }
+        menuItems[#menuItems + 1] = {
+            header = header,
+            txt = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
+            params = {
+                event = "fivem-appearance:client:openClothingShop",
+                args = isPedMenu
             }
         }
-
-        -- Add outfit menu items
-        if outfitMenuItems and type(outfitMenuItems) == "table" then
-            for i = 1, #outfitMenuItems, 1 do
-                local item = outfitMenuItems[i]
-                if item and type(item) == "table" then
-                    local newOption = {
-                        title = item.header or "Kıyafet",
-                        description = item.txt or "",
-                        icon = "shirt",
-                        onSelect = function()
-                            if item.params and item.params.event then
-                                TriggerEvent(item.params.event, item.params.args)
-                            end
-                        end
-                    }
-                    options[#options + 1] = newOption
-                end
-            end
+        for i = 0, #outfitMenuItems, 1 do
+            menuItems[#menuItems + 1] = outfitMenuItems[i]
         end
-
-        -- Ensure options is a valid table
-        if type(options) ~= "table" or #options == 0 then
-            options = {{
-                title = header,
-                description = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
-                icon = "shirt",
-                onSelect = function()
-                    TriggerEvent("fivem-appearance:client:openClothingShop", isPedMenu)
-                end
-            }}
-        end
-
-        lib.registerContext('clothing_shop_menu', {
-            title = 'Kıyafet Mağazası',
-            options = options
-        })
-        lib.showContext('clothing_shop_menu')
     elseif menuType == "outfit" then
         menuItems[#menuItems + 1] = {
             header = "👔 | Kıyafet Seçenekleri",
             isMenuHeader = true -- Set to true to make a nonclickable title
         }
-        if outfitMenuItems and type(outfitMenuItems) == "table" then
-            for i = 1, #outfitMenuItems, 1 do
-                menuItems[#menuItems + 1] = outfitMenuItems[i]
-            end
+        for i = 0, #outfitMenuItems, 1 do
+            menuItems[#menuItems + 1] = outfitMenuItems[i]
         end
     elseif menuType == "job-outfit" then
         menuItems[#menuItems + 1] = {
