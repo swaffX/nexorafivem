@@ -347,8 +347,9 @@ end)
                 x = v.coords[1]
                 y = v.coords[2]
                 z = v.coords[3]
+                DrawMarker(2, x, y, z + 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 255, 255, 255, 255, false, false, false, true, false, false, false)
                 DrawText3D(x,y,z+1.2,v.marker, 0.35, 4)
-                DrawText3D(x,y,z+1.05, "~w~[E]", 0.5, 4)
+                DrawText3D(x,y,z+1.0, "~w~[E] ile etkilesim", 0.4, 4)
                 if IsControlJustPressed(0,38) then
                   if v.job == Framework.PlayerData.job.name or v.job == 'all' then
                     SendNUIMessage({
@@ -448,8 +449,9 @@ elseif Config.Framework == 'QBCore' or Config.Framework == 'OLDQBCore'  then
                         if dist < 10 then
                             if dist < 3 then
                                 local x, y, z = v.coords[1], v.coords[2], v.coords[3]
+                                DrawMarker(2, x, y, z + 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 255, 255, 255, 255, false, false, false, true, false, false, false)
                                 DrawText3D(x, y, z + 1.2, v.marker, 0.35, 4)
-                                DrawText3D(x, y, z + 1.05, "~w~[E]", 0.5, 4)
+                                DrawText3D(x, y, z + 1.0, "~w~[E] ile etkilesim", 0.4, 4)
                                 if IsControlJustPressed(0, 38) then
                                     if v.job == Framework.PlayerData.job.name or v.job == 'all' then
                                         SendNUIMessage({
