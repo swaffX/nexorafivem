@@ -44,9 +44,19 @@ RegisterCommand('+Megaphoneaga', function()
     return
   end
 
-  exports["pma-voice"]:overrideProximityRange(60.0, true)
-  TriggerServerEvent('torpak-policemegaphone:applySubmix', true)
-  QBCore.Functions.Notify('Megafon Devrede', 'success')
+  if megafonAktif then
+    -- Zaten aktif, kapat
+    megafonAktif = false
+    exports["pma-voice"]:clearProximityOverride()
+    TriggerServerEvent('torpak-policemegaphone:applySubmix', false)
+    QBCore.Functions.Notify('Megafon Devre Dışı', 'error')
+  else
+    -- Aktif değil, aç
+    megafonAktif = true
+    exports["pma-voice"]:overrideProximityRange(60.0, true)
+    TriggerServerEvent('torpak-policemegaphone:applySubmix', true)
+    QBCore.Functions.Notify('Megafon Devrede', 'success')
+  end
 end, false)
 
 local data = {
@@ -79,39 +89,10 @@ RegisterNetEvent('torpak-policemegaphone:updateSubmixStatus', function(state, so
     end
 end)
 
-CreateThread(function()
-    filter = CreateAudioSubmix("Megaphone")
-    SetAudioSubmixEffectRadioFx(filter, 0)
-    for hash, value in pairs(data) do
-        SetAudioSubmixEffectParamInt(filter, 0, hash, 1)
-    end
-    AddAudioSubmixOutput(filter, 0)
-end)
-
-RegisterCommand('-Megaphoneaga', function()
-  if not PlayerData or not PlayerData.job then 
-    PlayerData = QBCore.Functions.GetPlayerData() 
-  end
-  
-  if PlayerData and PlayerData.job and PlayerData.job.name == "police" and CheckPlayer() then
-    exports["pma-voice"]:clearProximityOverride()
-    QBCore.Functions.Notify('Megafon Devre Dışı', 'error')
-    TriggerServerEvent('torpak-policemegaphone:applySubmix', false)
-  end
-end, false)
-
 RegisterKeyMapping('+Megaphoneaga', 'Megafon', 'keyboard', 'LSHIFT')
 
-RegisterNetEvent('torpak-policemegaphone:updateSubmixStatus', function(state, source)
-  if state then
-      MumbleSetSubmixForServerId(source, filter)
-  else
-      MumbleSetSubmixForServerId(source, -1)
-  end
-end)
-
-
 local elinde = false
+local megafonAktif = false
 
 RegisterNetEvent("torpak-policemegaphone:useitem", function()
   print(elinde)
