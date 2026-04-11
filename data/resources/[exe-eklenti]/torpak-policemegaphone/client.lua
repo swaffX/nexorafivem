@@ -25,15 +25,28 @@ end
 
 --https://cookbook.fivem.net/2020/01/06/using-the-new-console-key-bindings/
 RegisterCommand('+Megaphoneaga', function()
-  if not PlayerData or not PlayerData.job then 
-    PlayerData = QBCore.Functions.GetPlayerData() 
+  if not PlayerData or not PlayerData.job then
+    PlayerData = QBCore.Functions.GetPlayerData()
   end
-  
-  if PlayerData and PlayerData.job and PlayerData.job.name == "police" and CheckPlayer() then
-    exports["pma-voice"]:overrideProximityRange(60.0, true)
-    TriggerServerEvent('torpak-policemegaphone:applySubmix', true)
-    QBCore.Functions.Notify('Megafon Devrede', 'success')
+
+  if not PlayerData or not PlayerData.job then
+    QBCore.Functions.Notify('Oyuncu verisi yüklenmedi!', 'error')
+    return
   end
+
+  if PlayerData.job.name ~= "police" then
+    QBCore.Functions.Notify('Polis değilsin!', 'error')
+    return
+  end
+
+  if not CheckPlayer() then
+    QBCore.Functions.Notify('Polis aracında değilsin!', 'error')
+    return
+  end
+
+  exports["pma-voice"]:overrideProximityRange(60.0, true)
+  TriggerServerEvent('torpak-policemegaphone:applySubmix', true)
+  QBCore.Functions.Notify('Megafon Devrede', 'success')
 end, false)
 
 local data = {
