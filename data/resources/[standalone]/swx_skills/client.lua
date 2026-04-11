@@ -153,7 +153,7 @@ CreateThread(function()
     end
 end)
 
--- Sürüş kontrolü (hız kademesine göre XP)
+-- Sürüş kontrolü (sadece araçtan inince XP ver)
 CreateThread(function()
     while true do
         Wait(1000)
@@ -165,40 +165,18 @@ CreateThread(function()
                 inVehicle = true
                 drivingStartTime = GetGameTimer()
             end
-
-            local speed = GetEntitySpeed(vehicle) * 3.6 -- km/h
-
-            if speed > 150 then
-                CheckXPGain('driving', 'racing')
-            elseif speed > 100 then
-                CheckXPGain('driving', 'fast')
-            elseif speed > 50 then
-                CheckXPGain('driving', 'cruising')
-            end
         elseif inVehicle then
             -- Araçtan indiğinde XP ver
             local drivingTime = (GetGameTimer() - drivingStartTime) / 1000 -- saniye
             if drivingTime >= 10 then -- En az 10 saniye sürmüş olmalı
                 local bonusXP = math.floor(drivingTime / 10) * 50 -- Her 10 saniye için 50 XP
                 if bonusXP > 0 then
-                    -- XP biriktir
-                    if not accumulatedXP['driving'] then
-                        accumulatedXP['driving'] = 0
-                    end
-                    accumulatedXP['driving'] = accumulatedXP['driving'] + bonusXP
+                    if not playerSkills then playerSkills = {} end
+                    playerSkills['driving'] = playerSkills['driving'] or 1
+                    playerSkills['driving_xp'] = (playerSkills['driving_xp'] or 0) + bonusXP
 
-                    -- Threshold'a ulaştıysa server'a gönder
-                    if accumulatedXP['driving'] >= (Config.XPThreshold or 10) then
-                        local xpToSend = accumulatedXP['driving']
-                        accumulatedXP['driving'] = 0
-
-                        if not playerSkills then playerSkills = {} end
-                        playerSkills['driving'] = playerSkills['driving'] or 1
-                        playerSkills['driving_xp'] = (playerSkills['driving_xp'] or 0) + xpToSend
-
-                        ShowSkillBarUpdate('driving')
-                        TriggerServerEvent('swx_skills:addXP', 'driving', xpToSend)
-                    end
+                    ShowSkillBarUpdate('driving')
+                    TriggerServerEvent('swx_skills:addXP', 'driving', bonusXP)
                 end
             end
             inVehicle = false
