@@ -65,20 +65,33 @@ end)
 -- Skill bar güncelleme göster
 local function ShowSkillBarUpdate(skillName)
     if not Config or not Config.Skills or not Config.Skills[skillName] then return end
-    if not playerSkills then playerSkills = {} end
-    
+    if not Config.XPThreshold then return end
+
     local skillConfig = Config.Skills[skillName]
-    local level     = playerSkills[skillName] or 1
-    local currentXP = playerSkills[skillName .. '_xp'] or 0
+
+    -- Karakter seviyesi için bar gösterme (otomatik hesaplanır)
+    if skillConfig.isCharacterLevel then return end
+
+    local level = playerSkills[skillName] or 1
+    local xp = playerSkills[skillName .. '_xp'] or 0
     local requiredXP = math.floor(skillConfig.baseXP * math.pow(skillConfig.xpMultiplier, level - 1))
-    
+
+    -- playerSkills'i başlat (eğer boşsa)
+    if not playerSkills then
+        playerSkills = {}
+    end
+
+    playerSkills[skillName] = level
+    playerSkills[skillName .. '_xp'] = xp
+
+    -- UI güncelle
     SendNUIMessage({
-        type = 'showSkillBar',
+        type = 'updateSkill',
         skill = skillName,
         level = level,
-        xp = currentXP,
+        xp = xp,
         requiredXP = requiredXP,
-        config = skillConfig
+        config = Config.Skills[skillName]
     })
     
     -- 3 saniye sonra gizle
