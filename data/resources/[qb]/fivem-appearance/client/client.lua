@@ -656,7 +656,7 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
         }
 
         -- Add outfit menu items
-        for i = 0, #outfitMenuItems, 1 do
+        for i = 1, #outfitMenuItems, 1 do
             local item = outfitMenuItems[i]
             options[#options + 1] = {
                 title = item.header,
