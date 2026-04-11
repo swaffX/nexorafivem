@@ -8,10 +8,10 @@ Config.Skills = {
         label       = "Dayanıklılık",
         color       = "#e84393",   -- canlı pembe-kırmızı
         maxLevel    = 50,
-        -- Seviye başına gereken XP = baseXP * xpMultiplier^(level-1)
-        -- Örnek: Lv1→2: 500 | Lv5→6: ~1.000 | Lv10→11: ~2.000 | Lv20→21: ~8.000 | Lv50: ~1M
-        baseXP      = 500,
-        xpMultiplier = 1.15,
+        -- Seviye başına gereken XP = baseXP * level
+        -- Örnek: Lv1→2: 7,222 | Lv5→6: 36,110 | Lv9→10: 65,000 | Lv20→21: 144,440 | Lv50: 361,110
+        baseXP      = 7222,
+        xpMultiplier = 1.0,
         statBonus   = {
             type           = "stamina",
             amountPerLevel = 2.0   -- Her levelda +2 stamina
@@ -21,12 +21,24 @@ Config.Skills = {
         label       = "Sürüş",
         color       = "#00d2ff",   -- açık mavi
         maxLevel    = 50,
-        baseXP      = 500,
-        xpMultiplier = 1.15,
+        baseXP      = 7222,
+        xpMultiplier = 1.0,
         statBonus   = {
             type           = "driving_skill",
             amountPerLevel = 2.0   -- Her levelda +2 sürüş becerisi
         }
+    },
+    ["character"] = {
+        label       = "Karakter Seviyesi",
+        color       = "#f1c40f",   -- altın sarısı
+        maxLevel    = 50,
+        baseXP      = 7222,
+        xpMultiplier = 1.0,
+        statBonus   = {
+            type           = "none",
+            amountPerLevel = 0
+        },
+        isCharacterLevel = true   -- Diğer skill'lere dayalı otomatik seviye
     },
 }
 
@@ -35,10 +47,10 @@ Config.Skills = {
 -- ─────────────────────────────────────────────
 Config.XPActivities = {
     ["stamina"] = {
-        running   = 3,   -- normal koşu
-        sprinting = 5,   -- sprint (yüksek hız)
-        swimming  = 4,   -- yüzme
-        cycling   = 2,   -- bisiklet
+        running   = 1,   -- normal koşu (azaltıldı)
+        sprinting = 2,   -- sprint (yüksek hız) (azaltıldı)
+        swimming  = 2,   -- yüzme (azaltıldı)
+        cycling   = 1,   -- bisiklet (azaltıldı)
     },
     ["driving"] = {
         cruising  = 2,   -- 50-100 km/h
@@ -51,5 +63,5 @@ Config.XPActivities = {
 --  Ayarlar
 -- ─────────────────────────────────────────────
 Config.ShowSkillBarDuration = 5000   -- Level atlayınca kaç ms görünsün
-Config.XPThreshold          = 30     -- Kaç XP biriktirince bar güncellensin
+Config.XPThreshold          = 100    -- Kaç XP biriktirince bar güncellensin (artırıldı)
 
