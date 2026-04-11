@@ -319,92 +319,15 @@ function L0_1(A0_2, A1_2)
   L2_2 = {}
   L3_2 = {}
   L4_2 = Lang
-  L5_2 = "take_outfit"
+  L5_2 = "take_a_car"
   L4_2 = L4_2(L5_2)
   L3_2.title = L4_2
   L4_2 = Lang
-  L5_2 = "take_outfit_desc"
+  L5_2 = "take_a_car_desc"
   L4_2 = L4_2(L5_2)
   L3_2.description = L4_2
-  L3_2.icon = "shirt"
+  L3_2.icon = "car"
   function L4_2()
-    local L0_3, L1_3, L2_3, L3_3, L4_3, L5_3, L6_3
-    L0_3 = PlayerPedId
-    L0_3 = L0_3()
-    L1_3 = GetEntityModel
-    L2_3 = L0_3
-    L1_3 = L1_3(L2_3)
-    L2_3 = joaat
-    L3_3 = "mp_m_freemode_01"
-    L2_3 = L2_3(L3_3)
-    if L1_3 == L2_3 then
-      L2_3 = "male"
-      if L2_3 then
-        goto lbl_15
-      end
-    end
-    L2_3 = "female"
-    ::lbl_15::
-    L3_3 = Config
-    L3_3 = L3_3.Jobs
-    L4_3 = A0_2
-    L3_3 = L3_3[L4_3]
-    L3_3 = L3_3.outfits
-    L3_3 = L3_3[L2_3]
-    L4_3 = clothingAction
-    L5_3 = L3_3
-    L6_3 = false
-    L4_3(L5_3, L6_3)
-    L4_3 = Config
-    L4_3 = L4_3.Jobs
-    L5_3 = A0_2
-    L4_3 = L4_3[L5_3]
-    L4_3 = L4_3.debug
-    if L4_3 then
-      L4_3 = print
-      L5_3 = "[^2INFO^7] Job outfit has been dressed."
-      L4_3(L5_3)
-    end
-  end
-  L3_2.onSelect = L4_2
-  L4_2 = {}
-  L5_2 = Lang
-  L6_2 = "take_default_outfit"
-  L5_2 = L5_2(L6_2)
-  L4_2.title = L5_2
-  L5_2 = Lang
-  L6_2 = "take_default_outfit_desc"
-  L5_2 = L5_2(L6_2)
-  L4_2.description = L5_2
-  L4_2.icon = "shirt"
-  function L5_2()
-    local L0_3, L1_3
-    L0_3 = clothingAction
-    L1_3 = nil
-    L0_3(L1_3)
-    L0_3 = Config
-    L0_3 = L0_3.Jobs
-    L1_3 = A0_2
-    L0_3 = L0_3[L1_3]
-    L0_3 = L0_3.debug
-    if L0_3 then
-      L0_3 = print
-      L1_3 = "[^2INFO^7] Default outfit has been dressed."
-      L0_3(L1_3)
-    end
-  end
-  L4_2.onSelect = L5_2
-  L5_2 = {}
-  L6_2 = Lang
-  L7_2 = "take_a_car"
-  L6_2 = L6_2(L7_2)
-  L5_2.title = L6_2
-  L6_2 = Lang
-  L7_2 = "take_a_car_desc"
-  L6_2 = L6_2(L7_2)
-  L5_2.description = L6_2
-  L5_2.icon = "car"
-  function L6_2()
     local L0_3, L1_3, L2_3, L3_3
     L0_3 = vehicle
     if nil ~= L0_3 then
@@ -431,8 +354,8 @@ function L0_1(A0_2, A1_2)
     L1_3 = A0_2
     L0_3(L1_3)
   end
-  L5_2.onSelect = L6_2
-  L6_2 = {}
+  L3_2.onSelect = L4_2
+  L4_2 = {}
   if "trucker" == A0_2 then
     L7_2 = Lang
     L8_2 = "cancel_the_delivery"
@@ -453,7 +376,7 @@ function L0_1(A0_2, A1_2)
   L8_2 = "delete_car"
   L7_2 = L7_2(L8_2)
   ::lbl_69::
-  L6_2.title = L7_2
+  L4_2.title = L7_2
   if "trucker" == A0_2 then
     L7_2 = Lang
     L8_2 = "cancel_the_delivery_desc"
@@ -474,8 +397,8 @@ function L0_1(A0_2, A1_2)
   L8_2 = "delete_car_desc"
   L7_2 = L7_2(L8_2)
   ::lbl_87::
-  L6_2.description = L7_2
-  L6_2.icon = "car-burst"
+  L4_2.description = L7_2
+  L4_2.icon = "car-burst"
   function L7_2()
     local L0_3, L1_3, L2_3, L3_3, L4_3
     L0_3 = A0_2
@@ -555,29 +478,27 @@ function L0_1(A0_2, A1_2)
       L0_3(L1_3, L2_3, L3_3, L4_3)
     end
   end
-  L6_2.onSelect = L7_2
-  L7_2 = {}
-  L8_2 = Lang
-  L9_2 = "leave_job"
-  L8_2 = L8_2(L9_2)
-  L7_2.title = L8_2
-  L8_2 = Lang
-  L9_2 = "leave_job_desc"
-  L8_2 = L8_2(L9_2)
-  L7_2.description = L8_2
-  L7_2.icon = "right-from-bracket"
-  function L8_2()
+  L4_2.onSelect = L7_2
+  L5_2 = {}
+  L6_2 = Lang
+  L7_2 = "leave_job"
+  L6_2 = L6_2(L7_2)
+  L5_2.title = L6_2
+  L6_2 = Lang
+  L7_2 = "leave_job_desc"
+  L6_2 = L6_2(L7_2)
+  L5_2.description = L6_2
+  L5_2.icon = "right-from-bracket"
+  function L6_2()
     local L0_3, L1_3
     L0_3 = TriggerServerEvent
     L1_3 = "wais:setUnemployed"
     L0_3(L1_3)
   end
-  L7_2.onSelect = L8_2
+  L5_2.onSelect = L6_2
   L2_2[1] = L3_2
   L2_2[2] = L4_2
   L2_2[3] = L5_2
-  L2_2[4] = L6_2
-  L2_2[5] = L7_2
   if "mobile_hotdog" == A0_2 then
     L3_2 = {}
     L4_2 = Lang
