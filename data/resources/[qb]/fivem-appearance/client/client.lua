@@ -656,18 +656,34 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
         }
 
         -- Add outfit menu items
-        for i = 1, #outfitMenuItems, 1 do
-            local item = outfitMenuItems[i]
-            options[#options + 1] = {
-                title = item.header,
-                description = item.txt or "",
+        if outfitMenuItems and type(outfitMenuItems) == "table" then
+            for i = 1, #outfitMenuItems, 1 do
+                local item = outfitMenuItems[i]
+                if item and type(item) == "table" then
+                    options[#options + 1] = {
+                        title = item.header or "Kıyafet",
+                        description = item.txt or "",
+                        icon = "shirt",
+                        onSelect = function()
+                            if item.params and item.params.event then
+                                TriggerEvent(item.params.event, item.params.args)
+                            end
+                        end
+                    }
+                end
+            end
+        end
+
+        -- Ensure options is a valid table
+        if type(options) ~= "table" or #options == 0 then
+            options = {{
+                title = header,
+                description = "Giymek için geniş bir ürün yelpazesinden seçim yapın :)",
                 icon = "shirt",
                 onSelect = function()
-                    if item.params and item.params.event then
-                        TriggerEvent(item.params.event, item.params.args)
-                    end
+                    TriggerEvent("fivem-appearance:client:openClothingShop", isPedMenu)
                 end
-            }
+            }}
         end
 
         lib.registerContext('clothing_shop_menu', {
@@ -680,8 +696,10 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
             header = "👔 | Kıyafet Seçenekleri",
             isMenuHeader = true -- Set to true to make a nonclickable title
         }
-        for i = 0, #outfitMenuItems, 1 do
-            menuItems[#menuItems + 1] = outfitMenuItems[i]
+        if outfitMenuItems and type(outfitMenuItems) == "table" then
+            for i = 1, #outfitMenuItems, 1 do
+                menuItems[#menuItems + 1] = outfitMenuItems[i]
+            end
         end
     elseif menuType == "job-outfit" then
         menuItems[#menuItems + 1] = {
