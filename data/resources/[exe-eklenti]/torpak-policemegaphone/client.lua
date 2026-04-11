@@ -40,7 +40,6 @@ RegisterCommand('+Megaphoneaga', function()
   end
 
   if not CheckPlayer() then
-    QBCore.Functions.Notify('Polis aracında değilsin!', 'error')
     return
   end
 
