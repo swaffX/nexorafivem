@@ -660,7 +660,7 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
             for i = 1, #outfitMenuItems, 1 do
                 local item = outfitMenuItems[i]
                 if item and type(item) == "table" then
-                    options[#options + 1] = {
+                    local newOption = {
                         title = item.header or "Kıyafet",
                         description = item.txt or "",
                         icon = "shirt",
@@ -670,6 +670,7 @@ function OpenMenu(isPedMenu, backEvent, menuType, menuData)
                             end
                         end
                     }
+                    options[#options + 1] = newOption
                 end
             end
         end
