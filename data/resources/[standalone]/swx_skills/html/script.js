@@ -1,5 +1,6 @@
 let skillBars = {};
 let hideTimers = {};
+let currentXPValues = {}; // Store current XP values for animation
 
 window.addEventListener('message', function(event) {
     const data = event.data;
@@ -16,12 +17,39 @@ function fmt(n) {
     return Math.floor(n).toLocaleString('de-DE');
 }
 
+// Counting animation for numbers
+function animateNumber(element, start, end, duration) {
+    const startTime = performance.now();
+    const startTimeValue = start;
+    const endTimeValue = end;
+
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease out cubic
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+        const currentValue = startTimeValue + (endTimeValue - startTimeValue) * easeProgress;
+        element.textContent = fmt(currentValue);
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    requestAnimationFrame(update);
+}
+
 function createSkillBar(skillName, level, xp, requiredXP, config) {
     const el = document.createElement('div');
     el.className = 'skill-bar';
     el.id = `skill-${skillName}`;
 
     const pct = Math.min((xp / requiredXP) * 100, 100);
+
+    // Initialize current XP value
+    currentXPValues[skillName] = 0;
 
     el.innerHTML = `
         <div class="skill-name">${config.label.toUpperCase()}</div>
@@ -32,13 +60,18 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
             </div>
             <span class="skill-level-num">${level + 1}</span>
         </div>
-        <div class="skill-xp-text">${fmt(xp)} / ${fmt(requiredXP)}</div>
+        <div class="skill-xp-text">
+            <span class="xp-current">${fmt(0)}</span> / <span class="xp-required">${fmt(requiredXP)}</span>
+        </div>
     `;
 
-    // Animate bar after mount
+    // Animate bar and XP after mount
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             el.querySelector('.skill-progress-bar').style.width = pct + '%';
+            const xpCurrent = el.querySelector('.xp-current');
+            animateNumber(xpCurrent, 0, xp, 2000);
+            currentXPValues[skillName] = xp;
         });
     });
 
@@ -88,7 +121,15 @@ function updateBarDOM(skillName, level, xp, requiredXP) {
     nums[0].textContent = level;
     nums[1].textContent = level + 1;
     el.querySelector('.skill-progress-bar').style.width = pct + '%';
-    el.querySelector('.skill-xp-text').textContent = `${fmt(xp)} / ${fmt(requiredXP)}`;
+
+    // Update required XP (no animation needed)
+    el.querySelector('.xp-required').textContent = fmt(requiredXP);
+
+    // Animate current XP number
+    const xpCurrent = el.querySelector('.xp-current');
+    const oldXP = currentXPValues[skillName] || 0;
+    currentXPValues[skillName] = xp;
+    animateNumber(xpCurrent, oldXP, xp, 2000); // 2 second animation
 }
 
 function updateSkill(data) {
