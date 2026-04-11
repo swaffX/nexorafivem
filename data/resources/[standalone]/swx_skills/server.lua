@@ -34,6 +34,10 @@ CreateThread(function()
         `character_xp` INT DEFAULT 0,
         `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )]])
+
+    -- Mevcut tabloya eksik sütunları ekle
+    dbQuery([[ALTER TABLE `player_skills` ADD COLUMN IF NOT EXISTS `character` INT DEFAULT 1]])
+    dbQuery([[ALTER TABLE `player_skills` ADD COLUMN IF NOT EXISTS `character_xp` INT DEFAULT 0]])
 end)
 
 -- Oyuncunun skillerini al
