@@ -362,8 +362,7 @@ end)
                 
                 if npc then
                     local npcCoords = GetEntityCoords(npc)
-                    DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
-                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
+                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Arac Satin Al")
                 end
                 if IsControlJustPressed(0,38) then
                   if v.job == Framework.PlayerData.job.name or v.job == 'all' then
@@ -479,8 +478,7 @@ elseif Config.Framework == 'QBCore' or Config.Framework == 'OLDQBCore'  then
                                 
                                 if npc then
                                     local npcCoords = GetEntityCoords(npc)
-                                    DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
-                                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
+                                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Arac Satin Al")
                                 end
                                 if IsControlJustPressed(0, 38) then
                                     if v.job == Framework.PlayerData.job.name or v.job == 'all' then
