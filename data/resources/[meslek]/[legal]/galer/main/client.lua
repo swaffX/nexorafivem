@@ -347,9 +347,21 @@ end)
                 x = v.coords[1]
                 y = v.coords[2]
                 z = v.coords[3]
-                -- Baloncuk ve E etkilesimi (Rentacar'daki gibi)
-                local npcCoords = GetEntityCoords(createdPeds[1])
-                if npcCoords then
+                -- Baloncuk ve E etkilesimi (NPC'nin ustunde)
+                local npc = nil
+                for i = 1, #createdPeds do
+                    if DoesEntityExist(createdPeds[i]) then
+                        local pedCoords = GetEntityCoords(createdPeds[i])
+                        local distToPed = #(vector3(x,y,z) - pedCoords)
+                        if distToPed < 2.0 then
+                            npc = createdPeds[i]
+                            break
+                        end
+                    end
+                end
+                
+                if npc then
+                    local npcCoords = GetEntityCoords(npc)
                     DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
                     DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
                 end
@@ -452,9 +464,21 @@ elseif Config.Framework == 'QBCore' or Config.Framework == 'OLDQBCore'  then
                         if dist < 10 then
                             if dist < 3 then
                                 local x, y, z = v.coords[1], v.coords[2], v.coords[3]
-                                -- Baloncuk ve E etkilesimi (Rentacar'daki gibi)
-                                local npcCoords = GetEntityCoords(createdPeds[1])
-                                if npcCoords then
+                                -- Baloncuk ve E etkilesimi (NPC'nin ustunde)
+                                local npc = nil
+                                for i = 1, #createdPeds do
+                                    if DoesEntityExist(createdPeds[i]) then
+                                        local pedCoords = GetEntityCoords(createdPeds[i])
+                                        local distToPed = #(vector3(x,y,z) - pedCoords)
+                                        if distToPed < 2.0 then
+                                            npc = createdPeds[i]
+                                            break
+                                        end
+                                    end
+                                end
+                                
+                                if npc then
+                                    local npcCoords = GetEntityCoords(npc)
                                     DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
                                     DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
                                 end
