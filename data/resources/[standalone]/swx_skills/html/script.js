@@ -1,6 +1,7 @@
 let skillBars = {};
 let hideTimers = {};
 let currentXPValues = {}; // Store current XP values for animation
+let currentPercentages = {}; // Store current percentage values for bar animation
 
 window.addEventListener('message', function(event) {
     const data = event.data;
@@ -48,8 +49,9 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
 
     const pct = Math.min((xp / requiredXP) * 100, 100);
 
-    // Initialize current XP value
+    // Initialize current XP value and percentage
     currentXPValues[skillName] = 0;
+    currentPercentages[skillName] = 0;
 
     el.innerHTML = `
         <div class="skill-name">${config.label.toUpperCase()}</div>
@@ -72,6 +74,7 @@ function createSkillBar(skillName, level, xp, requiredXP, config) {
             const xpCurrent = el.querySelector('.xp-current');
             animateNumber(xpCurrent, 0, xp, 2000);
             currentXPValues[skillName] = xp;
+            currentPercentages[skillName] = pct;
         });
     });
 
@@ -120,7 +123,15 @@ function updateBarDOM(skillName, level, xp, requiredXP) {
     const nums = el.querySelectorAll('.skill-level-num');
     nums[0].textContent = level;
     nums[1].textContent = level + 1;
-    el.querySelector('.skill-progress-bar').style.width = pct + '%';
+
+    // Animate progress bar from current percentage to new percentage
+    const oldPct = currentPercentages[skillName] || 0;
+    const progressBar = el.querySelector('.skill-progress-bar');
+    progressBar.style.width = oldPct + '%'; // Start from old position
+    requestAnimationFrame(() => {
+        progressBar.style.width = pct + '%'; // Animate to new position
+    });
+    currentPercentages[skillName] = pct;
 
     // Update required XP (no animation needed)
     el.querySelector('.xp-required').textContent = fmt(requiredXP);
