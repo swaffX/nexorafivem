@@ -347,9 +347,12 @@ end)
                 x = v.coords[1]
                 y = v.coords[2]
                 z = v.coords[3]
-                DrawMarker(2, x, y, z + 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 255, 255, 255, 255, false, false, false, true, false, false, false)
-                DrawText3D(x,y,z+1.2,v.marker, 0.35, 4)
-                DrawText3D(x,y,z+1.0, "~w~[E] ile etkilesim", 0.4, 4)
+                -- Baloncuk ve E etkilesimi (Rentacar'daki gibi)
+                local npcCoords = GetEntityCoords(createdPeds[1])
+                if npcCoords then
+                    DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
+                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
+                end
                 if IsControlJustPressed(0,38) then
                   if v.job == Framework.PlayerData.job.name or v.job == 'all' then
                     SendNUIMessage({
@@ -449,9 +452,12 @@ elseif Config.Framework == 'QBCore' or Config.Framework == 'OLDQBCore'  then
                         if dist < 10 then
                             if dist < 3 then
                                 local x, y, z = v.coords[1], v.coords[2], v.coords[3]
-                                DrawMarker(2, x, y, z + 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 255, 255, 255, 255, false, false, false, true, false, false, false)
-                                DrawText3D(x, y, z + 1.2, v.marker, 0.35, 4)
-                                DrawText3D(x, y, z + 1.0, "~w~[E] ile etkilesim", 0.4, 4)
+                                -- Baloncuk ve E etkilesimi (Rentacar'daki gibi)
+                                local npcCoords = GetEntityCoords(createdPeds[1])
+                                if npcCoords then
+                                    DrawWelcomeBubble(npcCoords, "GALERI", "Hosgeldiniz! Tum araclar burada.")
+                                    DrawText3D(npcCoords.x, npcCoords.y, npcCoords.z + 1.0, "[~g~E~w~] Galeri")
+                                end
                                 if IsControlJustPressed(0, 38) then
                                     if v.job == Framework.PlayerData.job.name or v.job == 'all' then
                                         SendNUIMessage({
@@ -647,5 +653,64 @@ end)
 	SetTextEntry("STRING")
 	AddTextComponentString(text)
 	DrawText(x,y)
+end
+
+-- Rentacar'daki gibi 3D KONUSMA BALONCUGU
+function DrawWelcomeBubble(coords, title, subtitle)
+    local onScreen, _x, _y = World3dToScreen2d(coords.x, coords.y, coords.z + 1.75)
+    
+    if onScreen then
+        local bubbleWidth = 0.28
+        local bubbleHeight = 0.09
+        local tailHeight = 0.02
+        local alpha = 220
+        
+        -- Ana baloncuğun arka planı
+        DrawRect(_x, _y - bubbleHeight/2 + 0.015, bubbleWidth - 0.02, 0.03, 0, 0, 0, alpha)
+        DrawRect(_x, _y - 0.005, bubbleWidth, bubbleHeight - 0.04, 0, 0, 0, alpha)
+        DrawRect(_x, _y + bubbleHeight/2 - 0.025, bubbleWidth - 0.02, 0.02, 0, 0, 0, alpha)
+        
+        -- Köşe yuvarlaklığı
+        DrawRect(_x - bubbleWidth/2 + 0.01, _y - bubbleHeight/2 + 0.02, 0.02, 0.025, 0, 0, 0, alpha)
+        DrawRect(_x + bubbleWidth/2 - 0.01, _y - bubbleHeight/2 + 0.02, 0.02, 0.025, 0, 0, 0, alpha)
+        DrawRect(_x - bubbleWidth/2 + 0.01, _y + bubbleHeight/2 - 0.03, 0.02, 0.015, 0, 0, 0, alpha)
+        DrawRect(_x + bubbleWidth/2 - 0.01, _y + bubbleHeight/2 - 0.03, 0.02, 0.015, 0, 0, 0, alpha)
+        
+        -- Kuyruk
+        DrawRect(_x, _y + bubbleHeight/2 - 0.005, 0.015, tailHeight + 0.01, 0, 0, 0, alpha)
+        DrawRect(_x - 0.008, _y + bubbleHeight/2 - 0.01, 0.01, tailHeight, 0, 0, 0, alpha)
+        DrawRect(_x + 0.008, _y + bubbleHeight/2 - 0.01, 0.01, tailHeight, 0, 0, 0, alpha)
+        DrawRect(_x, _y + bubbleHeight/2 + tailHeight/2 - 0.002, 0.008, 0.008, 0, 0, 0, alpha)
+        
+        -- Başlık (Altın renk)
+        SetTextScale(0.32, 0.32)
+        SetTextFont(4)
+        SetTextProportional(1)
+        SetTextColour(255, 215, 0, 255)
+        SetTextEntry("STRING")
+        SetTextCentre(1)
+        AddTextComponentString(title)
+        DrawText(_x, _y - 0.035)
+        
+        -- Alt başlık (Beyaz)
+        SetTextScale(0.23, 0.23)
+        SetTextFont(4)
+        SetTextProportional(1)
+        SetTextColour(255, 255, 255, 255)
+        SetTextEntry("STRING")
+        SetTextCentre(1)
+        AddTextComponentString(subtitle)
+        DrawText(_x, _y - 0.002)
+        
+        -- İkon
+        SetTextScale(0.35, 0.35)
+        SetTextFont(4)
+        SetTextProportional(1)
+        SetTextColour(255, 215, 0, 255)
+        SetTextEntry("STRING")
+        SetTextCentre(1)
+        AddTextComponentString("💬")
+        DrawText(_x - bubbleWidth/2 + 0.025, _y - 0.035)
+    end
 end
 
