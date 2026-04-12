@@ -25,7 +25,8 @@ lib.callback.register('swx_welcome:isNewPlayer', function(source)
         if result and result[1] then
             -- Kayıt var, first_join değerine bak
             local firstJoinValue = result[1].first_join
-            local isNew = firstJoinValue == 1
+            -- oxmysql TINYINT(1) değerini boolean olarak döndürür
+            local isNew = (firstJoinValue == 1 or firstJoinValue == true)
             print('[SWX-Welcome] Database record found, first_join: ' .. tostring(firstJoinValue) .. ', isNew: ' .. tostring(isNew))
             return isNew
         else
