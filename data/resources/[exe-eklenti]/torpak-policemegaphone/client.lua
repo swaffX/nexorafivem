@@ -34,12 +34,14 @@ RegisterCommand('+Megaphoneaga', function()
     return
   end
 
-  if PlayerData.job.name ~= "police" then
-    QBCore.Functions.Notify('Polis değilsin!', 'error')
+  -- Önce polis aracında mı kontrol et, değilse sessizce çık
+  if not CheckPlayer() then
     return
   end
 
-  if not CheckPlayer() then
+  -- Polis aracındaysa ve polis değilse uyar
+  if PlayerData.job.name ~= "police" then
+    QBCore.Functions.Notify('Polis değilsin!', 'error')
     return
   end
 
