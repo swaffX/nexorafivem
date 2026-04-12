@@ -2862,7 +2862,7 @@ body {
 .street-container {
     width: fit-content;
     height: 100%;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: flex-start;
     gap: 1vh;
