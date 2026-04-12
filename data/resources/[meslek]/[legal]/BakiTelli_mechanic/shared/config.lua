@@ -1,8 +1,7 @@
-
 Config = {}
 
-Config.Mysql = "mysql-async" -- mysql-async, ghmattimysql, oxmysql
-Config.Money = "bank" -- cash or bank
+Config.Mysql = "oxmysql" -- mysql-async, ghmattimysql, oxmysql
+Config.Money = "cash" -- cash or bank
 Config.Distance = 5 -- Acces Menu Distance
 Config.UsingFuel = "default" -- legacyfuel , bakitelli_fuel, default, other
 -- > If you choose the other one, set it from shared > client.lua
@@ -13,71 +12,76 @@ Config.Mechanics = {
 	["Bennys"] = {
 		Job = "mechanic", -- Sadece 'mechanic' mesleğine sahip oyuncular erişebilir
 		Coords = vector4(-211.7776, -1324.457, 30.45644, 177.6539),
+		Label = "Mekanik Lokasyonu",
 	},
 }
 
 Config.Blips = {
 	Blip = true,
-	Name = "Mechanics",
+	Name = "Mekanik",
 	sprite = 544,
 	color = 4,
 	scale = 1.0,
 }
 
 Config.Langs = {
-	OpenMenu = "[E] - Mechanic Menu",
-	NoPrice = "You don't have enough money.",
-	BuyItem = "Successfully modified",
-	ChangeHorns = "If you want to try the horn changed, switch to Free Camera by right-clicking",
-	Clean = "You Cleaned the Car",
-	Repair = "Car engine repaired",
-	AdvancedRepair = "Repaired Car",
-	Stock = "Stock",
+	OpenMenu = "[E] - Mekanik Menusu",
+	NoPrice = "Yeterli paranız yok.",
+	BuyItem = "Modifikasyon başarıyla tamamlandı!",
+	ChangeHorns = "Korna değişikliğini denemek için sağ tıklayarak Serbest Kameraya geçin",
+	Clean = "Aracınız temizlendi!",
+	Repair = "Arac motoru onarildi!",
+	AdvancedRepair = "Arac tamamen onarildi!",
+	Stock = "Stok",
 } 
 
 Config.ModsList = {
 	RepairMenu = {
-		name = "Repair-Cleaning",
+		name = "Tamir / Temizlik",
 		img = "./imgs/repair.png", 
 	},
 	Suspension = {
-		name = "Suspension",
+		name = "Suspansiyon",
 		img = "./imgs/suspension.png"
 	},
 	Brakes = {
-		name = "Brakes",
+		name = "Frenler",
 		img = "./imgs/Brakes.png"
 	},
 	Engine = {
-		name = "Engine",
+		name = "Motor",
 		img = "./imgs/engine.png"
 	},
 	Transmission = {
-		name = "Transmission",
+		name = "Sanziman",
 		img = "./imgs/transmission.png",
 	},
+	Turbo = {
+		name = "Turbo",
+		img = "./imgs/engine.png",
+	},
 	Colors = {
-		name = "Colors",
+		name = "Renkler",
 		img = "./imgs/colors.png",
 	},
 	Horns = {
-		name = "Horns",
+		name = "Kornalar",
 		img = "./imgs/horns.png",
 	},
 	Wheels = {
-		name = "Wheels",
+		name = "Jantlar",
 		img = "./imgs/wheel.png",
 	},
 	Plates = {
-		name = "Plates",
+		name = "Plakalar",
 		img = "./imgs/plate.png",
 	},
 	Neons = {
-		name = "Neons",
+		name = "Neonlar",
 		img = "./imgs/neon.png",
 	},
 	WindowTint = {
-		name = "Window Tint",
+		name = "Cam Filmi",
 		img = "./imgs/window.png"
 	},
 	Liveries = {
@@ -85,7 +89,7 @@ Config.ModsList = {
 		img = "./imgs/liveries.png", 
 	},
 	Windows = {
-		name = "Windows",
+		name = "Pencereler",
 		img = "./imgs/windows.png", 
 	},
 	Tank = {
@@ -105,39 +109,39 @@ Config.ModsList = {
 		img = "./imgs/struts.png", 
 	},	
 	AirFilter = {
-		name = "Air filter",
+		name = "Hava Filtresi",
 		img = "./imgs/airfilter.png", 
 	},	
 	EngineBlock = {
-		name = "Engine Block",
+		name = "Motor Bloğu",
 		img = "./imgs/engineblock.png", 
 	},	
 	Hydraulics = {
-		name = "Hydraulics",
+		name = "Hidrolik",
 		img = "./imgs/hydraulics.png", 
 	},	
 	Trunk = {
-		name = "Trunk",
+		name = "Bagaj",
 		img = "./imgs/trunk.png", 
 	},	
 	Plaques = {
-		name = "Plaques",
+		name = "Plakalar",
 		img = "./imgs/plate.png", 
 	},	
 	ShiftLeavers = {
-		name = "Shift Leavers",
+		name = "Vites Kolları",
 		img = "./imgs/shiftleavers.png", 
 	},	
 	Stringwheel = {
-		name = "String Wheel",
+		name = "Dizayn Jant",
 		img = "./imgs/stringwheel.png", 
 	},	
 	Seats = {
-		name = "Seats",
+		name = "Koltuklar",
 		img = "./imgs/seats.png", 
 	},	
 	DoorSpeaker = {
-		name = "Door Speaker",
+		name = "Kapı Hoparlörü",
 		img = "./imgs/doorspeaker.png", 
 	},	
 	Dial = {
@@ -145,11 +149,11 @@ Config.ModsList = {
 		img = "./imgs/dial.png", 
 	},	
 	Dashboard = {
-		name = "Dashboard",
+		name = "Gösterge Paneli",
 		img = "./imgs/dashboard.png", 
 	},	
 	Ornaments = {
-		name = "Ornaments",
+		name = "Süslemeler",
 		img = "./imgs/ornaments.png", 
 	},	
 	Trim = {
@@ -157,27 +161,27 @@ Config.ModsList = {
 		img = "./imgs/trim.png", 
 	},	
 	VanityPlates = {
-		name = "Vanity Plates",
+		name = "Vanity Plakaları",
 		img = "./imgs/vanityplates.png", 
 	},	
 	PlateHolder = {
-		name = "PlateHolder",
+		name = "Plaka Tutucu",
 		img = "./imgs/plateholder.png", 
 	},	
 	Roof = {
-		name = "Roof",
+		name = "Çatı",
 		img = "./imgs/roof.png", 
 	},	
 	Fenders = {
-		name = "Fenders",
+		name = "Fenderler",
 		img = "./imgs/fenders.png", 
 	},	
 	Hood = {
-		name = "Hood",
+		name = "Kaput",
 		img = "./imgs/hood.png", 
 	},	
 	Grille = {
-		name = "Grille",
+		name = "Izgara",
 		img = "./imgs/grille.png", 
 	},	
 	RollCage = {
@@ -185,19 +189,19 @@ Config.ModsList = {
 		img = "./imgs/rollcage.png", 
 	},	
 	Exhaust = {
-		name = "Exhaust",
+		name = "Egzoz",
 		img = "./imgs/exhaust.png", 
 	},	
 	Skirts = {
-		name = "Skirts",
+		name = "Etekler",
 		img = "./imgs/skirts.png", 
 	},	
 	RearBumpers = {
-		name = "RearBumpers",
+		name = "Arka Bumpers",
 		img = "./imgs/rearbumpers.png", 
 	},	
 	FrontBumpers = {
-		name = "Front Bumpers",
+		name = "Ön Bumpers",
 		img = "./imgs/frontbumpers.png", 
 	},	
 	Spoilers = {
@@ -208,25 +212,25 @@ Config.ModsList = {
 
 Config.RepairMenu = {
 	["Repair"] = {
-		name = "Repair ",
-		price = 250,
-		img = "./imgs/repair.png", 
-	},
-	["AdvancedRepair"] = {
-		name = "Advanced Repair ",
+		name = "Temel Tamir",
 		price = 500,
 		img = "./imgs/repair.png", 
 	},
+	["AdvancedRepair"] = {
+		name = "Gelismis Tamir",
+		price = 1500,
+		img = "./imgs/repair.png", 
+	},
 	["Clean"] = {
-		name = "Cleaning ",
-		price = 100,
+		name = "Arac Yikama",
+		price = 250,
 		img = "./imgs/repair.png", 
 	}
 }
 
 Config.WheelsType = {
 	["accessories"] = {
-		name = "Wheel Accessories",
+		name = "Jant Aksesuarları",
 		img = "./imgs/wheel.png"
 	},
 	-- ["wheelcolor"] = {
@@ -455,27 +459,32 @@ Config.Colors = {
 	}
 	
 	Config.Suspensions =  {
-		{name = "Lowered Suspension",mod = 0, price = 100},
-		{name = "Street Suspension",mod = 1, price = 250},
-		{name = "Sport Suspension",mod = 2, price = 500},
-		{name = "Competition Suspension",mod = 3, price = 1000},
+		{name = "Düşürülmüş Süspansiyon",mod = 0, price = 100},
+		{name = "Sokak Süspansiyonu",mod = 1, price = 250},
+		{name = "Spor Süspansiyonu",mod = 2, price = 500},
+		{name = "Yarış Süspansiyonu",mod = 3, price = 1000},
 	}
 	Config.Brakes = {
-		{name = "Street Brakes", mod = 0, price = 500},
-		{name = "Sport Brakes", mod = 1, price = 1000},
-		{name = "Race Brakes", mod = 2, price = 1500},
+		{name = "Standart Fren", mod = 0, price = 500},
+		{name = "Spor Fren", mod = 1, price = 1000},
+		{name = "Yaris Freni", mod = 2, price = 1500},
 	}
 
 	Config.Engine = {
-		{name = "Engine Upgrade, Level 3", mod = 2, price = 1500},
-		{name = "Engine Upgrade, Level 2", mod = 1, price = 3000},
-		{name = "Engine Upgrade, Level 1", mod = 0, price = 4500},
+		{name = "Motor Yukseltme Seviye 3", mod = 2, price = 1500},
+		{name = "Motor Yukseltme Seviye 2", mod = 1, price = 3000},
+		{name = "Motor Yukseltme Seviye 1", mod = 0, price = 4500},
 	}
 
 	Config.Transmission = {
-		{name = "Street Transmission", mod = 0, price = 500},
-		{name = "Sports Transmission", mod = 1, price = 1000},
-		{name = "Race Transmission", mod = 2, price = 1500},
+		{name = "Standart Sanziman", mod = 0, price = 500},
+		{name = "Spor Sanziman", mod = 1, price = 1000},
+		{name = "Yaris Sanzimanı", mod = 2, price = 1500},
+	}
+
+	Config.Turbo = {
+		{name = "Turbo Tak",    toggle = true,  price = 3000},
+		{name = "Turbo Kaldir", toggle = false, price = 0},
 	}
 
 	Config.Wheel = {

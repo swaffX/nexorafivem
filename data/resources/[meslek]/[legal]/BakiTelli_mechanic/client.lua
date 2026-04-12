@@ -111,22 +111,22 @@ function AddMods()
 end
 
 function detailed(veh)
-	local pmult, tmult, handling, brake = 1000,800,GetPerformanceStats(veh).handling,GetPerformanceStats(veh).brakes
-	topspeed = math.ceil(GetVehicleModelEstimatedMaxSpeed(GetEntityModel(veh))*4.605936)
-	power = math.ceil(GetVehicleModelAcceleration(GetEntityModel(veh))*pmult)
-	torque = math.ceil(GetVehicleModelAcceleration(GetEntityModel(veh))*tmult)
-	brakes = GetVehicleModelMaxBraking(GetEntityModel(veh)) * 80
-    health =  math.floor(GetVehicleEngineHealth(veh) / 10)
-    fuel = getfuel(veh)
+    local driveForce = GetVehicleHandlingFloat(veh, 'CHandlingData', 'fInitialDriveForce')
+    local topspeed   = math.ceil(GetVehicleHandlingFloat(veh, 'CHandlingData', 'fInitialDriveMaxFlatVel') * 3.6)
+    local power      = math.ceil(driveForce * 1000)
+    local torque     = math.ceil(driveForce * 800)
+    local brakes     = math.ceil(GetVehicleHandlingFloat(veh, 'CHandlingData', 'fBrakeForce') * 100)
+    local health     = math.floor(GetVehicleEngineHealth(veh) / 10)
+    local fuel       = math.min(100, math.floor(getfuel(veh)))
     SendNUIMessage({
-		action = "update",
-		topspeed = topspeed,
-		power = power,
-		torque = torque,
-		brakes = brakes,
-        health = health,
-        fuel = fuel
-	})
+        action   = "update",
+        topspeed = topspeed,
+        power    = power,
+        torque   = torque,
+        brakes   = brakes,
+        health   = health,
+        fuel     = fuel
+    })
 end
 
 function GetPerformanceStats(vehicle)
@@ -386,6 +386,19 @@ RegisterNUICallback("SellectId", function (data)
                 select = select,
             })
         end
+    elseif id == "Turbo" then
+        local playerVeh = GetVehiclePedIsIn(PlayerPedId(), false)
+        local turboOn = IsToggleModOn(playerVeh, 18)
+        for k, v in pairs(Config.Turbo) do
+            SendNUIMessage({
+                action = "addItems",
+                label = v.name,
+                img = Config.ModsList["Turbo"].img,
+                price = v.price,
+                id = k,
+                select = (v.toggle == turboOn),
+            })
+        end
     elseif id == "Wheels" then
         typer = "main"
         SendNUIMessage({action = "emptyall"})
@@ -587,6 +600,10 @@ RegisterNUICallback("SellectItem", function (data)
     elseif SellectMode == "Transmission" then
         SellectItemPrice = Config.Transmission[tonumber(id)].price 
         SetVehicleMod(playerVeh, 13, Config.Transmission[tonumber(id)].mod)
+    elseif SellectMode == "Turbo" then
+        SellectItemPrice = Config.Turbo[tonumber(id)].price
+        SetVehicleModKit(playerVeh, 0)
+        ToggleVehicleMod(playerVeh, 18, Config.Turbo[tonumber(id)].toggle)
     elseif SellectMode == "wheelSmoke" then 
         SellectItemPrice = Config.Wheel.wheelaccessories[tonumber(id)].price 
         ToggleVehicleMod(playerVeh,20,true)

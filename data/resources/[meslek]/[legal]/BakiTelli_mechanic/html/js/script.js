@@ -81,7 +81,7 @@ $(document).ready(function () {
         event.data.img +
         `" /></div>
       <div class="l-item-content">
-        <div class="l-item-top">retrofit</div>
+        <div class="l-item-top">modifikasyon</div>
         <div class="l-item-title">` +
         event.data.label +
         `</div>
