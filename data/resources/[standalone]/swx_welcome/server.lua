@@ -62,13 +62,13 @@ RegisterNetEvent('swx_welcome:giveStarterItems', function()
 end)
 
 -- Karakter seçildiğinde kontrol et (ak4y-multicharacter)
-RegisterServerEvent("ak4y-multicharacter:client:chooseChar", function()
+RegisterServerEvent("ak4y-multicharacter:client:chooseCharX", function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
     if not Player then return end
 
-    print('[SWX-Welcome] ak4y-multicharacter:client:chooseChar event triggered for player: ' .. src)
+    print('[SWX-Welcome] ak4y-multicharacter:client:chooseCharX event triggered for player: ' .. src)
 
     -- Yeni oyuncu mu kontrol et
     local isNew = lib.callback.await('swx_welcome:isNewPlayer', false, src)
