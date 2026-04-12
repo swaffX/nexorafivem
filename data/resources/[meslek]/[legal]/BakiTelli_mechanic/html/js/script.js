@@ -110,9 +110,7 @@ $(document).ready(function () {
             <div class="b-item-tp-title">` +
         event.data.label +
         `</div>
-            <div class="b-item-tp-price">$ ` +
-        event.data.price +
-        `</div>
+            <div class="b-item-tp-price">$ 0</div>
           </div>
         </div>
     `;
@@ -122,7 +120,7 @@ $(document).ready(function () {
         $("#" + event.data.id).addClass("newwidth");
       }
     } else if (event.data.action == "updateprice") {
-      $(".tp-price").html("$ " + event.data.price);
+      $(".tp-price").html("$ 0");
     }
   });
 });
