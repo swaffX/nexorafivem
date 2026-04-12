@@ -12,18 +12,25 @@ end
 -- Yeni oyuncu mu kontrol et
 lib.callback.register('swx_welcome:isNewPlayer', function(source)
     local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return false end
+    if not Player then
+        print('[SWX-Welcome] ERROR: Player not found for source: ' .. source)
+        return false
+    end
 
     local citizenid = Player.PlayerData.citizenid
+    print('[SWX-Welcome] Checking if new player for citizenid: ' .. citizenid)
 
     if Config.UseDatabase then
         local result = MySQL.query.await('SELECT first_join FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid})
         if result and result[1] then
             -- Kayıt var, first_join değerine bak
-            return result[1].first_join == 1
+            local isNew = result[1].first_join == 1
+            print('[SWX-Welcome] Database record found, first_join: ' .. result[1].first_join .. ', isNew: ' .. tostring(isNew))
+            return isNew
         else
             -- Kayıt yok - bu oyuncu sistemden önce vardı, yeni değil
             -- Kayıt oluştur ve first_join = 0 yap (eski oyuncu olarak işaretle)
+            print('[SWX-Welcome] No database record, marking as existing player (first_join = 0)')
             MySQL.insert('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 0)', {citizenid})
             return false
         end
@@ -32,10 +39,13 @@ lib.callback.register('swx_welcome:isNewPlayer', function(source)
         local meta = Player.PlayerData.metadata
         if not meta.firstJoin then
             -- Metadata yok - eski oyuncu olarak işaretle
+            print('[SWX-Welcome] No metadata found, marking as existing player')
             Player.Functions.SetMetaData('firstJoin', false)
             return false
         end
-        return meta.firstJoin == true
+        local isNew = meta.firstJoin == true
+        print('[SWX-Welcome] Metadata found, firstJoin: ' .. tostring(meta.firstJoin) .. ', isNew: ' .. tostring(isNew))
+        return isNew
     end
 end)
 
