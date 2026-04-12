@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexora Mekanik</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="overlay" v-if="isOpen">
+        <div class="panel">
+
+            <!-- Header -->
+            <div class="panel-header">
+                <div class="header-icon">🔧</div>
+                <div class="header-text">
+                    <div class="header-title">MEKANIK FIS</div>
+                    <div class="header-sub">{{ vehicleName }}</div>
+                </div>
+                <button class="close-btn" @click="closeUI">✕</button>
+            </div>
+
+            <!-- Parts List -->
+            <div class="parts-section">
+                <div class="section-label">TAMIR EDILECEK PARCALAR</div>
+
+                <div class="part-item" v-for="part in parts" :key="part.id"
+                     :class="{ selected: isSelected(part.id), damaged: getDamage(part.id) > 0 }"
+                     @click="togglePart(part)">
+
+                    <div class="part-check">
+                        <span v-if="isSelected(part.id)">✓</span>
+                    </div>
+
+                    <div class="part-info">
+                        <div class="part-label">{{ part.label }}</div>
+                        <div class="damage-bar" v-if="getDamage(part.id) > 0">
+                            <div class="damage-fill" :style="{ width: getDamage(part.id) + '%' }"></div>
+                            <span class="damage-text">Hasar: %{{ getDamage(part.id) }}</span>
+                        </div>
+                        <div class="no-damage" v-else>Hasar Yok</div>
+                    </div>
+
+                    <div class="part-price-box">
+                        <input class="price-input"
+                               :value="getSelectedPrice(part.id)"
+                               @input="updatePrice(part.id, $event)"
+                               @click.stop
+                               v-if="isSelected(part.id)"
+                               type="number" min="0" />
+                        <span class="part-price-default" v-else>${{ part.price }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="customer-row">
+                <div class="customer-label">
+                    <span class="dot" :class="{ online: targetId > 0 }"></span>
+                    {{ targetId > 0 ? 'Musteri Bulundu' : 'Yakin Musteri Yok' }}
+                </div>
+                <div class="total-box">
+                    Toplam: <strong>${{ total }}</strong>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <button class="send-btn"
+                    :disabled="selectedParts.length === 0 || targetId === -1"
+                    @click="sendFis">
+                {{ selectedParts.length === 0 ? 'Parca Sec' : targetId === -1 ? 'Musteri Yok' : 'FIS GONDER ($' + total + ')' }}
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

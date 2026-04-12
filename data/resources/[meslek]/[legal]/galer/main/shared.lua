@@ -34,44 +34,41 @@ Config.Vehicles = {
     Car = {
         ['car'] = {
             -- [BAŞLANGIÇ/ECONOMY ARAÇLARI]
-            {model='asea',       label='Asea',          price=6500,    category='sedan'},
-            {model='emperor',    label='Emperor',       price=8000,    category='sedan'},
-            {model='Injection',  label='Injection',     price=12000,   category='jeep'},        
-            {model='bifta',      label='Bifta',         price=15000,   category='jeep'},
-            {model='rebel2',     label='Rebel',         price=8500,    category='jeep'},
-            {model='rancherxl',  label='Rancher XL',    price=18000,   category='jeep'},
-            {model='mesa3',      label='Mesa',          price=35000,   category='jeep'},
+            {model='asea',       label='Asea',          price=10000,    category='sedan'},
+            {model='emperor',    label='Emperor',       price=12000,    category='sedan'},
+            {model='Injection',  label='Injection',     price=18000,   category='jeep'},
+            {model='bifta',      label='Bifta',         price=22000,   category='jeep'},
+            {model='rebel2',     label='Rebel',         price=13000,    category='jeep'},
+            {model='rancherxl',  label='Rancher XL',    price=25000,   category='jeep'},
+            {model='mesa3',      label='Mesa',          price=45000,   category='jeep'},
             
             -- [SPOR ARABALAR]
-            {model='buffalo4',   label='Buffalo STX',   price=42000,   category='sport'},
-            {model='drafter',    label='Drafter',       price=55000,   category='sport'},
-            {model='jester',     label='Jester',        price=48000,   category='sport'},
-            {model='elegy2',     label='Elegy Retro',   price=52000,   category='sport'},
-            {model='hermes',     label='Hermes',        price=38000,   category='trunk'},
-            {model='blade',      label='Blade',         price=24000,   category='trunk'},
+            {model='buffalo4',   label='Buffalo STX',   price=65000,   category='sport'},
+            {model='drafter',    label='Drafter',       price=80000,   category='sport'},
+            {model='jester',     label='Jester',        price=70000,   category='sport'},
+            {model='elegy2',     label='Elegy Retro',   price=75000,   category='sport'},
+            {model='hermes',     label='Hermes',        price=55000,   category='trunk'},
+            {model='blade',      label='Blade',         price=35000,   category='trunk'},
             
             -- [DONATE ARAÇLAR]
-            {model='skyline',    label='Nissan Skyline GT-R34', price=75000,   category='donate'},
-            {model='r820',       label='Audi R8 2020',  price=100000,  category='donate'},
-            {model='redeye',     label='Dodge Challenger', price=80000, category='donate'},
-            {model='mustang19', label='Ford Mustang 2019', price=95000, category='donate'},
-            {model='gtrnismo17', label='Nissan GT-R R35 Nismo', price=90000, category='donate'},
-            {model='brz13',  label='Subaru BRZ 2013', price=55000, category='donate'},
-            {model='911turbos', label='Porsche 911 Turbo S', price=120000, category='donate'},
+            {model='skyline',    label='Nissan Skyline GT-R34', price=150000,   category='donate'},
+            {model='r820',       label='Audi R8 2020',  price=190000,  category='donate'},
+            {model='redeye',     label='Dodge Challenger', price=160000, category='donate'},
+            {model='mustang19', label='Ford Mustang 2019', price=180000, category='donate'},
+            {model='gtrnismo17', label='Nissan GT-R R35 Nismo', price=170000, category='donate'},
+            {model='brz13',  label='Subaru BRZ 2013', price=100000, category='donate'},
+            {model='911turbos', label='Porsche 911 Turbo S', price=200000, category='donate'},
 
-            -- [LÜKS ARABALAR]
-            {model='zentorno',   label='Zentorno',      price=145000,  category='sport'},
-            
             -- [MOTOSİKLETLER]
-            {model='bati',       label='Bati',          price=22000,   category='MOTORCYCLES'},
-            {model='sanchez',    label='Sanchez',       price=9500,    category='MOTORCYCLES'},
-            {model='avarus',     label='Avarus',        price=15000,   category='MOTORCYCLES'},
-            
+            {model='bati',       label='Bati',          price=35000,   category='MOTORCYCLES'},
+            {model='sanchez',    label='Sanchez',       price=15000,    category='MOTORCYCLES'},
+            {model='avarus',     label='Avarus',        price=22000,   category='MOTORCYCLES'},
+
             -- [MUSCLE/CLASSIC]
-            {model='buccaneer',  label='Buccaneer',     price=16500,   category='trunk'},
-            {model='hotknife',   label='Hotknife',      price=28000,   category='trunk'},
-            {model='moonbeam',   label='Moon Beam',     price=22000,   category='trunk'},
-            {model='brawler',    label='Brawler',       price=32000,   category='jeep'},
+            {model='buccaneer',  label='Buccaneer',     price=25000,   category='trunk'},
+            {model='hotknife',   label='Hotknife',      price=40000,   category='trunk'},
+            {model='moonbeam',   label='Moon Beam',     price=32000,   category='trunk'},
+            {model='brawler',    label='Brawler',       price=45000,   category='jeep'},
         },
 
         -- TEKNE VE HAVA ARACI SATIŞI KAPALI
