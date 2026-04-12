@@ -44,8 +44,12 @@ createApp({
 
         closeGUI() {
             this.isOpen = false;
-            // Lua'ya bildir (client.lua handles closing via SendNUIMessage)
-            // No fetch needed since client.lua already handles the close action
+            // Lua'ya bildir - mouse focus serbest bırakılacak
+            fetch(`https://${GetParentResourceName()}/close`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            }).catch(() => {});
         },
 
         selectVehicle(vehicle) {
