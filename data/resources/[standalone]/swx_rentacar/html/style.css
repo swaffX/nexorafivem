@@ -21,32 +21,21 @@
     box-sizing: border-box;
 }
 
-html {
-    background: rgba(0, 0, 0, 0) !important;
-    background-color: rgba(0, 0, 0, 0) !important;
-}
-
-body {
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0) !important;
-    background-color: rgba(0, 0, 0, 0) !important;
+html, body {
+    background: transparent;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     font-family: 'Poppins', sans-serif;
 }
 
 #app {
-    position: fixed;
-    inset: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0) !important;
-    pointer-events: none;
-}
-
-.rental-container {
-    pointer-events: all;
+    background: transparent;
 }
 
 [v-cloak] {
@@ -57,14 +46,12 @@ body {
 .rental-container {
     width: 520px;
     max-height: 88vh;
-    background: rgba(10, 12, 25, 0.82);
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    background: rgba(13, 14, 30, 0.96);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(99, 102, 241, 0.2);
     box-shadow:
-        0 32px 64px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(99, 102, 241, 0.15) inset;
+        0 24px 48px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(99, 102, 241, 0.1) inset;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -235,9 +222,9 @@ body {
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
-    background: var(--bg-card);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 14px;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
