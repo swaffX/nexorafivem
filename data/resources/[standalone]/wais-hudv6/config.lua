@@ -28,7 +28,7 @@ Config.PostalMap = {
     --]]
 
     ["enabled"] = false, -- If you are using PostalMap on your server, you should set this to `true`. Otherwise, the map may disappear, visibility problems or mask problems may occur.
-    ["showNearPostal"] = true, -- If you do `true`, the code of the postal you are close to will appear just opposite your location information. (It may increase resmon, albeit very little)
+    ["showNearPostal"] = false, -- If you do `true`, the code of the postal you are close to will appear just opposite your location information. (It may increase resmon, albeit very little)
 }
 
 Config.Commands = {

@@ -25,6 +25,7 @@ RegisterNetEvent('swx_speaker:client:speakerRemoved')
 AddEventHandler('swx_speaker:client:speakerRemoved', function()
     if currentMusicId then
         exports.xsound:Destroy(currentMusicId)
+        TriggerServerEvent('swx_speaker:server:stopMusic')
         currentMusicId = nil
         isPlaying = false
         isPaused = false
@@ -567,6 +568,7 @@ function ManageQueueMenu()
                 onSelect = function()
                     if currentMusicId then
                         exports.xsound:Destroy(currentMusicId)
+                        TriggerServerEvent('swx_speaker:server:stopMusic')
                         currentMusicId = nil
                         isPlaying = false
                         isPaused = false
