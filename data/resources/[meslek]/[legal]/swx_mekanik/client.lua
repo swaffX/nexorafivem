@@ -20,7 +20,7 @@ local function GetVehicleName(veh)
     return GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(veh)))
 end
 
-local function GetClosestVehicle()
+local function FindClosestVehicle()
     local ped   = PlayerPedId()
     local pos   = GetEntityCoords(ped)
     local veh   = GetClosestVehicle(pos.x, pos.y, pos.z, Config.ScanVehicleDistance, 0, 70)
@@ -28,7 +28,7 @@ local function GetClosestVehicle()
     return nil
 end
 
-local function GetClosestPlayer()
+local function FindClosestPlayer()
     local ped   = PlayerPedId()
     local pos   = GetEntityCoords(ped)
     local best  = nil
@@ -64,17 +64,18 @@ local function GetPartPosition(vehicle, partId)
 end
 
 -- Arac hasar bilgisi
-local function GetDamageInfo(vehicle)
-    return {
+local function GetDamageInfoForVehicle(vehicle)
+    local info = {
         engine   = math.floor(math.max(0, 1 - GetVehicleEngineHealth(vehicle) / 1000) * 100),
-        body     = math.floor(math.max(0, 1 - GetVehicleBodyHealth(vehicle)  / 1000) * 100),
-        bonnet   = GetVehicleDoorDamageStatus(vehicle, 4) > 0 and 70 or 0,
-        boot     = GetVehicleDoorDamageStatus(vehicle, 5) > 0 and 60 or 0,
-        wheel_lf = IsVehicleTyreBurst(vehicle, 0, false) and 100 or 0,
-        wheel_rf = IsVehicleTyreBurst(vehicle, 1, false) and 100 or 0,
-        wheel_lr = IsVehicleTyreBurst(vehicle, 2, false) and 100 or 0,
-        wheel_rr = IsVehicleTyreBurst(vehicle, 3, false) and 100 or 0,
+        body     = math.floor(math.max(0, 1 - GetVehicleBodyHealth(vehicle) / 1000) * 100),
     }
+    info.bonnet = info.body > 10 and math.min(info.body, 90) or 0
+    info.boot   = info.body > 10 and math.min(info.body, 70) or 0
+    info.wheel_lf = IsVehicleTyreBurst(vehicle, 0, false) and 100 or 0
+    info.wheel_rf = IsVehicleTyreBurst(vehicle, 1, false) and 100 or 0
+    info.wheel_lr = IsVehicleTyreBurst(vehicle, 2, false) and 100 or 0
+    info.wheel_rr = IsVehicleTyreBurst(vehicle, 3, false) and 100 or 0
+    return info
 end
 
 -- ===================== PLAYER DATA =====================
@@ -106,16 +107,16 @@ RegisterCommand('mekanik', function()
         return
     end
 
-    local vehicle = GetClosestVehicle()
+    local vehicle = FindClosestVehicle()
     if not vehicle then
         lib.notify({ title = 'Hata', description = 'Yakin araç bulunamadi (12m)!', type = 'error' })
         return
     end
 
-    local closestPlayer = GetClosestPlayer()
+    local closestPlayer = FindClosestPlayer()
     local targetServerId = closestPlayer and GetPlayerServerId(closestPlayer) or -1
 
-    local damage = GetDamageInfo(vehicle)
+    local damage = GetDamageInfoForVehicle(vehicle)
 
     -- NUI'yi ac
     isUIOpen = true
