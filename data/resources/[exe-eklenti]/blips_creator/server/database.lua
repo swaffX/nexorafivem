@@ -12,11 +12,15 @@ function setupDatabase(cb)
     local sqlContent = LoadResourceFile(resName, string.format(sqlPath, scriptVersion))
 
     if(sqlContent) then
-        MySQL.Async.execute(sqlContent, {}, function()
-            print("[" .. GetCurrentResourceName() .. "] Database ready")
+        MySQL.Async.execute(sqlContent, {}, function(affectedRows)
+            print("[" .. GetCurrentResourceName() .. "] Database ready (SQL executed)")
+            cb()
+        end, function(err, query, params)
+            print("[" .. GetCurrentResourceName() .. "] Database setup failed: " .. tostring(err))
             cb()
         end)
     else
+        print("[" .. GetCurrentResourceName() .. "] SQL file not found, skipping database setup")
         cb()
     end
 end
