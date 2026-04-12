@@ -76,6 +76,11 @@ local function getPlayerBlips()
 
     local license = getPlayerIdentifier(playerId)
 
+    if not license then
+        TriggerClientEvent('blips_creator:loadPlayerBlips', playerId, {})
+        return
+    end
+
     playersBlips[license] = playersBlips[license] or {}
 
     local allBlips = {}
@@ -114,7 +119,9 @@ local function saveBlip(blipId, blipData)
     local playerId = source
     local license = getPlayerIdentifier(playerId)
 
-    if(playersBlips[license][blipId]) then        
+    if not license then return end
+
+    if(playersBlips[license] and playersBlips[license][blipId]) then        
         MySQL.Async.execute([[
             UPDATE global_blips SET 
             name=@name,
@@ -186,6 +193,8 @@ local function createPlayerBlip(blipData)
     local playerId = source
     local license = getPlayerIdentifier(playerId)
 
+    if not license then return end
+
     if(not playersBlips[license]) then
         playersBlips[license] = {}
     end
@@ -224,6 +233,8 @@ RegisterNetEvent('blips_creator:createPlayerBlip', createPlayerBlip)
 local function deleteBlip(blipId)
     local playerId = source
     local identifier = getPlayerIdentifier(playerId)
+
+    if not identifier then return end
 
     -- If the blip is of the player
     if(playersBlips[identifier] and playersBlips[identifier][blipId]) then
