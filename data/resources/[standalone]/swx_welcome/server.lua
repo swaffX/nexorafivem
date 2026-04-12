@@ -24,8 +24,9 @@ lib.callback.register('swx_welcome:isNewPlayer', function(source)
         local result = MySQL.query.await('SELECT first_join FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid})
         if result and result[1] then
             -- Kayıt var, first_join değerine bak
-            local isNew = result[1].first_join == 1
-            print('[SWX-Welcome] Database record found, first_join: ' .. result[1].first_join .. ', isNew: ' .. tostring(isNew))
+            local firstJoinValue = result[1].first_join
+            local isNew = firstJoinValue == 1
+            print('[SWX-Welcome] Database record found, first_join: ' .. tostring(firstJoinValue) .. ', isNew: ' .. tostring(isNew))
             return isNew
         else
             -- Kayıt yok - bu oyuncu sistemden önce vardı, yeni değil
