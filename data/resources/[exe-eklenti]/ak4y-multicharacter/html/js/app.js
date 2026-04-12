@@ -375,19 +375,19 @@ $(document).on("click", "#createButtonX", function () {
 
     // Validation
     if (!firstname || firstname === "AD" || hasWhiteSpace(firstname)) {
-        alert("Lütfen geçerli bir ad giriniz!");
+        showToast("Lütfen geçerli bir ad giriniz!", "error");
         return false;
     }
     if (!lastname || lastname === "SOYAD" || hasWhiteSpace(lastname)) {
-        alert("Lütfen geçerli bir soyad giriniz!");
+        showToast("Lütfen geçerli bir soyad giriniz!", "error");
         return false;
     }
     if (!nationality || nationality === "UYRUK" || hasWhiteSpace(nationality)) {
-        alert("Lütfen geçerli bir uyruk giriniz!");
+        showToast("Lütfen geçerli bir uyruk giriniz!", "error");
         return false;
     }
     if (!birthdate) {
-        alert("Lütfen doğum tarihi seçiniz!");
+        showToast("Lütfen doğum tarihi seçiniz!", "warning");
         return false;
     }
 
@@ -398,17 +398,17 @@ $(document).on("click", "#createButtonX", function () {
     const maxDate = new Date(today.getFullYear() - 90, today.getMonth(), today.getDate());
 
     if (birthDateObj > minDate) {
-        alert("Karakter oluşturmak için minimum 16 yaşında olmalısınız!");
+        showToast("Karakter oluşturmak için minimum 16 yaşında olmalısınız!", "warning");
         return false;
     }
     if (birthDateObj < maxDate) {
-        alert("Geçersiz doğum tarihi!");
+        showToast("Geçersiz doğum tarihi!", "error");
         return false;
     }
 
     // Profanity check
     if (regTest.test(firstname) || regTest.test(lastname)) {
-        alert("Hata: Uygunsuz kelime kullandınız. Lütfen tekrar deneyiniz!");
+        showToast("Hata: Uygunsuz kelime kullandınız. Lütfen tekrar deneyiniz!", "error");
         return false;
     }
 
