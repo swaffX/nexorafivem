@@ -1,21 +1,21 @@
-/* NEXORA RENT - Professional Glass Morphism Theme */
+/* NEXORA RENT - Ultra Modern Light Glass Theme */
 :root {
-    --primary: #3b82f6;
-    --primary-dark: #2563eb;
-    --primary-light: #60a5fa;
-    --bg-glass: rgba(15, 23, 42, 0.85);
-    --bg-card: rgba(30, 41, 59, 0.7);
-    --bg-hover: rgba(51, 65, 85, 0.8);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(148, 163, 184, 0.9);
-    --border: rgba(59, 130, 246, 0.3);
-    --success: #22c55e;
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --primary-light: #818cf8;
+    --bg-glass: rgba(255, 255, 255, 0.75);
+    --bg-card: rgba(255, 255, 255, 0.55);
+    --bg-hover: rgba(255, 255, 255, 0.85);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: rgba(99, 102, 241, 0.25);
+    --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
-    --gold: #fbbf24;
-    --gradient-start: #3b82f6;
-    --gradient-end: #8b5cf6;
-    --accent: #06b6d4;
+    --gold: #f59e0b;
+    --gradient-start: #6366f1;
+    --gradient-end: #a855f7;
+    --accent: #0ea5e9;
 }
 
 * {
@@ -40,18 +40,20 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 620px;
+    width: 600px;
     max-height: 85vh;
-    background: var(--bg-glass);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+                0 0 100px rgba(99, 102, 241, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideIn {
@@ -70,9 +72,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px 26px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -84,8 +86,8 @@ body {
     left: -100%;
     width: 200%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    animation: shimmer 4s infinite;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 3s infinite;
 }
 
 @keyframes shimmer {
@@ -131,35 +133,35 @@ body {
 .welcome-banner {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 18px 24px;
-    background: rgba(59, 130, 246, 0.08);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 16px;
+    padding: 20px 26px;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .welcome-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
-    color: var(--primary-light);
+    font-size: 1.5rem;
+    color: var(--primary);
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .welcome-text h2 {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: var(--primary-light);
-    margin-bottom: 2px;
+    color: var(--primary);
+    margin-bottom: 4px;
 }
 
 .welcome-text p {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
 }
 
@@ -210,10 +212,10 @@ body {
     align-items: center;
     gap: 16px;
     padding: 16px 20px;
-    background: rgba(30, 41, 59, 0.6);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -227,17 +229,17 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 0;
 }
 
 .vehicle-card:hover {
-    background: rgba(51, 65, 85, 0.7);
-    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(99, 102, 241, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
 }
 
 .vehicle-card:hover::before {
@@ -245,31 +247,31 @@ body {
 }
 
 .vehicle-card.selected {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: rgba(59, 130, 246, 0.5);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 8px 20px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), 0 8px 25px rgba(99, 102, 241, 0.2);
 }
 
 .vehicle-image {
     width: 64px;
     height: 64px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
-    color: var(--primary-light);
+    color: var(--primary);
     flex-shrink: 0;
     position: relative;
     z-index: 1;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.15);
 }
 
 .vehicle-card:hover .vehicle-image {
     transform: scale(1.05);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
 }
 
 .vehicle-info {
@@ -318,9 +320,9 @@ body {
 
 /* Selection Details */
 .selection-details {
-    padding: 16px 24px;
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 18px 26px;
+    background: rgba(255, 255, 255, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .detail-row {
@@ -328,7 +330,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .detail-row:last-child {
@@ -353,10 +355,10 @@ body {
 
 /* Footer */
 .rental-footer {
-    padding: 18px 24px;
-    background: rgba(30, 41, 59, 0.5);
+    padding: 20px 26px;
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .rental-footer.no-selection {
@@ -373,20 +375,20 @@ body {
 /* Rent Button */
 .rent-btn {
     width: 100%;
-    padding: 16px 24px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 18px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--gradient-end) 100%);
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     color: white;
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
     position: relative;
     overflow: hidden;
 }

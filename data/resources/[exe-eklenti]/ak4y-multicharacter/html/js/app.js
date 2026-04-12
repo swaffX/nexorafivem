@@ -4,6 +4,12 @@ var firstOpen = true;
 var tebexLink = "";
 
 $(document).ready(function () {
+    // Set max date for datepicker (current year - 16)
+    const today = new Date();
+    const maxYear = today.getFullYear() - 16;
+    const maxDate = maxYear + "-12-31";
+    $("#datepicker").attr("max", maxDate);
+
     window.addEventListener("message", function (event) {
         if (event.data.action === "ui") {
             if (firstOpen) {
@@ -366,14 +372,45 @@ $(document).on("click", "#createButtonX", function () {
     }
     let cid = escapeHtml($(this).attr("data-clickedUnique"));
     const regTest = new RegExp(profList.join("|"), "i");
-    // if (!firstname || !lastname || !nationality || !birthdate || hasWhiteSpace(firstname) || hasWhiteSpace(lastname) || hasWhiteSpace(nationality)) {
-    //     console.log("FIELDS REQUIRED");
-    //     return false;
-    // }
-    // if (regTest.test(firstname) || regTest.test(lastname)) {
-    //     console.log("ERROR: You used a derogatory/vulgar term. Please try again!");
-    //     return false;
-    // }
+
+    // Validation
+    if (!firstname || firstname === "AD" || hasWhiteSpace(firstname)) {
+        alert("Lütfen geçerli bir ad giriniz!");
+        return false;
+    }
+    if (!lastname || lastname === "SOYAD" || hasWhiteSpace(lastname)) {
+        alert("Lütfen geçerli bir soyad giriniz!");
+        return false;
+    }
+    if (!nationality || nationality === "UYRUK" || hasWhiteSpace(nationality)) {
+        alert("Lütfen geçerli bir uyruk giriniz!");
+        return false;
+    }
+    if (!birthdate) {
+        alert("Lütfen doğum tarihi seçiniz!");
+        return false;
+    }
+
+    // Birthdate validation - minimum age 16, maximum age 90
+    const birthDateObj = new Date(birthdate);
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
+    const maxDate = new Date(today.getFullYear() - 90, today.getMonth(), today.getDate());
+
+    if (birthDateObj > minDate) {
+        alert("Karakter oluşturmak için minimum 16 yaşında olmalısınız!");
+        return false;
+    }
+    if (birthDateObj < maxDate) {
+        alert("Geçersiz doğum tarihi!");
+        return false;
+    }
+
+    // Profanity check
+    if (regTest.test(firstname) || regTest.test(lastname)) {
+        alert("Hata: Uygunsuz kelime kullandınız. Lütfen tekrar deneyiniz!");
+        return false;
+    }
 
     $.post(
         "https://ak4y-multicharacter/createNewCharacter",

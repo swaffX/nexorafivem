@@ -290,6 +290,7 @@
                                 name=""
                                 id="firstname"
                                 value="AD"
+                                required
                                 onblur="if(this.value == '') { this.value='AD'}"
                                 onfocus="if (this.value == 'AD') {this.value=''}"
                             />
@@ -303,6 +304,7 @@
                                 name=""
                                 id="lastname"
                                 value="SOYAD"
+                                required
                                 onblur="if(this.value == '') { this.value='SOYAD'}"
                                 onfocus="if (this.value == 'SOYAD') {this.value=''}"
                             />
@@ -316,13 +318,14 @@
                                 name=""
                                 id="nationality"
                                 value="UYRUK"
+                                required
                                 onblur="if(this.value == '') { this.value='UYRUK'}"
                                 onfocus="if (this.value == 'UYRUK') {this.value=''}"
                             />
                         </div>
                         <div class="dateOfBirthArea">
                             <div class="rightSolidText" id="dobTx">DOĞUM TARİHİ</div>
-                            <input type="date" class="" name="" id="datepicker" min="1900-01-01" max="2023-12-31" />
+                            <input type="date" class="" name="" id="datepicker" min="1950-01-01" required />
                         </div>
                         <!-- <div class="heightArea">
                             <div class="rightSolidText">HEIHGT</div>

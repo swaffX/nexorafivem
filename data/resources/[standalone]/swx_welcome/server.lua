@@ -40,14 +40,14 @@ end)
 RegisterNetEvent('swx_welcome:giveStarterItems', function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    
+
     if not Player then return end
-    
+
     -- Itemleri ver
     for _, item in ipairs(Config.StarterItems) do
         Player.Functions.AddItem(item.name, item.amount)
     end
-    
+
     -- Para ver
     Player.Functions.AddMoney('cash', Config.StarterCash)
     Player.Functions.AddMoney('bank', Config.StarterBank)
@@ -59,29 +59,6 @@ RegisterNetEvent('swx_welcome:giveStarterItems', function()
     end
 
     QBCore.Functions.Notify(src, 'Başlangıç hediyelerin verildi!', 'success')
-end)
-
--- Karakter seçildiğinde kontrol et (ak4y-multicharacter)
-RegisterServerEvent("ak4y-multicharacter:client:chooseCharX", function()
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-
-    if not Player then return end
-
-    print('[SWX-Welcome] ak4y-multicharacter:client:chooseCharX event triggered for player: ' .. src)
-
-    -- Yeni oyuncu mu kontrol et
-    local isNew = lib.callback.await('swx_welcome:isNewPlayer', false, src)
-
-    print('[SWX-Welcome] isNewPlayer callback result: ' .. tostring(isNew))
-
-    if isNew then
-        -- Kısa gecikme ile göster (karakter spawn olana kadar)
-        SetTimeout(3000, function()
-            print('[SWX-Welcome] Triggering client event for player: ' .. src)
-            TriggerClientEvent('swx_welcome:checkNewPlayer', src)
-        end)
-    end
 end)
 
 print('[SWX-Welcome] Server yüklendi!')

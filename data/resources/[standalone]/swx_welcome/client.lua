@@ -64,7 +64,14 @@ end, false)
 
 -- Login olduğunda kontrol et
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    -- Server kontrolü yapacak
+    -- Server kontrolü yap
+    local isNew = lib.callback.await('swx_welcome:isNewPlayer', false)
+
+    if isNew then
+        -- Kısa gecikme ile göster (karakter spawn olana kadar)
+        Wait(2000)
+        ShowWelcomeUI()
+    end
 end)
 
 print('[SWX-Welcome] Client yüklendi!')
