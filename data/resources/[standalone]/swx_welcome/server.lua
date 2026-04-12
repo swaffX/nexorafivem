@@ -87,13 +87,13 @@ RegisterNetEvent('swx_welcome:characterCreated', function(citizenid)
 
     if Config.UseDatabase then
         -- Kayıt varsa güncelle, yoksa oluştur, first_join = 1 yap
-        MySQL.query.await('SELECT citizenid FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid}, function(result)
-            if result and result[1] then
-                MySQL.update('UPDATE `' .. Config.DBTable .. '` SET first_join = 1 WHERE citizenid = ?', {citizenid})
-            else
-                MySQL.insert('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 1)', {citizenid})
-            end
-        end)
+        local result = MySQL.query.await('SELECT citizenid FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid})
+        if result and result[1] then
+            MySQL.update.await('UPDATE `' .. Config.DBTable .. '` SET first_join = 1 WHERE citizenid = ?', {citizenid})
+        else
+            MySQL.insert.await('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 1)', {citizenid})
+        end
+        print('[SWX-Welcome] Database updated for citizenid: ' .. citizenid .. ', first_join = 1')
     end
 end)
 
