@@ -61,14 +61,14 @@ RegisterNetEvent('swx_welcome:giveStarterItems', function()
     QBCore.Functions.Notify(src, 'Başlangıç hediyelerin verildi!', 'success')
 end)
 
--- Karakter görünümü kaydedildiğinde kontrol et (karakter oluşturma tamamlandıktan sonra)
-RegisterServerEvent("fivem-appearance:server:saveAppearance", function(appearance)
+-- Karakter seçildiğinde kontrol et (ak4y-multicharacter)
+RegisterServerEvent("ak4y-multicharacter:client:chooseChar", function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
     if not Player then return end
 
-    print('[SWX-Welcome] fivem-appearance:server:saveAppearance event triggered for player: ' .. src)
+    print('[SWX-Welcome] ak4y-multicharacter:client:chooseChar event triggered for player: ' .. src)
 
     -- Yeni oyuncu mu kontrol et
     local isNew = lib.callback.await('swx_welcome:isNewPlayer', false, src)
@@ -77,7 +77,7 @@ RegisterServerEvent("fivem-appearance:server:saveAppearance", function(appearanc
 
     if isNew then
         -- Kısa gecikme ile göster (karakter spawn olana kadar)
-        SetTimeout(2000, function()
+        SetTimeout(3000, function()
             print('[SWX-Welcome] Triggering client event for player: ' .. src)
             TriggerClientEvent('swx_welcome:checkNewPlayer', src)
         end)
