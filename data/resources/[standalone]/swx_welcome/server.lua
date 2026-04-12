@@ -68,12 +68,17 @@ RegisterServerEvent("fivem-appearance:server:saveAppearance", function(appearanc
 
     if not Player then return end
 
+    print('[SWX-Welcome] fivem-appearance:server:saveAppearance event triggered for player: ' .. src)
+
     -- Yeni oyuncu mu kontrol et
     local isNew = lib.callback.await('swx_welcome:isNewPlayer', false, src)
+
+    print('[SWX-Welcome] isNewPlayer callback result: ' .. tostring(isNew))
 
     if isNew then
         -- Kısa gecikme ile göster (karakter spawn olana kadar)
         SetTimeout(2000, function()
+            print('[SWX-Welcome] Triggering client event for player: ' .. src)
             TriggerClientEvent('swx_welcome:checkNewPlayer', src)
         end)
     end
