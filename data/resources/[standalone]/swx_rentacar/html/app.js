@@ -21,7 +21,8 @@ createApp({
                     this.openGUI(data.vehicles);
                     break;
                 case 'close':
-                    this.closeGUI();
+                    // Lua'dan gelen close - sadece UI'ı kapat, fetch gönderme (döngü önleme)
+                    this.isOpen = false;
                     break;
             }
         });
@@ -43,6 +44,7 @@ createApp({
         },
 
         closeGUI() {
+            if (!this.isOpen) return;
             this.isOpen = false;
             // Lua'ya bildir - mouse focus serbest bırakılacak
             fetch(`https://${GetParentResourceName()}/close`, {
