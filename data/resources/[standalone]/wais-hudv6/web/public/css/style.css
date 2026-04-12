@@ -2847,7 +2847,7 @@ body {
     min-width: 25vh;
     width: fit-content;
     height: fit-content;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
     padding: .75vh;
