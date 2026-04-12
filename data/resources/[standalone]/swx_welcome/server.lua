@@ -74,4 +74,28 @@ RegisterNetEvent('swx_welcome:giveStarterItems', function()
     QBCore.Functions.Notify(src, 'Başlangıç hediyelerin verildi!', 'success')
 end)
 
+-- Karakter oluşturulduğunda yeni oyuncu olarak işaretle
+RegisterNetEvent('ak4y-multicharacter:server:createCharacter', function(data)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+
+    if not Player then return end
+
+    local citizenid = Player.PlayerData.citizenid
+    print('[SWX-Welcome] New character created for citizenid: ' .. citizenid .. ', marking as new player')
+
+    if Config.UseDatabase then
+        -- Kayıt varsa güncelle, yoksa oluştur, first_join = 1 yap
+        MySQL.query.await('SELECT citizenid FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid}, function(result)
+            if result and result[1] then
+                MySQL.update('UPDATE `' .. Config.DBTable .. '` SET first_join = 1 WHERE citizenid = ?', {citizenid})
+            else
+                MySQL.insert('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 1)', {citizenid})
+            end
+        end)
+    else
+        Player.Functions.SetMetaData('firstJoin', true)
+    end
+end)
+
 print('[SWX-Welcome] Server yüklendi!')
