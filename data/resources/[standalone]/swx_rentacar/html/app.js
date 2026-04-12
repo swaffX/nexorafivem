@@ -42,20 +42,10 @@ createApp({
             this.isRenting = false;
         },
 
-        async closeGUI() {
+        closeGUI() {
             this.isOpen = false;
-            // Lua'ya bildir ve callback bekle
-            try {
-                await fetch(`https://${GetParentResourceName()}/close`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json; charset=UTF-8'
-                    },
-                    body: JSON.stringify({})
-                });
-            } catch (e) {
-                console.error('Close error:', e);
-            }
+            // Lua'ya bildir (client.lua handles closing via SendNUIMessage)
+            // No fetch needed since client.lua already handles the close action
         },
 
         selectVehicle(vehicle) {

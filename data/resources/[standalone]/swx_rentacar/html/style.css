@@ -1,19 +1,21 @@
-/* NEXORA RENT - Modern Dark Theme */
+/* NEXORA RENT - Ultra Modern Dark Theme */
 :root {
-    --primary: #00d4ff;
-    --primary-dark: #00a8cc;
-    --bg-dark: rgba(15, 15, 20, 0.95);
-    --bg-card: rgba(30, 30, 35, 0.9);
-    --bg-hover: rgba(40, 40, 45, 0.95);
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --bg-dark: rgba(17, 24, 39, 0.98);
+    --bg-card: rgba(31, 41, 55, 0.95);
+    --bg-hover: rgba(55, 65, 81, 0.95);
     --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --border: rgba(255, 255, 255, 0.1);
-    --success: #4ade80;
-    --warning: #fbbf24;
-    --error: #f87171;
-    --gold: #ffd700;
-    --gradient-start: #00d4ff;
-    --gradient-end: #7c3aed;
+    --text-secondary: rgba(156, 163, 175, 0.8);
+    --border: rgba(99, 102, 241, 0.2);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gold: #fbbf24;
+    --gradient-start: #6366f1;
+    --gradient-end: #8b5cf6;
+    --accent: #ec4899;
 }
 
 * {
@@ -38,26 +40,27 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 550px;
-    max-height: 80vh;
+    width: 600px;
+    max-height: 85vh;
     background: var(--bg-dark);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
+    backdrop-filter: blur(30px);
+    border-radius: 24px;
     border: 1px solid var(--border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    animation: slideIn 0.4s ease-out;
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translate(-50%, -45%);
+        transform: translate(-50%, -48%) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%) scale(1);
     }
 }
 
@@ -66,9 +69,35 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    padding: 24px 28px;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 50%, var(--accent) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
     border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.rental-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .logo {
@@ -185,38 +214,67 @@ body {
 .vehicle-card {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px 20px;
+    gap: 18px;
+    padding: 18px 22px;
     background: var(--bg-card);
-    border-radius: 15px;
+    border-radius: 16px;
     border: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    overflow: hidden;
+}
+
+.vehicle-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
 }
 
 .vehicle-card:hover {
     background: var(--bg-hover);
     border-color: var(--primary);
-    transform: translateX(5px);
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.4);
+}
+
+.vehicle-card:hover::before {
+    opacity: 0.05;
 }
 
 .vehicle-card.selected {
-    background: rgba(0, 212, 255, 0.15);
+    background: rgba(99, 102, 241, 0.15);
     border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary), 0 10px 30px -10px rgba(99, 102, 241, 0.3);
 }
 
 .vehicle-image {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     background: linear-gradient(135deg, var(--bg-hover) 0%, var(--bg-card) 100%);
-    border-radius: 12px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: var(--primary);
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+.vehicle-card:hover .vehicle-image {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
 
 .vehicle-info {
@@ -319,34 +377,58 @@ body {
 /* Rent Button */
 .rent-btn {
     width: 100%;
-    padding: 16px 24px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 18px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--accent) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
     border: none;
-    border-radius: 12px;
+    border-radius: 16px;
     color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    gap: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.rent-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.rent-btn:hover:not(:disabled)::before {
+    left: 100%;
 }
 
 .rent-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5), 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.rent-btn:active:not(:disabled) {
+    transform: translateY(-1px) scale(0.98);
 }
 
 .rent-btn:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
+    filter: grayscale(0.5);
 }
 
 .rent-btn i {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 /* Responsive */
