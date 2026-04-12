@@ -13,26 +13,29 @@ end
 lib.callback.register('swx_welcome:isNewPlayer', function(source)
     local Player = QBCore.Functions.GetPlayer(source)
     if not Player then return false end
-    
+
     local citizenid = Player.PlayerData.citizenid
-    
+
     if Config.UseDatabase then
         local result = MySQL.query.await('SELECT first_join FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid})
         if result and result[1] then
+            -- Kayıt var, first_join değerine bak
             return result[1].first_join == 1
         else
-            -- İlk kez giriş, kaydet
-            MySQL.insert('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 1)', {citizenid})
-            return true
+            -- Kayıt yok - bu oyuncu sistemden önce vardı, yeni değil
+            -- Kayıt oluştur ve first_join = 0 yap (eski oyuncu olarak işaretle)
+            MySQL.insert('INSERT INTO `' .. Config.DBTable .. '` (citizenid, first_join) VALUES (?, 0)', {citizenid})
+            return false
         end
     else
         -- QBCore metadata kullan
         local meta = Player.PlayerData.metadata
         if not meta.firstJoin then
-            Player.Functions.SetMetaData('firstJoin', true)
-            return true
+            -- Metadata yok - eski oyuncu olarak işaretle
+            Player.Functions.SetMetaData('firstJoin', false)
+            return false
         end
-        return false
+        return meta.firstJoin == true
     end
 end)
 
