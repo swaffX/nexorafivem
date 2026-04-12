@@ -94,6 +94,7 @@ ConfigSv.AddMoney = function(src, amount, comingJob)
     end
 
     sendWebhook(ConfigSv.GetPlayerName(src), (Config.SideJob and comingJob or job), amount)
+    TriggerClientEvent('wais:showNotification', src, ('💸 $%s kazandın!'):format(amount), 'success', 4000)
     p:resolve(true)
     return Citizen.Await(p)
 end
