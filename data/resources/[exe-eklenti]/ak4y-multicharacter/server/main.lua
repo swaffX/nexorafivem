@@ -37,6 +37,13 @@ RegisterNetEvent('ak4y-multicharacter:server:createCharacter', function(data)
         repeat
             Wait(10)
         until hasDonePreloading[src]
+
+        -- Trigger custom event for welcome script
+        local Player = QBCore.Functions.GetPlayer(src)
+        if Player then
+            TriggerEvent('swx_welcome:characterCreated', Player.PlayerData.citizenid)
+        end
+
         if AK4Y.UseQbApartments then 
                 local randbucket = (GetPlayerPed(src) .. math.random(1,999))
                 SetPlayerRoutingBucket(src, randbucket)
