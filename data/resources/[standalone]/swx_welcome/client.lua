@@ -67,21 +67,25 @@ RegisterCommand('testwelcome', function()
     end
 end, false)
 
--- Login olduğunda kontrol et
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    print('[SWX-Welcome] QBCore:Client:OnPlayerLoaded event fired')
-    -- Server kontrolü yap
+-- Karakter oluşturulup appearance onaylandıktan sonra welcome göster
+RegisterNetEvent('swx_welcome:checkNewPlayer', function()
+    print('[SWX-Welcome] swx_welcome:checkNewPlayer event fired')
     local isNew = lib.callback.await('swx_welcome:isNewPlayer', false)
     print('[SWX-Welcome] isNewPlayer callback result: ' .. tostring(isNew))
 
     if isNew then
-        -- Kısa gecikme ile göster (karakter spawn olana kadar)
-        Wait(2000)
+        Wait(1500)
         print('[SWX-Welcome] Showing welcome UI')
         ShowWelcomeUI()
     else
         print('[SWX-Welcome] Player is not new, skipping welcome')
     end
+end)
+
+-- Eski giriş kontrolü - sadece yeniden bağlanma için
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    -- Yeni karakter için welcome, appearance onayından gelir
+    -- Bu event sadece mevcut karakterlerle bağlanma için
 end)
 
 print('[SWX-Welcome] Client yüklendi!')

@@ -68,7 +68,7 @@ AK4Y.StarterItems = {
     {item = "driver_license", amount = 1},
     {item = "white_phone", amount = 1},
     {item = "sandwich", amount = 2},
-    {item = "cola", amount = 2},
+    {item = "kurkakola", amount = 2},
     -- {item = "burger", amount = 3},
     -- {item = "phone", amount = 1},
 }

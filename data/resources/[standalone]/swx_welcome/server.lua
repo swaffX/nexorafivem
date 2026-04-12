@@ -99,4 +99,22 @@ RegisterNetEvent('swx_welcome:characterCreated', function(citizenid)
     end
 end)
 
+-- Appearance onaylandığında yeni oyuncu ise welcome göster
+RegisterServerEvent("fivem-appearance:server:saveAppearance", function(appearance)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+
+    local citizenid = Player.PlayerData.citizenid
+    local result = MySQL.query.await('SELECT first_join FROM `' .. Config.DBTable .. '` WHERE citizenid = ?', {citizenid})
+    if result and result[1] then
+        local firstJoinValue = result[1].first_join
+        local isNew = (firstJoinValue == 1 or firstJoinValue == true)
+        if isNew then
+            print('[SWX-Welcome] Appearance saved, triggering welcome for new player: ' .. citizenid)
+            TriggerClientEvent('swx_welcome:checkNewPlayer', src)
+        end
+    end
+end)
+
 print('[SWX-Welcome] Server yüklendi!')
