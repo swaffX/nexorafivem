@@ -1,3 +1,7 @@
+-- ╔══════════════════════════════════════════════════╗
+-- ║       NEXORA - MEKANIK SISTEMI (CLIENT)          ║
+-- ║  qb-target ile arac uzerinden acilir             ║
+-- ╚══════════════════════════════════════════════════╝
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = {}
 
@@ -18,14 +22,6 @@ end
 
 local function GetVehicleName(veh)
     return GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(veh)))
-end
-
-local function FindClosestVehicle()
-    local ped   = PlayerPedId()
-    local pos   = GetEntityCoords(ped)
-    local veh   = GetClosestVehicle(pos.x, pos.y, pos.z, Config.ScanVehicleDistance, 0, 70)
-    if DoesEntityExist(veh) and veh ~= 0 then return veh end
-    return nil
 end
 
 local function FindClosestPlayer()
@@ -94,42 +90,77 @@ RegisterNetEvent('swx_mekanik:client:notify', function(msg, t)
     lib.notify({ title = 'Mekanik', description = msg, type = t or 'info' })
 end)
 
--- ===================== MEKANIK KOMUTU =====================
+-- ===================== QB-TARGET KURULUM =====================
 
-RegisterCommand('mekanik', function()
-    if not IsMechanic() then
-        lib.notify({ title = 'Hata', description = 'Bu komutu kullanma yetkiniz yok!', type = 'error' })
-        return
-    end
-
+local function OpenInspectMenu(vehicle)
     if isUIOpen or activeRepairJob then
         lib.notify({ title = 'Bilgi', description = 'Zaten aktif bir islem var!', type = 'warning' })
         return
     end
 
-    local vehicle = FindClosestVehicle()
-    if not vehicle then
-        lib.notify({ title = 'Hata', description = 'Yakin araç bulunamadi (12m)!', type = 'error' })
+    if not DoesEntityExist(vehicle) then
+        lib.notify({ title = 'Hata', description = 'Arac bulunamadi!', type = 'error' })
         return
     end
 
-    local closestPlayer = FindClosestPlayer()
-    local targetServerId = closestPlayer and GetPlayerServerId(closestPlayer) or -1
+    -- Surucu var mi kontrol et (arac icinde olmali)
+    local driverPed      = GetPedInVehicleSeat(vehicle, -1)
+    local targetServerId = -1
+
+    if DoesEntityExist(driverPed) and driverPed ~= 0 and not IsPedAPlayer(driverPed) == false then
+        -- Surucu oyuncu mu?
+        for _, pid in ipairs(GetActivePlayers()) do
+            if GetPlayerPed(pid) == driverPed then
+                targetServerId = GetPlayerServerId(pid)
+                break
+            end
+        end
+    end
+
+    -- Surucu yoksa yakin oyuncuya gonder
+    if targetServerId == -1 then
+        local closest = FindClosestPlayer()
+        targetServerId = closest and GetPlayerServerId(closest) or -1
+    end
 
     local damage = GetDamageInfoForVehicle(vehicle)
 
-    -- NUI'yi ac
     isUIOpen = true
     SetNuiFocus(true, true)
     SendNUIMessage({
-        action       = 'open',
-        parts        = Config.Parts,
-        vehicleName  = GetVehicleName(vehicle),
-        damage       = damage,
-        vehicleNet   = NetworkGetNetworkIdFromEntity(vehicle),
-        targetId     = targetServerId,
+        action      = 'open',
+        parts       = Config.Parts,
+        vehicleName = GetVehicleName(vehicle),
+        damage      = damage,
+        vehicleNet  = NetworkGetNetworkIdFromEntity(vehicle),
+        targetId    = targetServerId,
     })
-end, false)
+end
+
+-- qb-target: tum araclara mekanik secenegi ekle
+CreateThread(function()
+    exports['qb-target']:AddGlobalVehicle({
+        options = {
+            {
+                type  = 'client',
+                event = 'swx_mekanik:client:openInspect',
+                icon  = 'fas fa-wrench',
+                label = 'Araci Incele',
+                job   = Config.MechanicJobs,
+            }
+        },
+        distance = 2.5,
+    })
+end)
+
+RegisterNetEvent('swx_mekanik:client:openInspect', function(data)
+    if not IsMechanic() then
+        lib.notify({ title = 'Hata', description = 'Bu islemi yapma yetkiniz yok!', type = 'error' })
+        return
+    end
+    local vehicle = data.entity
+    OpenInspectMenu(vehicle)
+end)
 
 -- ===================== NUI CALLBACKS =====================
 

@@ -21,9 +21,6 @@ Config.RepairDuration = 7000
 -- Parca ile etkilesim mesafesi (metre)
 Config.InteractDistance = 3.0
 
--- En yakin arac tarama mesafesi
-Config.ScanVehicleDistance = 12.0
-
 -- En yakin oyuncu tarama mesafesi
 Config.ScanPlayerDistance = 20.0
 
