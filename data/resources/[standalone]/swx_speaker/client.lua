@@ -338,6 +338,7 @@ function PlayMusic(url, title)
             -- Hoparlör var, müziği başlat
             if currentMusicId then
                 exports.xsound:Destroy(currentMusicId)
+                TriggerServerEvent('swx_speaker:server:stopMusic')
             end
             
             currentMusicId = "speaker_" .. GetPlayerServerId(PlayerId()) .. "_" .. math.random(1000, 9999)
@@ -846,6 +847,7 @@ CreateThread(function()
                         print('[SWX Speaker] Araçtan indi (3s onay), müzik durduruluyor')
                         if currentMusicId then
                             exports.xsound:Destroy(currentMusicId)
+                            TriggerServerEvent('swx_speaker:server:stopMusic')
                             currentMusicId = nil
                             isPlaying = false
                             isPaused = false
