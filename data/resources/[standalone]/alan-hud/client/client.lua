@@ -75,7 +75,7 @@ Citizen.CreateThread(function()
             heal = (GetEntityHealth(playerPed) - 100),
             armor = GetPedArmour(playerPed),
             stamina = 100 - GetPlayerSprintStaminaRemaining(PlayerId()),
-            oxy = IsPedSwimmingUnderWater(playerPed) and GetPlayerUnderWaterTimeRemaining(PlayerId()) or 100,
+            oxy = IsPedSwimmingUnderWater(playerPed) and (GetPlayerRemainingBreathTime and GetPlayerRemainingBreathTime(PlayerId()) or 0) or 100,
             thirst = thirst,
             hunger = hunger,
             vehicle = inVehicle,

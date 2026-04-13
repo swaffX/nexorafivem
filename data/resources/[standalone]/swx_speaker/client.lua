@@ -1477,10 +1477,8 @@ end)
 -- Duraklat/devam et broadcast
 RegisterNetEvent('swx_speaker:client:remotePause', function(data)
     local myId = GetPlayerServerId(PlayerId())
-    -- Gönderen ben isem ve müziği ben çalıyorsam zaten yerel olarak uygulandı
-    if data.senderId == myId and currentMusicId then return end
 
-    -- Müziği ben çalıyorsam ve başkası tetiklediyse
+    -- Müziği ben çalıyorsam ve başkası tetiklediyse (ses manipülasyonunu yalnızca o zaman yap)
     if data.senderId ~= myId and currentMusicId then
         if data.shouldPause then
             exports.xsound:Pause(currentMusicId)
