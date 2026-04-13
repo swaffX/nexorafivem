@@ -273,6 +273,15 @@ RegisterNetEvent('swx_speaker:server:updateSettings', function(volume, maxDistan
     })
 end)
 
+-- Duraklat/devam et broadcast
+RegisterNetEvent('swx_speaker:server:broadcastPause', function(shouldPause)
+    local src = source
+    TriggerClientEvent('swx_speaker:client:remotePause', -1, {
+        senderId = src,
+        shouldPause = shouldPause
+    })
+end)
+
 -- Müzik durdurmayı bildir
 RegisterNetEvent('swx_speaker:server:stopMusic', function()
     local src = source

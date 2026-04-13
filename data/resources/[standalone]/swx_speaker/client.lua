@@ -19,6 +19,8 @@ local isTransitioning = false -- Geçiş animasyonu aktif mi?
 
 -- Remote müzikleri takip için
 local remoteMusicTracks = {}
+local remoteIsPlaying = false
+local remoteIsPaused = false
 
 -- Hoparlör söküldüğünde müzik durdur
 RegisterNetEvent('swx_speaker:client:speakerRemoved')
@@ -155,10 +157,10 @@ function OpenSpeakerMenu()
                         end
                     },
                     {
-                        title = isPaused and 'Müziği devam ettir' or 'Müziği duraklat',
-                        description = isPaused and 'Müziği yeniden başlat' or 'Mevcut şarkıyı duraklat',
-                        icon = isPaused and 'play' or 'pause',
-                        disabled = not isPlaying and not isPaused,
+                        title = (isPaused or remoteIsPaused) and 'Müziği devam ettir' or 'Müziği duraklat',
+                        description = (isPaused or remoteIsPaused) and 'Müziği yeniden başlat' or 'Mevcut şarkıyı duraklat',
+                        icon = (isPaused or remoteIsPaused) and 'play' or 'pause',
+                        disabled = not isPlaying and not isPaused and not remoteIsPlaying and not remoteIsPaused,
                         onSelect = function()
                             TogglePause()
                         end
@@ -428,22 +430,31 @@ function PlayNextSong()
 end
 
 function TogglePause()
-    if not currentMusicId then return end
-    
-    if isPaused then
-        -- Duraklatılmış, devam ettir
-        exports.xsound:Resume(currentMusicId)
-        isPaused = false
-        isPlaying = true
-        TriggerEvent('swx_carplay:resume', currentSongTitle)
-        QBCore.Functions.Notify('Müzik devam ediyor', 'success')
-    else
-        -- Çalıyor, duraklat
-        exports.xsound:Pause(currentMusicId)
-        isPaused = true
-        isPlaying = false
-        TriggerEvent('swx_carplay:pause', currentSongTitle)
-        QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
+    if currentMusicId then
+        -- Ben müziği başlatan kişiyim
+        if isPaused then
+            exports.xsound:Resume(currentMusicId)
+            isPaused = false
+            isPlaying = true
+            TriggerEvent('swx_carplay:resume', currentSongTitle)
+            QBCore.Functions.Notify('Müzik devam ediyor', 'success')
+        else
+            exports.xsound:Pause(currentMusicId)
+            isPaused = true
+            isPlaying = false
+            TriggerEvent('swx_carplay:pause', currentSongTitle)
+            QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
+        end
+        TriggerServerEvent('swx_speaker:server:broadcastPause', isPaused)
+    elseif remoteIsPlaying or remoteIsPaused then
+        -- Ben yolcuyum
+        local newState = not remoteIsPaused
+        TriggerServerEvent('swx_speaker:server:broadcastPause', newState)
+        if newState then
+            QBCore.Functions.Notify('Müzik duraklatıldı', 'info')
+        else
+            QBCore.Functions.Notify('Müzik devam ediyor', 'success')
+        end
     end
 end
 
@@ -478,8 +489,18 @@ function VolumeRangeDialog()
             exports.xsound:setVolume(currentMusicId, currentVolume)
         end
         
+        if currentMusicId then
+            TriggerServerEvent('swx_speaker:server:updateSettings', currentVolume, currentDistance)
+        else
+            -- Yolcu: sadece kendi duyuşunu değiştir
+            for musicId, _ in pairs(remoteMusicTracks) do
+                pcall(function()
+                    exports.xsound:setVolume(musicId, currentVolume)
+                    exports.xsound:Distance(musicId, currentDistance)
+                end)
+            end
+        end
         QBCore.Functions.Notify('✅ Ses: ' .. string.format("%.2f", currentVolume) .. ' | Uzaklık: ' .. string.format("%.1f", currentDistance) .. 'm', 'success')
-        TriggerServerEvent('swx_speaker:server:updateSettings', currentVolume, currentDistance)
     end
 end
 
@@ -1356,6 +1377,8 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
         exports.xsound:PlayUrl(musicId, data.url, data.volume or 0.6, false)
         exports.xsound:destroyOnFinish(musicId, false)
         remoteMusicTracks[musicId] = { vehicleNetId = data.vehicleNetId, playerId = data.playerId }
+        remoteIsPlaying = true
+        remoteIsPaused = false
         -- Carplay widget güncelle
         TriggerEvent('swx_carplay:start', data.title)
         print(string.format('[SWX Speaker] Aynı araçta müzik çalınıyor (non-positional): Player=%s, Title=%s',
@@ -1445,6 +1468,41 @@ RegisterNetEvent('swx_speaker:client:stopMusic', function(data)
             remoteMusicTracks[musicId] = nil
         end
     end
+    remoteIsPlaying = false
+    remoteIsPaused = false
     
     print('[SWX Speaker] Diğer oyuncunun müziği durduruldu: Player=' .. data.playerId)
+end)
+
+-- Duraklat/devam et broadcast
+RegisterNetEvent('swx_speaker:client:remotePause', function(data)
+    local myId = GetPlayerServerId(PlayerId())
+    -- Gönderen ben isem ve müziği ben çalıyorsam zaten yerel olarak uygulandı
+    if data.senderId == myId and currentMusicId then return end
+
+    -- Müziği ben çalıyorsam ve başkası tetiklediyse
+    if data.senderId ~= myId and currentMusicId then
+        if data.shouldPause then
+            exports.xsound:Pause(currentMusicId)
+            isPaused = true
+            isPlaying = false
+        else
+            exports.xsound:Resume(currentMusicId)
+            isPaused = false
+            isPlaying = true
+        end
+    end
+
+    -- Remote track'leri duraklat/devam ettir
+    for musicId, _ in pairs(remoteMusicTracks) do
+        pcall(function()
+            if data.shouldPause then
+                exports.xsound:Pause(musicId)
+            else
+                exports.xsound:Resume(musicId)
+            end
+        end)
+    end
+    remoteIsPaused = data.shouldPause
+    if remoteIsPaused then remoteIsPlaying = false else remoteIsPlaying = true end
 end)
