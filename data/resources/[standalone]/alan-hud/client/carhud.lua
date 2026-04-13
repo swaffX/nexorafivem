@@ -1,6 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-local tekerPatlak, sikiKemer, cruiseIsOn, seatbelt, vehIsMovingFwd, alarmset, engineRunning = false, false, false, false, false, false, false
+local sikiKemer, cruiseIsOn, seatbelt, vehIsMovingFwd, alarmset, engineRunning = false, false, false, false, false, false
 local curSpeed, prevSpeed, kemerSayi, cruiseSpeed, speedLimit = 0.0, 0.0, 0, 999.0, 80.0
 local prevVelocity = {x = 0.0, y = 0.0, z = 0.0}
 local compassOn = true
@@ -105,10 +105,8 @@ RegisterNetEvent("tgiann-hud:hizsabitle")
 AddEventHandler("tgiann-hud:hizsabitle", function(args)
     if args[1] == nil then args[1] = 1 end
     if driverSeat and tonumber(args[1]) > 0 then
-        if not IsVehicleTyreBurst(vehicle, 0) and not IsVehicleTyreBurst(vehicle, 1) and not IsVehicleTyreBurst(vehicle, 4) and not IsVehicleTyreBurst(vehicle, 5) then 
-            cruiseIsOn = true
-            cruiseSpeed = (tonumber(args[1] + 2) / 3.6)
-        end
+        cruiseIsOn = true
+        cruiseSpeed = (tonumber(args[1] + 2) / 3.6)
     end
 end)
 
@@ -152,9 +150,6 @@ Citizen.CreateThread(function()
         Citizen.Wait(time)
     end
 end)
-
-
-
 
 local offRoad = 0
 Citizen.CreateThread(function()
@@ -417,7 +412,7 @@ Citizen.CreateThread(function()
                         engine = true,
                         yukseklik = (GetVehicleClass(vehicle) == 15 or GetVehicleClass(vehicle) == 16) and GetEntityHeightAboveGround(vehicle) or false,
                         engineHealth = GetVehicleEngineHealth(vehicle),
-                    }) 
+                    })
                 end
             else
                 if inVehSetState then
@@ -442,11 +437,6 @@ Citizen.CreateThread(function()
         end
 
     end
-end)
-
-RegisterNetEvent("tgiann-hud:car:eject-other-player-car-client")
-AddEventHandler("tgiann-hud:car:eject-other-player-car-client", function(velocity)
-    ejectPlayer()
 end)
 
 -- Secondary thread to update strings
@@ -612,15 +602,6 @@ Citizen.CreateThread(function()
                 vehIsMovingFwd = GetEntitySpeedVector(vehicle, true).y > 1.0
                 if sikiKemer and seatbelt then DisableControlAction(0, 75) else EnableControlAction(0, 75) end  -- Sıkı Kemer Engel
                 vehAcc = (prevSpeed - curSpeed) / GetFrameTime() > 981
-                if not seatbelt then
-                    if vehIsMovingFwd and prevSpeed*3.6 > 80 and vehAcc then
-                        ejectPlayer()
-                        tyreBrustSet(math.random(1, 2) == 1 and true or false)
-                    else
-                        prevVelocity = GetEntityVelocity(vehicle)
-                    end
-                end
-
                 if not GetPedConfigFlag(playerPed, 184, 1) then SetPedConfigFlag(playerPed, 184, true) end
                 if GetIsTaskActive(playerPed, 165) then
                     if GetSeatPedIsTryingToEnter(playerPed) == -1 then
@@ -638,7 +619,7 @@ Citizen.CreateThread(function()
                     --     DisableControlAction(2, 60)
                     -- end
 
-                    local cruiseOn = cruiseIsOn and cruiseSpeed or tekerPatlak and 50.0
+                    local cruiseOn = cruiseIsOn and cruiseSpeed
                     if not VehicleNormalMaxSpeed and not cruiseOn then
                         VehicleNormalMaxSpeed = true
                         maxSpeed = GetVehicleHandlingFloat(vehicle,"CHandlingData","fInitialDriveMaxFlatVel")
@@ -650,37 +631,6 @@ Citizen.CreateThread(function()
                     
                     if prevSpeed > maxSpeed then
                         SetEntityMaxSpeed(vehicle, prevSpeed-0.5)
-                    end
-
-                    if vehicleClass ~= 13 and vehicleClass ~= 8 and vehicleClass ~= 14 then
-                        if vehIsMovingFwd and vehAcc then
-                            if prevSpeed*3.6 > 140.0 then
-                                TriggerEvent("iens:motortamiret", vehicle, 10.0)
-                                tyreBrustSet(math.random(1, 2) == 1 and true or false)
-                                local seatPlayerId = {}
-                                for i=1, GetVehicleModelNumberOfSeats(GetEntityModel(vehicle)) do
-                                    if i ~= 1 then
-                                        if not IsVehicleSeatFree(vehicle, i-2) then 
-                                            local otherPlayerId = GetPedInVehicleSeat(vehicle, i-2) 
-                                            local playerHandle = NetworkGetPlayerIndexFromPed(otherPlayerId)
-                                            local playerServerId = GetPlayerServerId(playerHandle)
-                                            table.insert(seatPlayerId, playerServerId)
-                                        end
-                                    end
-                                end
-                                
-                                if #seatPlayerId > 0 then
-                                    TriggerServerEvent("tgiann-hud:car:eject-other-player-car", seatPlayerId, prevVelocity)
-                                end
-                                ejectPlayer()
-                            end
-                        end
-                    end
-
-                    if IsVehicleTyreBurst(vehicle, 0) or IsVehicleTyreBurst(vehicle, 1) or IsVehicleTyreBurst(vehicle, 4) or IsVehicleTyreBurst(vehicle, 5) then 
-                        tekerPatlak = true
-                    else
-                        tekerPatlak = false
                     end
 
                     prevVelocity = GetEntityVelocity(vehicle)
@@ -701,39 +651,6 @@ Citizen.CreateThread(function()
         Citizen.Wait(time)
     end
 end)
-
-function tyreBrustSet(engine)
-    local lastVehicle = GetPlayersLastVehicle(playerPed)
-    local RastgeleTeker = (math.random(1,4))
-    if RastgeleTeker == 1 then
-        SetVehicleTyreBurst(lastVehicle, 0, 1, 100.0)
-    elseif RastgeleTeker == 2 then
-        SetVehicleTyreBurst(lastVehicle, 0, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 4, 1, 100.0)
-    elseif RastgeleTeker == 3 then
-        SetVehicleTyreBurst(lastVehicle, 0, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 1, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 4, 1, 100.0)
-    elseif RastgeleTeker == 4 then
-        SetVehicleTyreBurst(lastVehicle, 0, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 1, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 4, 1, 100.0)
-        SetVehicleTyreBurst(lastVehicle, 5, 1, 100.0)
-    end
-    if engine then TriggerEvent("iens:motortamiret", lastVehicle, 10.0) end
-end
-
-function ejectPlayer()
-    if not sikiKemer then 
-        local position = GetEntityCoords(playerPed)
-        SetEntityCoords(playerPed, position.x, position.y, position.z - 0.47, true, true, true)
-        SetEntityVelocity(playerPed, prevVelocity.x, prevVelocity.y, prevVelocity.z)
-        Citizen.Wait(1)
-        SetPedToRagdoll(playerPed, 1000, 1000, 0, 0, 0, 0)
-        Citizen.Wait(1000)
-        -- if math.random(1, 3) == 1 then SetEntityHealth(playerPed, 0) end
-    end
-end
 
 RegisterNetEvent("CarFuelAlarm")
 AddEventHandler("CarFuelAlarm",function()
