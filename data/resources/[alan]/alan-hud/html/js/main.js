@@ -235,20 +235,6 @@ window.addEventListener('message', (event) => {
         SetCarIcon(event.data.iconName, event.data.iconColor)
     } else if (event.data.type == "CusalsetUI") {
         Show(event.data.state)
-    } else if (event.data.type == "CARPLAY_UPDATE") {
-        const widget = $("#carplay-widget");
-        const statusEl = $("#carplay-status");
-        if (event.data.state === "playing") {
-            $("#carplay-title").text(event.data.title || "-");
-            statusEl.removeClass("paused");
-            widget.fadeIn(300);
-        } else if (event.data.state === "paused") {
-            $("#carplay-title").text((event.data.title || "-") + " ⏸");
-            statusEl.addClass("paused");
-            widget.fadeIn(300);
-        } else if (event.data.state === "stopped") {
-            widget.fadeOut(300);
-        }
     }
 });
 

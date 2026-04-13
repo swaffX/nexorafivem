@@ -291,25 +291,6 @@ CreateThread(function()
 	end
 end)
 
--- ============================================
--- CARPLAY (swx_speaker entegrasyonu)
--- ============================================
-AddEventHandler('swx_carplay:start', function(title)
-    SendNUIMessage({ type = "CARPLAY_UPDATE", state = "playing", title = title or "Bilinmiyor" })
-end)
-
-AddEventHandler('swx_carplay:resume', function(title)
-    SendNUIMessage({ type = "CARPLAY_UPDATE", state = "playing", title = title or "Bilinmiyor" })
-end)
-
-AddEventHandler('swx_carplay:pause', function(title)
-    SendNUIMessage({ type = "CARPLAY_UPDATE", state = "paused", title = title or "Bilinmiyor" })
-end)
-
-AddEventHandler('swx_carplay:stop', function()
-    SendNUIMessage({ type = "CARPLAY_UPDATE", state = "stopped" })
-end)
-
 -- Ses seviyesi modu değiştiğinde NUI'ye gönder
 RegisterNetEvent('pma-voice:setTalkingMode')
 AddEventHandler('pma-voice:setTalkingMode', function(voiceMode)
