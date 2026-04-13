@@ -1368,28 +1368,57 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
     
     local musicId = "speaker_remote_" .. data.playerId .. "_" .. math.random(1000, 9999)
     
-    -- Aynı araçta mı kontrol et
-    local localVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
-    local isSameVehicle = (vehicle and vehicle ~= 0 and DoesEntityExist(vehicle) and localVehicle == vehicle)
+    -- Aynı araçta mı kontrol et (IsPedInVehicle daha güvenilir)
+    local isSameVehicle = (vehicle and vehicle ~= 0 and DoesEntityExist(vehicle) and IsPedInVehicle(PlayerPedId(), vehicle, false))
     
     if isSameVehicle then
-        -- Aynı araç: sürücü gibi non-positional ses (tam ses)
+        -- Aynı araç: non-positional ses (tam ses)
         exports.xsound:PlayUrl(musicId, data.url, data.volume or 0.6, false)
         exports.xsound:destroyOnFinish(musicId, false)
         remoteMusicTracks[musicId] = { vehicleNetId = data.vehicleNetId, playerId = data.playerId }
         remoteIsPlaying = true
         remoteIsPaused = false
-        -- Carplay widget güncelle
         TriggerEvent('swx_carplay:start', data.title)
         print(string.format('[SWX Speaker] Aynı araçta müzik çalınıyor (non-positional): Player=%s, Title=%s',
             data.playerId, data.title or 'Bilinmeyen'))
+
+        -- Araçtan çıkınca positional'a geç
+        local _musicId = musicId
+        local _netId   = data.vehicleNetId
+        local _url     = data.url
+        local _vol     = data.volume or 0.6
+        local _maxDist = data.maxDistance or 60.0
+        CreateThread(function()
+            while remoteMusicTracks[_musicId] do
+                local srcVeh = NetworkGetEntityFromNetworkId(_netId)
+                if not IsPedInVehicle(PlayerPedId(), srcVeh, false) then
+                    -- Artık araçta değil: positional'a geç
+                    pcall(function() exports.xsound:Destroy(_musicId) end)
+                    if srcVeh and srcVeh ~= 0 and DoesEntityExist(srcVeh) then
+                        local c = GetEntityCoords(srcVeh)
+                        exports.xsound:PlayUrlPos(_musicId, _url, _vol, c, false, {
+                            maxDistance = _maxDist,
+                            rolloffFactor = 2.0,
+                            refDistance  = 1.0
+                        })
+                        remoteMusicTracks[_musicId] = { vehicleNetId = _netId, playerId = data.playerId }
+                    else
+                        remoteMusicTracks[_musicId] = nil
+                    end
+                    remoteIsPlaying = false
+                    remoteIsPaused  = false
+                    break
+                end
+                Wait(500)
+            end
+        end)
     elseif not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) then
         -- Araç yok: koordinata göre 3D ses
         if data.coords then
             exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, data.coords, false, {
                 maxDistance = data.maxDistance or 60.0,
-                rolloffFactor = 1.0,
-                refDistance = 5.0
+                rolloffFactor = 2.0,
+                refDistance  = 1.0
             })
             print(string.format('[SWX Speaker] Diğer oyuncunun müziği çalınıyor: Player=%s, Title=%s', 
                 data.playerId, data.title or 'Bilinmeyen'))
@@ -1399,8 +1428,8 @@ RegisterNetEvent('swx_speaker:client:syncMusic', function(data)
         local coords = GetEntityCoords(vehicle)
         exports.xsound:PlayUrlPos(musicId, data.url, data.volume or 0.6, coords, false, {
             maxDistance = data.maxDistance or 60.0,
-            rolloffFactor = 1.0,
-            refDistance = 5.0
+            rolloffFactor = 2.0,
+            refDistance  = 1.0
         })
         
         remoteMusicTracks[musicId] = {
