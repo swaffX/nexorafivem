@@ -243,26 +243,34 @@ RegisterNetEvent('swx_speaker:server:clearHistory', function()
     end
 end)
 
--- Müzik çalmayı yakındaki oyunculara bildir (xSound isNetworked desteği için)
-RegisterNetEvent('swx_speaker:server:playMusic', function(url, title, vehicleNetId, coords)
+-- Müzik çalmayı yakındaki oyunculara bildir
+RegisterNetEvent('swx_speaker:server:playMusic', function(url, title, vehicleNetId, coords, volume, maxDistance)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     
     if not Player then return end
     
-    -- Yakındaki tüm oyunculara müzik bilgisini gönder
-    -- Bu event xSound'un isNetworked özelliğini desteklemek için
     TriggerClientEvent('swx_speaker:client:syncMusic', -1, {
         playerId = src,
         url = url,
         title = title,
         vehicleNetId = vehicleNetId,
         coords = coords,
-        volume = 0.6,
-        maxDistance = 60.0
+        volume = volume or 0.6,
+        maxDistance = maxDistance or 60.0
     })
     
     print(string.format('[SWX Speaker Server] Müzik senkronize edildi: Player=%s, Title=%s', src, title or 'Bilinmeyen'))
+end)
+
+-- Ses/mesafe ayarı güncelleme
+RegisterNetEvent('swx_speaker:server:updateSettings', function(volume, maxDistance)
+    local src = source
+    TriggerClientEvent('swx_speaker:client:updateSettings', -1, {
+        playerId = src,
+        volume = volume or 0.6,
+        maxDistance = maxDistance or 60.0
+    })
 end)
 
 -- Müzik durdurmayı bildir
