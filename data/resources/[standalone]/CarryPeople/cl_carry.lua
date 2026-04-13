@@ -79,7 +79,7 @@ RegisterCommand("carry",function(source, args)
 	else
 		carry.InProgress = false
 		ClearPedSecondaryTask(PlayerPedId())
-		Detatity(PlayerPedId(), true, false)
+		DetachEntity(PlayerPedId(), true, false)
 		TriggerServerEvent("CarryPeople:stop",carry.targetSrc)
 		carry.targetSrc = 0
 	end
@@ -92,7 +92,7 @@ AddEventHandler("CarryPeople:syncTarget", function(targetSrc)
 	local targetPed = GetPlayerPed(GetPlayerFromServerId(targetSrc))
 	carry.InProgress = true
 	ensureAnimDict(carry.personCarried.animDict)
-	AttatityToEntity(PlayerPedId(), targetPed, 0, carry.personCarried.attachX, carry.personCarried.attachY, carry.personCarried.attachZ, 0.5, 0.5, 180, false, false, false, false, 2, false)
+	AttachEntityToEntity(PlayerPedId(), targetPed, 0, carry.personCarried.attachX, carry.personCarried.attachY, carry.personCarried.attachZ, 0.5, 0.5, 180, false, false, false, false, 2, false)
 	carry.type = "beingcarried"
 end)
 
@@ -100,7 +100,7 @@ RegisterNetEvent("CarryPeople:cl_stop")
 AddEventHandler("CarryPeople:cl_stop", function()
 	carry.InProgress = false
 	ClearPedSecondaryTask(PlayerPedId())
-	Detatity(PlayerPedId(), true, false)
+	DetachEntity(PlayerPedId(), true, false)
 end)
 
 Citizen.CreateThread(function()
